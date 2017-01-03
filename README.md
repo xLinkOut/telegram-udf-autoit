@@ -11,6 +11,9 @@ If you want to control a Telegram Bot in AutoIT, this UDF is for you!
 	* $BOT_TOKEN = AbCdFgH... (Token of your bot));
 4. Now you can use all the function provided in the file.
 
+_This UDF use curl to upload file to Telegram Server (like pictures, audios ecc); the library itself download the file if missing and use it in a temp folder_
+
+
 ## How to wait for incoming messages:
 
 To wait incoming messages you have to put the bot in Polling State, as this
