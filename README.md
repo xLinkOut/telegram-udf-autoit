@@ -1,4 +1,4 @@
-<img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="32"> # Telegram UDF fot AutoIT <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="32">
+# <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="32"> Telegram UDF fot AutoIT <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="32">
 
 > If you want to control a Telegram Bot in AutoIT, this UDF is for you! 
 
