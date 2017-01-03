@@ -40,7 +40,7 @@ The array returned by _Polling function contain:
 
 ### License:
 
- ** GPL v3.0 © **
+**GPL v3.0 ©**
 
 ### Legal:
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is an independent and unofficial. Use at your own risk.
