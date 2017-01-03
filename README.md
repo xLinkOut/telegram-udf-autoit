@@ -1,6 +1,6 @@
-# Telegram UDF fot AutoIT
+<img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="32"> # Telegram UDF fot AutoIT <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="32">
 
-If you want to control a Telegram Bot in AutoIT, this UDF is for you! 
+> If you want to control a Telegram Bot in AutoIT, this UDF is for you! 
 
 ## How it work:
 
@@ -14,7 +14,7 @@ If you want to control a Telegram Bot in AutoIT, this UDF is for you!
 _This UDF use curl to upload file to Telegram Server (like pictures, audios ecc); the library itself download the file if missing and use it in a temp folder_
 
 
-## How to wait for incoming messages:
+### How to wait for incoming messages:
 
 To wait incoming messages you have to put the bot in Polling State, as this
 ```autoit
@@ -30,14 +30,19 @@ The array returned by _Polling function contain:
 *	$msgData[2] = ChatID, use for interact with the user
 *	$msgData[3] = Text of the message
 	
-## Functions:
+### Functions:
 * **_InitBot:** _Initialize bot;_
 * **_Polling:** _Wait for incoming messages;_
 * **_GetUpdates:** _Get new messages from Telegram Server;_
 * **_GetMe:** _Get information about the bot;_
 * **_SendMsg:** _Send simple text message (support Markdown/HTML, Keyboard ecc..);_
 * **_ForwardMsg:** _Forward a message from a chat to another;_
-.
-.
-.
 
+### License:
+
+ ** GPL v3.0 © **
+
+### Legal:
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is an independent and unofficial. Use at your own risk.
+
+For support, just contact me! Enjoy 🎉
