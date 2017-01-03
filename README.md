@@ -5,15 +5,17 @@ If you want to control a Telegram Bot in AutoIT, this UDF is for you!
 ## How it work:
 
 1. Download "Telegram UDF.au3";
-2. Include it in your main script with: #include "Telegram UDF.au3";
-3. Initialize your bot **BEFORE** use Telegram function: _InitBot($BOT_ID,$BOT_TOKEN) (Where $BOT_ID = 12345678 (ID of your bot) and $BOT_TOKEN = AbCdFgH... (Token of your bot));
+2. Include it in your main script with: `#include "Telegram UDF.au3";`
+3. Initialize your bot **BEFORE** use Telegram function: `_InitBot($BOT_ID,$BOT_TOKEN)` , where:
+	* $BOT_ID = 12345678 (ID of your bot)
+	* $BOT_TOKEN = AbCdFgH... (Token of your bot));
 4. Now you can use all the function provided in the file.
 
 ## How to wait for incoming messages:
 
 To wait incoming messages you have to put the bot in Polling State, as this
 ```autoit
-While 1 ;Create a While to restart Polling after process a message
+While 1 ;Create a While to restart Polling after processed a message
 	$msgData = _Polling() ;_Polling function return an array with info about message
 	_SendMsg($msgData[2],$msgData[3]) ;Like Echo, send a message to the same user with the same text (see below)
 WEnd
