@@ -12,12 +12,12 @@ If you want to control a Telegram Bot in AutoIT, this UDF is for you!
 ## How to wait for incoming messages:
 
 To wait incoming messages you have to put the bot in Polling State, as this
-'''autoit
+```autoit
 While 1 ;Create a While to restart Polling after process a message
 	$msgData = _Polling() ;_Polling function return an array with info about message
-	_ArrayDisplay($msgData) ;use _ArrayDisplay function (included in Array.au3) to display the content of $msgData
+	_SendMsg($msgData[2],$msgData[3]) ;Like Echo, send a message to the same user with the same text (see below)
 WEnd
-'''
+```
 
 The array returned by _Polling function contain:
 *	$msgData[0] = Offset of the current update (used to 'switch' to next update)
