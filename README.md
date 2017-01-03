@@ -1,17 +1,17 @@
-# <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="32"> Telegram UDF fot AutoIT <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="32">
+# <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="16"> Telegram UDF fot AutoIT <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="16">
 
-> If you want to control a Telegram Bot in AutoIT, this UDF is for you! 
+> If you want to control your Telegram Bot with AutoIT, this UDF is for you! 
 
 ## How it work:
 
 1. Download "Telegram UDF.au3";
-2. Include it in your main script with: `#include "Telegram UDF.au3";`
-3. Initialize your bot **BEFORE** use Telegram function: `_InitBot($BOT_ID,$BOT_TOKEN)` , where:
+2. Include it in your main script: `#include "Telegram UDF.au3";`
+3. Initialize your bot **before** use other function: `_InitBot($BOT_ID,$BOT_TOKEN)` , where:
 	* $BOT_ID = 12345678 (ID of your bot)
 	* $BOT_TOKEN = AbCdFgH... (Token of your bot));
-4. Now you can use all the function provided in the file.
+4. Now you can use all the functions provided in the file.
 
-_This UDF use curl to upload file to Telegram Server (like pictures, audios ecc); the library itself download the file if missing and use it in a temp folder_
+_This UDF use cURL to upload file to Telegram Server (like pictures, audios ecc); the library itself download the file if missing and use it in a temp folder_
 
 
 ### How to wait for incoming messages:
