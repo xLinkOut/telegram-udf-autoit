@@ -1,6 +1,6 @@
 # Telegram UDF fot AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
 
-<img src="https://s24.postimg.org/xx8f8o0sl/Banner.png" align="middle">
+<img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png">
 
 > If you want to control your Telegram Bot with AutoIT, this UDF is for you! 
 
