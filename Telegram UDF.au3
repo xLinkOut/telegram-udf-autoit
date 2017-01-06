@@ -1,3 +1,21 @@
+#cs ------------------------------------------------------------------------------
+   UDF:
+	  Author		->	Luca aka LinkOut
+	  Description	->	Control Telegram Bot with AutoIT
+	  Language		->	English
+	  Status		->  Fully functional, but some functions are missing (like group function)
+
+   Documentation:
+	  Telegram API -> https://core.telegram.org/bots/api
+	  GitHub Page  -> https://github.com/xLinkOut/telegram-udf-autoit/
+
+   Author Information:
+	  GitHub	-> https://github.com/xLinkOut
+	  Telegram  -> https://t.me/LinkOut
+	  Instagram -> https://instagram.com/lucacirillo.jpg
+	  Email		-> mailto:luca.cirillo5@gmail.com
+#ce ------------------------------------------------------------------------------
+
 Global Const $HTTP_STATUS_OK = 200
 Global $BOT_ID = ""
 Global $TOKEN  = ""
@@ -6,16 +24,33 @@ Global $cURL   = @AppDataDir & "\curl.exe"
 Global $fOut   = @TempDir & "\telegramOutput.dat"
 Global $offset = 0
 
-; @INIT CHECK =======================================================================================
-If Not FileExists(@AppDataDir & "\curl.exe") Then
-   InetGet("https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw32_stc/curl-7.52.1/curl-7.52.1.zip",@AppDataDir & "\TelegramCurl.zip")
-   $oApp = ObjCreate("Shell.Application")
-   $hFolderitem = $oApp.NameSpace(@AppDataDir & "\TelegramCurl.zip\src\").Parsename("curl.exe")
-   $oApp.NameSpace(@AppDataDir).Copyhere($hFolderitem)
-   FileDelete(@AppDataDir & "\TelegramCurl.zip")
+#Region "@CURL CHECK"
+If Not FileExists($cURL) Then
+   $response = MsgBox(68,'cURL missing!',"This library need curl.exe to upload file to Telegram Server, otherwise functions like SendPhoto can't work." & @CRLF & _
+						     "To automatically download and locate cURL, press Yes." & @CRLF & _
+							 "Press No to download it by yourself; then put it wherever you want and update $cURL variable in the code to locate the .exe file")
+   If $response = 6 Then
+	  InetGet("https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw32_stc/curl-7.52.1/curl-7.52.1.zip",@AppDataDir & "\TelegramCurl.zip")
+	  $oApp = ObjCreate("Shell.Application")
+	  $hFolderitem = $oApp.NameSpace(@AppDataDir & "\TelegramCurl.zip\src\").Parsename("curl.exe")
+	  $oApp.NameSpace(@AppDataDir).Copyhere($hFolderitem)
+	  FileDelete(@AppDataDir & "\TelegramCurl.zip")
+	  MsgBox(64,'cURL','cURL is ready!')
+   ElseIf $response = 7 Then
+	  MsgBox(64,'cURL',"Ok, download curl.exe and don't forget to update $cURL var!" & @CRLF & _
+					   "Refer to this url -> https://curl.haxx.se/dlwiz/?type=bin")
+   EndIf
 EndIf
+#EndRegion
 
-; @BOT MAIN FUNCTION ================================================================================
+#Region "@BOT MAIN FUNCTION"
+#cs ===============================================================================
+   Function Name..:    	_InitBot()
+   Description....:	   	Initialize your Bot with BotID and Token
+   Parameter(s)...:    	$BotID - Your Bot ID (12345..)
+						$BotToken - Your Bot Token (AbCdEf...)
+   Return Value(s):	   	Return True
+#ce ===============================================================================
 Func _InitBot($BotID,$BotToken)
    $BOT_ID = $BotID
    $TOKEN  = $BotToken
@@ -23,6 +58,16 @@ Func _InitBot($BotID,$BotToken)
    Return True
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:    	_Polling()
+   Description....:     Wait for incoming messages from user
+   Parameter(s)...:     None
+   Return Value(s):		Return an array with information about messages:
+						   $msgData[0] = Offset of the current update (used to 'switch' to next update)
+						   $msgData[1] = Username of the user
+						   $msgData[2] = ChatID used to interact with the user
+						   $msgData[3] = Text of the message
+#ce ===============================================================================
 Func _Polling()
    While 1
 	  Sleep(1000) ;Prevent CPU Overloading
@@ -34,14 +79,39 @@ Func _Polling()
    WEnd
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:    	_GetUpdates()
+   Description....:     Used by _Polling() to get new messages
+   Parameter(s)...:     None
+   Return Value(s): 	Return string with information encoded in JSON format
+#ce ===============================================================================
 Func _GetUpdates()
    Return HttpGet($URL & "/getUpdates?offset=" & $offset)
 EndFunc ;==> _GetUpdates
 
+#cs ===============================================================================
+   Function Name..:    	_GetMe()
+   Description....:     Get information about the bot (like name, @botname...)
+   Parameter(s)...:     None
+   Return Value(s):		Return string with information encoded in JSON format
+#ce ===============================================================================
 Func _GetMe()
    Return HttpGet($URL & "/getMe")
 EndFunc ;==>_GetMe
 
+#cs ===============================================================================
+   Function Name..:		_SendMsg()
+   Description....:     Send simple text message
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Text: Text of the message
+						$ParseMode: Markdown/HTML (optional)- https://core.telegram.org/bots/api#sendmessage
+						$KeyboardMarkup: Custom Keyboards (optional) - https://core.telegram.org/bots/api#replykeyboardmarkup
+						$ResizeKeyboard: True/False (optional) - Requests clients to resize the keyboard vertically for optimal fit
+						$OneTimeKeyboard: True/False (optional) - Requests clients to hide the keyboard as soon as it's been used
+						$DisableWebPreview: True/False (optional) - Disables link previews for links in this message
+						$DisableNotification: True/False (optional) - Sends the message silently
+   Return Value(s):  	Return True (to debug, uncomment 'Return $Response')
+#ce ===============================================================================
 Func _SendMsg($ChatID, $Text, $ParseMode = Default, $KeyboardMarkup = Default, $ResizeKeyboard = False, $OneTimeKeyboard = False, $DisableWebPreview = False, $DisableNotification = False)
    Local $Query = $URL & "/sendMessage?chat_id=" & $ChatID &"&text=" & $Text
    If $ParseMode = "Markdown" Then $Query &= "&parse_mode=markdown"
@@ -56,6 +126,14 @@ Func _SendMsg($ChatID, $Text, $ParseMode = Default, $KeyboardMarkup = Default, $
    Return True
 EndFunc ;==> _SendMsg
 
+#cs ===============================================================================
+   Function Name..:		_ForwardMsg()
+   Description....:     Forward message from a chat to another
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$OriginalChatID: Unique identifier for the chat where the original message was sent
+						$MsgID: Message identifier in the chat specified in from_chat_id
+   Return Value(s):  	Return True (to debug, uncomment 'return $response')
+#ce ===============================================================================
 Func _ForwardMsg($ChatID, $OriginalChatID, $MsgID, $DisableNotification = False)
    Local $Query = $URL & "/forwardMessage?chat_id=" & $ChatID & "&from_chat_id=" & $OriginalChatID & "&message_id=" & $MsgID
    If $DisableNotification = True Then $Query &= "&disable_notification=True"
@@ -63,8 +141,17 @@ Func _ForwardMsg($ChatID, $OriginalChatID, $MsgID, $DisableNotification = False)
    ;Return $Response
    Return True
 EndFunc ;== _ForwardMsg
+#EndRegion
 
-; @SEND MEDIA FUNCTION ================================================================================
+#Region "@SEND MEDIA FUNCTION"
+#cs ===============================================================================
+   Function Name..:		_SendPhoto()
+   Description....:     Send a photo
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file
+						$Caption: Caption to send with photo (optional)
+   Return Value(s):  	Return File ID of the photo as string
+#ce ===============================================================================
 Func _SendPhoto($ChatID, $Path, $Caption = "")
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendPhoto' & ' -F chat_id=' & $ChatID
    If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
@@ -74,6 +161,14 @@ Func _SendPhoto($ChatID, $Path, $Caption = "")
   Return _GetFileID()
 EndFunc ;==> _SendPhoto
 
+#cs ===============================================================================
+   Function Name..:		_SendAudio()
+   Description....:     Send an audio
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file
+						$Caption: Caption to send with audio (optional)
+   Return Value(s):  	Return File ID of the audio as string
+#ce ===============================================================================
 Func _SendAudio($ChatID, $Path, $Caption = "")
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendAudio' & ' -F chat_id=' & $ChatID
    If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
@@ -83,6 +178,14 @@ Func _SendAudio($ChatID, $Path, $Caption = "")
    Return _GetFileID()
 EndFunc ;==> _SendAudio
 
+#cs ===============================================================================
+   Function Name..:		_SendVideo()
+   Description....:     Send a video
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file
+						$Caption: Caption to send with video (optional)
+   Return Value(s):  	Return File ID of the video as string
+#ce ===============================================================================
 Func _SendVideo($ChatID, $Path, $Caption = "")
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendVideo' & ' -F chat_id=' & $ChatID
    If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
@@ -92,6 +195,14 @@ Func _SendVideo($ChatID, $Path, $Caption = "")
    Return _GetFileID()
 EndFunc ;==> _SendVideo
 
+#cs ===============================================================================
+   Function Name..:		_SendDocument()
+   Description....:     Send a document
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file
+						$Caption: Caption to send with document (optional)
+   Return Value(s):  	Return File ID of the video as string
+#ce ===============================================================================
 Func _SendDocument($ChatID, $Path, $Caption = "")
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendDocument' & ' -F chat_id=' & $ChatID
    If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
@@ -101,6 +212,14 @@ Func _SendDocument($ChatID, $Path, $Caption = "")
    Return _GetFileID()
 EndFunc ;==> _SendDocument
 
+#cs ===============================================================================
+   Function Name..:		_SendVoice()
+   Description....:     Send a voice file
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file (format: .ogg)
+						$Caption: Caption to send with voice (optional)
+   Return Value(s):  	Return File ID of the video as string
+#ce ===============================================================================
 Func _SendVoice($ChatID, $Path, $Caption = "")
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendVoice' & ' -F chat_id=' & $ChatID
    If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
@@ -110,6 +229,13 @@ Func _SendVoice($ChatID, $Path, $Caption = "")
    Return _GetFileID()
 EndFunc ;==> _SendVoice
 
+#cs ===============================================================================
+   Function Name..:		_SendSticker()
+   Description....:     Send a sticker
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Path: Path to local file (format: .webp)
+   Return Value(s):  	Return File ID of the video as string
+#ce ===============================================================================
 Func _SendSticker($ChatID,$Path)
    Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendSticker' & ' -F chat_id=' & $ChatID
    $Query &= ' -F sticker="@' & $Path & '"'
@@ -118,26 +244,61 @@ Func _SendSticker($ChatID,$Path)
    Return _GetFileID()
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:		_SendChatAction()
+   Description....:     Display 'chat action' on specific chat (like Typing...)
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Action: Type of the action, can be: 'typing','upload_photo','upload_video','upload_audio',upload_document','find_location'
+   Return Value(s):  	Return True( (to debug uncomment 'Return $Response')
+#ce ===============================================================================
 Func _SendChatAction($ChatID, $Action)
-   ;typing ;upload_photo ;record_video ;upload_video ;record_audio ;upload_audio ;upload_document ; find_location
    Local $Query = $URL & "/sendChatAction?chat_id=" & $ChatID & "&action=" & $Action
    Local $Response = HttpPost($Query)
+   ;Return $Response
    Return True
 EndFunc ;==> _SendChatAction
 
+#cs ===============================================================================
+   Function Name..:		_SendLocation()
+   Description....:     Send a location
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Latitude: Latitute of location
+						$Longitude: Longitude of location
+   Return Value(s):  	Return True (to debug, uncomment 'Return $Response')
+#ce ===============================================================================
 Func _SendLocation($ChatID, $Latitude, $Longitude)
    Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
    Local $Response = HttpPost($Query)
+   ;Return $Response
    Return True
 EndFunc ;==> _SendLocation
 
+#cs ===============================================================================
+   Function Name..:		_SendContact()
+   Description....:     Send contact
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Phone: Phone number of the contact
+						$Name: Name of the contact
+   Return Value(s):  	Return True (to debug, uncomment 'Return $Response')
+#ce ===============================================================================
 Func _SendContact($ChatID,$Phone,$Name)
    Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $Name
    Local $Response = HttpPost($Query)
+   ;Return $Response
    Return True
 EndFunc ;==> _SendContact
+#EndRegion
 
-; @CHAT FUNCTION ======================================================================================
+#Region "@CHAT FUNCTION"
+#cs ===============================================================================
+   Function Name..:		_GetUserProfilePhotos()
+   Description....:     Get all the profile pictures of an user
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+						$Offset (optional): offset to use if you want to get a specific photo
+   Return Value(s):  	Return an array with count and fileIDs of the photos
+						$photoArray[0] = Integer, photo's count
+						$photoArray[1,2...] = FileID of the profile picture (use _DownloadFile to download file)
+#ce ===============================================================================
 Func _GetUserProfilePhotos($ChatID,$Offset = "")
    $Query = $URL & "/getUserProfilePhotos?user_id=" & $ChatID
    If $Offset <> "" Then $Query &= "&offset=" & $Offset
@@ -166,13 +327,26 @@ Func _GetUserProfilePhotos($ChatID,$Offset = "")
    Return $photoArray
 EndFunc ;==> _GetUserProfilePhotos
 
+#cs ===============================================================================
+   Function Name..:		_GetChat()
+   Description....:     Get basic information about chat, like username of the user, id of the user
+   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Return Value(s):  	Return string with information encoded in JSON format
+#ce ===============================================================================
 Func _GetChat($ChatID)
    Local $Query = $URL & "/getChat?chat_id=" & $ChatID
    Local $Response = HttpGet($Query)
    Return $Response
 EndFunc
+#EndRegion
 
-; @BACKGROUND FUNCTION ================================================================================
+#Region "@BACKGROUND FUNCTION"
+#cs ===============================================================================
+   Function Name..:		_GetFilePath()
+   Description....:     Get path of a specific file (specified by FileID) on Telegram Server
+   Parameter(s)...:     $FileID: Unique identifie for the file
+   Return Value(s):  	Return FilePath as String
+#ce ===============================================================================
 Func _GetFilePath($FileID)
    Local $Query = $URL & "/getFile?file_id=" & $FileID
    Local $Response = HttpPost($Query)
@@ -182,6 +356,12 @@ Func _GetFilePath($FileID)
    Return $FilePath
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:		_GetFileID()
+   Description....:     Get file ID of the last uploaded file
+   Parameter(s)...:     None
+   Return Value(s):  	Return FileID as String
+#ce ===============================================================================
 Func _GetFileID()
    Local $outputFile = FileOpen($fOut)
    Local $Output = FileRead($outputFile)
@@ -241,13 +421,26 @@ Func _GetFileID()
    EndIf
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:		_DownloadFile()
+   Description....:     Download and save locally a file from the Telegram Server by FilePath
+   Parameter(s)...:     $FilePath: Path of the file on Telegram Server
+   Return Value(s):  	Return True
+#ce ===============================================================================
 Func _DownloadFile($FilePath)
    Local $firstSplit = StringSplit($FilePath,'/')
    Local $fileName = $firstSplit[2]
    Local $Query = "https://api.telegram.org/file/bot" & $BOT_ID & ":" & $TOKEN & "/" & $FilePath
    InetGet($Query,$fileName)
+   Return True
 EndFunc
 
+#cs ===============================================================================
+   Function Name..:		_JSONDecode()
+   Description....:     Decode response from JSON format to array with information
+   Parameter(s)...:     JSON Response from HTTP request
+   Return Value(s):  	Return array with information about message
+#ce ===============================================================================
 Func _JSONDecode($JSONMsg)
    Local $firstSplit = StringSplit($JSONMsg,"update_id",1)
    Local $secondSplit = StringSplit($firstSplit[2], ",") ;1=BUFFER - 6=CHATID - 7=FIRSTNAME - 8=USERNAME - 9=TYPE - 10=DATE - 11=TEXT
@@ -294,7 +487,9 @@ Func _JSONDecode($JSONMsg)
    EndIf
    Return $dataArray
 EndFunc ;==> _JSONDecode
+#EndRegion
 
+#Region "@HTTP Request"
 Func HttpPost($sURL, $sData = "")
    Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
    $oHTTP.Open("POST", $sURL, False)
@@ -315,3 +510,4 @@ Func HttpGet($sURL, $sData = "")
    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3, 0, 0)
    Return SetError(0, 0, $oHTTP.ResponseText)
 EndFunc
+#EndRegion

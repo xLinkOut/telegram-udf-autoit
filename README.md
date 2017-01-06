@@ -1,4 +1,4 @@
-# Telegram UDF fot AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="24"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="24">
+# Telegram UDF fot AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
 
 > If you want to control your Telegram Bot with AutoIT, this UDF is for you! 
 
@@ -9,7 +9,7 @@
 3. Initialize your bot **before** use other function: `_InitBot(12345...,AbCdEfGh....)`
 4. Now you can use all the functions provided in the file.
 
-_This UDF use cURL to upload file to Telegram Server (like pictures, audios ecc); the library itself download the file if missing and use it in a temp folder_
+_This UDF use cURL to upload file to Telegram Server (like pictures, audios ecc): the library itself can download the file if missing, but if you don't trust you can download curl.exe by yourself and update $cURL variable that contain the path to the file._
 
 
 ### How to wait for incoming messages:
