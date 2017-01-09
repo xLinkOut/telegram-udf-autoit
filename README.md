@@ -16,7 +16,7 @@
 To wait incoming messages you have to put the bot in Polling State, as this
 
 ```autoit
-While 1 ;Create a While to restart Polling after processed a message
+While 1 ;Create a While to restart Polling after processing a message
 	$msgData = _Polling() ;_Polling function return an array with info about message
 	_SendMsg($msgData[2],$msgData[3]) ;Send a message to the same user with the same text
 WEnd
