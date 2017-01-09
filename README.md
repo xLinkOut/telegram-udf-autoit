@@ -11,9 +11,6 @@
 3. Initialize your bot **before** use other function: `_InitBot(12345...,AbCdEfGh....)`
 4. Now you can use all the functions provided in the file.
 
-_This UDF use cURL to upload file to Telegram Server (like pictures, audios ecc): the library itself can download the file if missing, but if you don't trust you can download curl.exe by yourself and update $cURL variable that contain the path to the file._
-
-
 ### How to wait for incoming messages:
 
 To wait incoming messages you have to put the bot in Polling State, as this
@@ -21,7 +18,7 @@ To wait incoming messages you have to put the bot in Polling State, as this
 ```autoit
 While 1 ;Create a While to restart Polling after processed a message
 	$msgData = _Polling() ;_Polling function return an array with info about message
-	_SendMsg($msgData[2],$msgData[3]) ;Like Echo, send a message to the same user with the same text (see below)
+	_SendMsg($msgData[2],$msgData[3]) ;Send a message to the same user with the same text
 WEnd
 ```
 
@@ -31,7 +28,7 @@ The array returned by _Polling function contain:
 *	$msgData[2] = ChatID, use for interact with the user
 *	$msgData[3] = Text of the message
 	
-### Functions:
+## Functions:
 * **_InitBot:** _Initialize bot (require BotID and BotTOKEN);_
 * **_Polling:** _Wait for incoming messages;_
 * **_GetUpdates:** _Get new messages from Telegram Server (Return a string);_
@@ -55,10 +52,22 @@ The array returned by _Polling function contain:
 * **_JSONDecode:** _Decode incoming message (Return an array with some information like chat ID ecc); _
 * **HttpPost and HttpGet:** _Helpful function to perform Get and Post request;_
 
-### License: GPL v3.0 ©
-Feel free to use this code, adapt it to your software; just mention this page if you share your software (free or paid).
+### Changelog:
+03/01/2016 - v1.0 - First Release.
+07/01/2016 - v1.1 - Added cURL prompt.
+09/01/2016 - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
+
+### Credits:
+Thanks to dragana-r (trancexx on AutoIT Forum) for WinHttp UDF: 
+	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/
+	https://github.com/dragana-r/autoit-winhttp
 
 ### Legal:
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is an independent and unofficial. Use at your own risk.
+**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
+
+### About:
+If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo
+I'll appreciate. Also, names of those who donated will be written in an **'Awesomes list'** (if you agree).
 
 For support, just contact me! Enjoy 🎉

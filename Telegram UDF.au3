@@ -1,66 +1,31 @@
-#cs------------------------------------------------------------------------------
-		 __          __              _               _
-		 \ \        / /             (_)             | |
-		  \ \  /\  / /_ _ _ __ _ __  _ _ __   __ _  | |
-		   \ \/  \/ / _` | '__| '_ \| | '_ \ / _` | | |
-		    \  /\  / (_| | |  | | | | | | | | (_| | |_|
-		     \/  \/ \__,_|_|  |_| |_|_|_| |_|\__, | (_)
-						      __/ |
-						     |___/
-
-	This version of the UDF use cURL to upload files to Telegram Servers
-	and require cURL.exe file. You can still use this version if you want,
-	or upgrade to v2.0 that use integrated Http functions and doesn't need cURL.
-#ce ------------------------------------------------------------------------------
-
 #cs ------------------------------------------------------------------------------
    UDF:
 	  Author		->	Luca aka LinkOut
 	  Description	->	Control Telegram Bot with AutoIT
 	  Language		->	English
-	  Status		->  Fully functional, but some functions are missing (like group function)
+	  Status		->	Fully functional, but some functions are missing (like group function)
 
    Documentation:
-	  Telegram API -> https://core.telegram.org/bots/api
-	  GitHub Page  -> https://github.com/xLinkOut/telegram-udf-autoit/
+	  Telegram API	->	https://core.telegram.org/bots/api
+	  GitHub Page	->	https://github.com/xLinkOut/telegram-udf-autoit/
 
    Author Information:
-	  GitHub	-> https://github.com/xLinkOut
-	  Telegram  -> https://t.me/LinkOut
-	  Instagram -> https://instagram.com/lucacirillo.jpg
-	  Email		-> mailto:luca.cirillo5@gmail.com
+	  GitHub	->	https://github.com/xLinkOut
+	  Telegram	->	https://t.me/LinkOut
+	  Instagram	->	https://instagram.com/lucacirillo.jpg
+	  Email		->	mailto:luca.cirillo5@gmail.com
+
+   Extra:
+	  WinHttp UDF provided by trancexx	->	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/
 #ce ------------------------------------------------------------------------------
 
-Global Const $HTTP_STATUS_OK = 200
+#include-once
+#include "WinHttp.au3"
+
 Global $BOT_ID = ""
 Global $TOKEN  = ""
 Global $URL	   = "https://api.telegram.org/bot"
-Global $cURL   = @AppDataDir & "\curl.exe"
-Global $fOut   = @TempDir & "\telegramOutput.dat"
 Global $offset = 0
-
-
-#Region "@CURL CHECK"
-   ;This UDF use cURL to upload file to Telegram Server (like pictures, audios ecc):
-   ;the library itself can download the file if missing, but if you don't trust you can download curl.exe by yourself
-   ;and update $cURL variable that contain the path to the file
-If Not FileExists($cURL) Then
-   $response = MsgBox(68,'cURL missing!',"This library need curl.exe to upload file to Telegram Server, otherwise functions like SendPhoto can't work." & @CRLF & _
-						     "To automatically download and locate cURL, press Yes." & @CRLF & _
-							 "Press No to download it by yourself; then put it wherever you want and update $cURL variable in the code to locate the .exe file")
-   If $response = 6 Then
-	  InetGet("https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw32_stc/curl-7.52.1/curl-7.52.1.zip",@AppDataDir & "\TelegramCurl.zip")
-	  $oApp = ObjCreate("Shell.Application")
-	  $hFolderitem = $oApp.NameSpace(@AppDataDir & "\TelegramCurl.zip\src\").Parsename("curl.exe")
-	  $oApp.NameSpace(@AppDataDir).Copyhere($hFolderitem)
-	  FileDelete(@AppDataDir & "\TelegramCurl.zip")
-	  MsgBox(64,'cURL','cURL is ready!')
-   ElseIf $response = 7 Then
-	  MsgBox(64,'cURL',"Ok, download curl.exe and don't forget to update $cURL var!" & @CRLF & _
-					   "Refer to this url -> https://curl.haxx.se/dlwiz/?type=bin")
-   EndIf
-EndIf
-#EndRegion
 
 #Region "@BOT MAIN FUNCTION"
 #cs ===============================================================================
@@ -172,12 +137,19 @@ EndFunc ;== _ForwardMsg
    Return Value(s):  	Return File ID of the photo as string
 #ce ===============================================================================
 Func _SendPhoto($ChatID, $Path, $Caption = "")
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendPhoto' & ' -F chat_id=' & $ChatID
-   If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
-   $Query &= ' -F photo="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE)
-   ProcessWaitClose($PID)
-  Return _GetFileID()
+   Local $Query = $URL & '/sendPhoto'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>' & _
+				  ' <input type="file" name="photo"/>'   & _
+				  ' <input type="text" name="caption"/>' & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id", $ChatID, _
+						"name:photo"  , $Path,   _
+						"name:caption", $Caption)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc ;==> _SendPhoto
 
 #cs ===============================================================================
@@ -189,12 +161,19 @@ EndFunc ;==> _SendPhoto
    Return Value(s):  	Return File ID of the audio as string
 #ce ===============================================================================
 Func _SendAudio($ChatID, $Path, $Caption = "")
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendAudio' & ' -F chat_id=' & $ChatID
-   If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
-   $Query &= ' -F audio="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE,0x2)
-   ProcessWaitClose($PID)
-   Return _GetFileID()
+   Local $Query = $URL & '/sendAudio'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>' & _
+				  ' <input type="file" name="audio"/>'   & _
+				  ' <input type="text" name="caption"/>' & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id", $ChatID, _
+						"name:audio"  , $Path,   _
+						"name:caption", $Caption)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc ;==> _SendAudio
 
 #cs ===============================================================================
@@ -206,12 +185,19 @@ EndFunc ;==> _SendAudio
    Return Value(s):  	Return File ID of the video as string
 #ce ===============================================================================
 Func _SendVideo($ChatID, $Path, $Caption = "")
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendVideo' & ' -F chat_id=' & $ChatID
-   If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
-   $Query &= ' -F video="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE)
-   ProcessWaitClose($PID)
-   Return _GetFileID()
+   Local $Query = $URL & '/sendVideo'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>' & _
+				  ' <input type="file" name="video"/>'   & _
+				  ' <input type="text" name="caption"/>' & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id", $ChatID, _
+						"name:video"  , $Path,   _
+						"name:caption", $Caption)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc ;==> _SendVideo
 
 #cs ===============================================================================
@@ -223,12 +209,19 @@ EndFunc ;==> _SendVideo
    Return Value(s):  	Return File ID of the video as string
 #ce ===============================================================================
 Func _SendDocument($ChatID, $Path, $Caption = "")
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendDocument' & ' -F chat_id=' & $ChatID
-   If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
-   $Query &= ' -F document="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE)
-   ProcessWaitClose($PID)
-   Return _GetFileID()
+   Local $Query = $URL & '/sendDocument'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>'  & _
+				  ' <input type="file" name="document"/>' & _
+				  ' <input type="text" name="caption"/>'  & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id",  $ChatID, _
+						"name:document", $Path,   _
+						"name:caption",  $Caption)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc ;==> _SendDocument
 
 #cs ===============================================================================
@@ -240,12 +233,19 @@ EndFunc ;==> _SendDocument
    Return Value(s):  	Return File ID of the video as string
 #ce ===============================================================================
 Func _SendVoice($ChatID, $Path, $Caption = "")
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendVoice' & ' -F chat_id=' & $ChatID
-   If $Caption <> "" Then $Query &= ' -F caption="' & $Caption & '" '
-   $Query &= ' -F voice="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE)
-   ProcessWaitClose($PID)
-   Return _GetFileID()
+   Local $Query = $URL & '/sendVoice'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>' & _
+				  ' <input type="file" name="voice"/>'   & _
+				  ' <input type="text" name="caption"/>' & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id", $ChatID, _
+						"name:voice"  , $Path,   _
+						"name:caption", $Caption)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc ;==> _SendVoice
 
 #cs ===============================================================================
@@ -256,11 +256,17 @@ EndFunc ;==> _SendVoice
    Return Value(s):  	Return File ID of the video as string
 #ce ===============================================================================
 Func _SendSticker($ChatID,$Path)
-   Local $Query = $cURL & ' --output "' & $fOut & '" -s -X POST ' & $URL & '/sendSticker' & ' -F chat_id=' & $ChatID
-   $Query &= ' -F sticker="@' & $Path & '"'
-   Local $PID = Run($Query, @ScriptDir, @SW_HIDE)
-   ProcessWaitClose($PID)
-   Return _GetFileID()
+   Local $Query = $URL & '/sendSticker'
+   Local $hOpen = _WinHttpOpen()
+   Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+				  ' <input type="text" name="chat_id"/>' & _
+				  ' <input type="file" name="sticker"/>'   & _
+			     '</form>'
+   Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
+						"name:chat_id", $ChatID, _
+						"name:sticker", $Path)
+   _WinHttpCloseHandle($hOpen)
+   Return _GetFileID($Response)
 EndFunc
 
 #cs ===============================================================================
@@ -268,7 +274,7 @@ EndFunc
    Description....:     Display 'chat action' on specific chat (like Typing...)
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$Action: Type of the action, can be: 'typing','upload_photo','upload_video','upload_audio',upload_document','find_location'
-   Return Value(s):  	Return True( (to debug uncomment 'Return $Response')
+   Return Value(s):  	Return True (to debug uncomment 'Return $Response')
 #ce ===============================================================================
 Func _SendChatAction($ChatID, $Action)
    Local $Query = $URL & "/sendChatAction?chat_id=" & $ChatID & "&action=" & $Action
@@ -334,7 +340,7 @@ Func _GetUserProfilePhotos($ChatID,$Offset = "")
    $photoArray[0] = $count
    $fileidPosition = 6
 
-   ;Get fileid for each photo
+   ;Get FileID for each photo
    For $i=1 to $count
 	  Local $secondSplit = StringSplit($firstSplit[$fileidPosition],',')
 	  Local $thirdSplit  = StringSplit($secondSplit[1],':')
@@ -378,15 +384,10 @@ EndFunc
 #cs ===============================================================================
    Function Name..:		_GetFileID()
    Description....:     Get file ID of the last uploaded file
-   Parameter(s)...:     None
+   Parameter(s)...:     $Output: Response from HTTP Request
    Return Value(s):  	Return FileID as String
 #ce ===============================================================================
-Func _GetFileID()
-   Local $outputFile = FileOpen($fOut)
-   Local $Output = FileRead($outputFile)
-   FileClose($outputFile)
-   FileDelete("output.dat")
-
+Func _GetFileID($Output)
    If StringInStr($Output,"photo",1) and StringInStr($Output,"width",1) Then
 	  Local $firstSplit  = StringSplit($Output,'[')
 	  Local $secondSplit = StringSplit($firstSplit[2],',')
@@ -396,9 +397,11 @@ Func _GetFileID()
       Return $FileID
 
    ElseIf StringInStr($Output,'audio":',1) And StringInStr($Output,'mime_type":"audio',1) Then
-	  Local $firstSplit = StringSplit($Output,':')
-	  Local $secondSplit = StringSplit($firstSplit[20],',')
-	  Local $FileID = StringTrimLeft($secondSplit[1],1)
+	  Local $firstSplit = StringSplit($Output,',')
+	  For $i=1 to $firstSplit[0]
+		 If StringInStr($firstSplit[$i],"file_id",1) Then Local $secondSplit = StringSplit($firstSplit[$i],':')
+	  Next
+	  Local $FileID = StringTrimLeft($secondSplit[2],1)
 	  $FileID = StringTrimRight($FileID,1)
 	  Return $FileID
 
