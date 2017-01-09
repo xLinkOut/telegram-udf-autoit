@@ -1,9 +1,14 @@
 # Telegram UDF fot AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
 
-<img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png">
+<p align="center">
+  <img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png"><br>
+</p>
 
-> If you want to control your Telegram Bot with AutoIT, this UDF is for you! 
-
+<p align="center">
+  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="24">
+  Telegram UDF is on the official AutoIT Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
+  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="24">
+ </p>
 ## How it work:
 
 1. Download "Telegram UDF.au3";
