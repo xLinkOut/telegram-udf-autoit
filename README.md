@@ -3,11 +3,13 @@
 <p align="center">
   <img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png"><br>
 </p>
-
 <p align="center">
-  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="24">
+<b>If you want to control your Telegram Bot with AutoIT, this library is for you!</b><br>
+</p>
+<p align="center">
+  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="20">
   Telegram UDF is on the official AutoIT Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
-  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="24">
+  <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="20">
  </p>
 ## How it work:
 
