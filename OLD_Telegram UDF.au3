@@ -1,3 +1,19 @@
+#cs------------------------------------------------------------------------------
+		 __          __              _               _ 
+		 \ \        / /             (_)             | |
+		  \ \  /\  / /_ _ _ __ _ __  _ _ __   __ _  | |
+		   \ \/  \/ / _` | '__| '_ \| | '_ \ / _` | | |
+		    \  /\  / (_| | |  | | | | | | | | (_| | |_|
+		     \/  \/ \__,_|_|  |_| |_|_|_| |_|\__, | (_)
+						      __/ |    
+						     |___/ 
+						     
+	This version of the UDF use cURL to upload files to Telegram Servers 
+	and require cURL.exe file. You can still use this version if you want,
+	or upgrade to v2.0 that use integrated Http functions and doesn't need cURL.
+#ce ------------------------------------------------------------------------------
+
+
 #cs ------------------------------------------------------------------------------
    UDF:
 	  Author		->	Luca aka LinkOut
