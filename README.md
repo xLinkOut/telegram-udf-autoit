@@ -49,25 +49,25 @@ The array returned by _Polling function contain:
 * **_GetFileID:** _Get FileID of a the file uploaded(Return a string);_
 * **_GetFilePath:** _Get the path of a specific file, require file ID (Return a string);_
 * **_DownloadFile:** _Download a file from the server, require file path (Return True);_
-* **_JSONDecode:** _Decode incoming message (Return an array with some information like chat ID ecc); _
+* **_JSONDecode:** _Decode incoming message (Return an array with some information like chat ID ecc);_
 * **HttpPost and HttpGet:** _Helpful function to perform Get and Post request;_
 
 ### Changelog:
-03/01/2016 - v1.0 - First Release.
-07/01/2016 - v1.1 - Added cURL prompt.
+03/01/2016 - v1.0 - First Release.  
+07/01/2016 - v1.1 - Added cURL prompt.  
 09/01/2016 - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
 
 ### Credits:
-Thanks to dragana-r (trancexx on AutoIT Forum) for WinHttp UDF: 
-	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/
+Thanks to dragana-r (trancexx on AutoIT Forum) for WinHttp UDF:  
+	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/  
 	https://github.com/dragana-r/autoit-winhttp
 
 ### Legal:
-**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
+**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).  
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
 
 ### About:
-If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo
-I'll appreciate. Also, names of those who donated will be written in an **'Awesomes list'** (if you agree).
+If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo  
+I'll appreciate. Also, names of those who donated will be written in an **'Awesome list'** (if you agree).
 
 For support, just contact me! Enjoy 🎉
