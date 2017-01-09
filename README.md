@@ -60,9 +60,9 @@ The array returned by _Polling function contain:
 * **HttpPost and HttpGet:** _Helpful function to perform Get and Post request;_
 
 ### Changelog:
-03/01/2016 - v1.0 - First Release.  
-07/01/2016 - v1.1 - Added cURL prompt.  
-09/01/2016 - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
+_03/01/2016_ - v1.0 - First Release.  
+_07/01/2016_ - v1.1 - Added cURL prompt.  
+_09/01/2016_ - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
 
 ### Credits:
 Thanks to dragana-r (trancexx on AutoIT Forum) for WinHttp UDF:  
