@@ -1,4 +1,4 @@
-# Telegram UDF fot AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
+# Telegram UDF for AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
 
 <p align="center">
   <img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png"><br>
