@@ -1,14 +1,14 @@
-# Telegram UDF for AutoIT <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
+# Telegram UDF for AutoIt <img src="https://s30.postimg.org/h95ulyoap/telegram_icon.png" width="28"> <img src="https://s27.postimg.org/3oe3w5l4j/autoit_icon.png" width="28">
 
 <p align="center">
   <img src="https://s27.postimg.org/8nstpg3v7/Def_Banner.png"><br>
 </p>
 <p align="center">
-<b>If you want to control your Telegram Bot with AutoIT, this library is for you!</b><br>
+<b>If you want to control your Telegram Bot with AutoIt, this library is for you!</b><br>
 </p>
 <p align="center">
   <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="20">
-  Telegram UDF is on the official AutoIT Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
+  Telegram UDF is on the official AutoIt Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
   <img src="http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/star-icon.png" width="20">
  </p>
 ## How it work:
@@ -65,13 +65,13 @@ _07/01/2016_ - v1.1 - Added cURL prompt.
 _09/01/2016_ - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
 
 ### Credits:
-Thanks to dragana-r (trancexx on AutoIT Forum) for WinHttp UDF:  
+Thanks to dragana-r (trancexx on AutoIt Forum) for WinHttp UDF:  
 	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/  
 	https://github.com/dragana-r/autoit-winhttp
 
 ### Legal:
 **License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).  
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIT or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
 
 ### About:
 If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo  
