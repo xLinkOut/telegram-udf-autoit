@@ -16,7 +16,7 @@
 #cs ------------------------------------------------------------------------------
    UDF:
 	  Author		->	Luca aka LinkOut
-	  Description	->	Control Telegram Bot with AutoIT
+	  Description	->	Control Telegram Bot with AutoIt
 	  Language		->	English
 	  Status		->  Fully functional, but some functions are missing (like group function)
 
