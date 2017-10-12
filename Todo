@@ -1,0 +1,60 @@
+########################################### ########################################### ###########################################
+                📌 To Do                                     ⏳ Doing...                                 ✔️ Done!                
+########################################### ########################################### ###########################################
+  • Togliere le funzioni di Debug          #  •                                        #  •
+  • Messaggio di errore a _InitBot         #  •                                        #  •
+  • Cambiare tutti i $Json in $Response    #  •                                        #  •
+  • Togliere gli spazi tra i parametri     #  •                                        #  •
+  • Sistemare le indentazioni delle _Send  #  •                                        #  •
+  • Cambiare le "" in ''                   #  •                                        #  •
+  • Cambiare KeyboardMarkup in ReplyMarkup #  •                                        #  •
+  • Guida in _SendChatAction               #  •                                        #  •
+  • Aggiungere reply_to_message_id a tutto #  •                                        #  •
+  • Parametri aggiuntivi a _SendContact    #  •                                        #  •
+  • Smistare i messaggi in __MsgDecode     #  •                                        #  •  
+  • Implementare _SendVenue                #  •                                        #  •
+  • Implementare editMessageLiveLocation   #  •                                        #  •
+  • Implementare stopMessageLiveLocation   #  •                                        #  •
+  • Limit a GetUserProfilePhotos           #  •                                        #  •
+  • Implementare kickChatMember            #  •                                        #  •
+  • Implementare unbanChatMember           #  •                                        #  •
+  • Implementare promoteChatMember         #  •                                        #  •
+  • Implementare exportChatInviteLink      #  •                                        #  •
+  • Implementare setChatPhoto              #  •                                        #  •
+  • Implementare deleteChatPhoto           #  •                                        #  •
+  • Implementare setChatTitle              #  •                                        #  •
+  • Implementare setChatDescription        #  •                                        #  •
+  • Implementare pinChatMessage            #  •                                        #  •
+  • Implementare unpinChatMessage          #  •                                        #  •
+  • Implementare leaveChat                 #  •                                        #  •
+  • Implementare getChatAdministrators     #  •                                        #  •
+  • Implementare getChatMembersCount       #  •                                        #  •
+  • Implementare getChatMember             #  •                                        #  •
+  • Implementare setChatStickerSet         #  •                                        #  •
+  • Implementare deleteChatStickerSet      #  •                                        #  •
+  • Implementare answerCallbackQuery       #  •                                        #  •
+  •                                        #  •                                        #  •
+  • Aggiungere i commenti                  #  •                                        #  •
+  • Scrivere la documentazione             #  •                                        #  •
+
+######################################################################################################################################
+   🐞 Bugs Tracker                                                               
+######################################################################################################################################
+    •
+    •
+    •
+    •
+    •
+    •
+    •
+    •
+
+
+######################################################################################################################################
+   ✏️ Notes                                                               
+######################################################################################################################################
+    •
+    •
+    •
+    •
+    •
