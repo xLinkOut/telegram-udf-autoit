@@ -2,18 +2,16 @@
 #include "include/WinHttp.au3"
 #include "include/JSON.au3"
 
-Global $TOKEN  = ""
+Global $TOKEN  = ''
 Global $URL	   = "https://api.telegram.org/bot"
 Global $Offset = 0
-Global $Debug = True
 
 #Region "@BOT MAIN FUNCTIONS"
 Func _InitBot($Token)
 	$TOKEN = $Token
 	$URL &= $Token
-    If($Debug) Then ConsoleWrite("Token: "&$Token&@CRLF)
     If(_GetMe() == False) Then
-        ConsoleWrite("Connection error: Token invalid/Webhook setted/Internet connection"&@CRLF)    
+        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..."&@CRLF)    
         Return SetError(1,0,False)
     Else
         Return True
@@ -44,7 +42,7 @@ Func _Polling()
     WEnd
 EndFunc ;==> _Polling
 
-Func _CreateKeyboard(ByRef $Keyboard, $Resize = False, $OneTime = False)
+Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
     Local $jsonKeyboard = '{"keyboard":['
@@ -71,210 +69,228 @@ EndFunc
 #EndRegion
 
 #Region "@SEND AND MEDIA FUNCTIONS"
-Func _SendMsg($ChatID, $Text, $ParseMode = Default, $KeyboardMarkup = Default, $DisableWebPreview = False, $DisableNotification = False)
+Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
     Local $Query = $URL & "/sendMessage?chat_id=" & $ChatID & "&text=" & $Text
     If StringLower($ParseMode) = "markdown" Then $Query &= "&parse_mode=markdown"
     If StringLower($ParseMode) = "html" Then $Query &= "&parse_mode=html"
     If $DisableWebPreview = True Then $Query &= "&disable_web_page_preview=True"
     If $DisableNotification = True Then $Query &= "&disable_notification=True"
-    If $KeyboardMarkup <> Default Then $Query &= "&reply_markup=" & $KeyboardMarkup    
-    Local $Response = Json_Decode(HttpPost($Query))
-	If Not (Json_IsObject($Response)) Then Return SetError(1,0,False) ;Check if json is valid
-    If Not (Json_Get($Response,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
-    Return Json_Get($Response,'[result][message_id]') ;Return message_id instead
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
+    Local $Json = Json_Decode(HttpPost($Query))
+	If Not (Json_IsObject($Json)) Then Return SetError(1,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
+    Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
 EndFunc ;==> _SendMsg
 
-Func _ForwardMsg($ChatID, $OriginalChatID, $MsgID, $DisableNotification = False)
+Func _ForwardMsg($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
     Local $Query = $URL & "/forwardMessage?chat_id=" & $ChatID & "&from_chat_id=" & $OriginalChatID & "&message_id=" & $MsgID
     If $DisableNotification Then $Query &= "&disable_notification=True"
-    Local $Response = Json_Decode(HttpPost($Query))
-    If Not (Json_IsObject($Response)) Then Return SetError(1,0,False) ;Check if json is valid
-    If Not (Json_Get($Response,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Return Json_Get($Response,'[result][message_id]') ;Return message_id instead
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(1,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
 EndFunc ;==> _ForwardMsg
 
-Func _SendPhoto($ChatID, $Path, $Caption = "", $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendPhoto($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendPhoto'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="photo"/>'   & _
-                    ' <input type="text" name="caption"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="photo"/>'   & _
+                  '<input type="text" name="caption"/>'
+    If $ReplyMarkup <> Default Then $Form &= '<input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $DisableNotification Then $Form &= '<input type="text" name="disable_notification"/>'
     $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:photo"  , $Path,   _
-                        "name:caption", $Caption, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:photo"  , $Path,   _
+                       "name:caption", $Caption, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'photo')
 EndFunc ;==> _SendPhoto
 
-Func _SendVideo($ChatID, $Path, $Caption = "", $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendVideo($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendVideo'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="video"/>'   & _
-                    ' <input type="text" name="caption"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="video"/>'   & _
+                  '<input type="text" name="caption"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'   
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:video"  , $Path,   _
-                        "name:caption", $Caption, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:video"  , $Path,   _
+                       "name:caption", $Caption, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'video')
 EndFunc ;==> _SendVideo
 
-Func _SendAudio($ChatID, $Path, $Caption = "", $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendAudio($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendAudio'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="audio"/>'   & _
-                    ' <input type="text" name="caption"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="audio"/>'   & _
+                  '<input type="text" name="caption"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'   
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:audio"  , $Path,   _
-                        "name:caption", $Caption, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:audio"  , $Path,   _
+                       "name:caption", $Caption, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
+    _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'audio')
 EndFunc ;==> _SendAudio
 
-Func _SendDocument($ChatID, $Path, $Caption = "", $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendDocument($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendDocument'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>'  & _
-                    ' <input type="file" name="document"/>' & _
-                    ' <input type="text" name="caption"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>'  & _
+                  '<input type="file" name="document"/>' & _
+                  '<input type="text" name="caption"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'   
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id",  $ChatID, _
-                        "name:document", $Path,   _
-                        "name:caption",  $Caption, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id",  $ChatID, _
+                       "name:document", $Path,   _
+                       "name:caption",  $Caption, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'document')
 EndFunc ;==> _SendDocument
 
-Func _SendVoice($ChatID, $Path, $Caption = "", $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendVoice($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendVoice'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="voice"/>'   & _
-                    ' <input type="text" name="caption"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="voice"/>'   & _
+                  '<input type="text" name="caption"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:voice"  , $Path,   _
-                        "name:caption", $Caption, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:voice"  , $Path,   _
+                       "name:caption", $Caption, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'voice')
 EndFunc ;==> _SendVoice
 
-Func _SendSticker($ChatID,$Path, $KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendSticker'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="sticker"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="sticker"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:sticker", $Path, _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:sticker", $Path, _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'sticker')
 EndFunc
 
-Func _SendVideoNote($ChatID,$Path,$KeyboardMarkup = Default, $DisableNotification = False)
+Func _SendVideoNote($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendPhoto'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                    ' <input type="text" name="chat_id"/>' & _
-                    ' <input type="file" name="video_note"/>'
-    If $KeyboardMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="video_note"/>'
+    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form, $hOpen, Default, _
-                        "name:chat_id", $ChatID, _
-                        "name:video_note"  , $Path,   _
-                        "name:reply_markup", $KeyboardMarkup, _
-                        "name:disable_notification", $DisableNotification)
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:video_note"  , $Path,   _
+                       "name:reply_markup", $ReplyMarkup, _
+                       "name:reply_to_message_id", $ReplyToMessage, _
+                       "name:disable_notification", $DisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Return __GetFileID($Json,'videonote')
 EndFunc
 
-Func _SendChatAction($ChatID, $Action)
+Func _SendChatAction($ChatID,$Action)
 
     #cs 
-        typing for text messages, 
-        upload_photo for photos, 
-        record_video or upload_video for videos, 
-        record_audio or upload_audio for audio files, 
-        upload_document for general files, 
-        find_location for location data, 
-        record_video_note
-        upload_video_note for video notes.
+        Valid action for _SendChatAction:
+            typing for text messages,
+            upload_photo for photos,
+            record_video or upload_video for videos,
+            record_audio or upload_audio for audio files,
+            upload_document for general files,
+            find_location for location data,
+            record_video_note or upload_video_note for video notes.
     #ce
 
     Local $Query = $URL & "/sendChatAction?chat_id=" & $ChatID & "&action=" & $Action
-    Local $Response = Json_Decode(HttpPost($Query))
-    If Not (Json_IsObject($Response)) Then Return SetError(2,0,False) ;Check if json is valid
-    If Not (Json_Get($Response,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendChatAction
 
-Func _SendLocation($ChatID, $Latitude, $Longitude)
+Func _SendLocation($ChatID,$Latitude,$Longitude,$ReplyToMessage = '')
     Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
-    Local $Response = Json_Decode(HttpPost($Query))
-    If Not (Json_IsObject($Response)) Then Return SetError(2,0,False) ;Check if json is valid
-    If Not (Json_Get($Response,'[ok]') = 'true') Then Return SetError(2,0,False)
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendLocation
 
-Func _SendContact($ChatID,$Phone,$Name)
+Func _SendContact($ChatID,$Phone,$Name,$ReplyToMessage = '',)
     Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $Name
-    Local $Response = Json_Decode(HttpPost($Query))
-    If Not (Json_IsObject($Response)) Then Return SetError(2,0,False) ;Check if json is valid
-    If Not (Json_Get($Response,'[ok]') = 'true') Then Return SetError(2,0,False)
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendContact
 
@@ -282,9 +298,9 @@ EndFunc ;==> _SendContact
 
 #Region "@CHAT FUNCTIONS"
 
-Func _GetUserProfilePhotos($ChatID,$Offset = "")
+Func _GetUserProfilePhotos($ChatID,$Offset = '')
     $Query = $URL & "/getUserProfilePhotos?user_id=" & $ChatID
-    If $Offset <> "" Then $Query &= "&offset=" & $Offset
+    If $Offset <> '' Then $Query &= "&offset=" & $Offset
     Local $Json = Json_Decode(HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Local $count = Json_Get($Json,'[result][total_count]')
@@ -300,9 +316,9 @@ EndFunc ;==> _GetUserProfilePhotos
 
 Func _GetChat($ChatID)
    Local $Query = $URL & "/getChat?chat_id=" & $ChatID
-   Local $Response = HttpGet($Query)
-   ConsoleWrite($Response)
-   Return $Response
+   Local $Json = HttpGet($Query)
+   ConsoleWrite($Json)
+   Return $Json
 EndFunc
 
 #EndRegion
@@ -321,8 +337,8 @@ EndFunc
 
 Func __GetFilePath($FileID)
     Local $Query = $URL & "/getFile?file_id=" & $FileID
-    Local $Response = Json_Decode(HttpPost($Query))
-    Return Json_Get($Response,'[result][file_path]')
+    Local $Json = Json_Decode(HttpPost($Query))
+    Return Json_Get($Json,'[result][file_path]')
 EndFunc
 
 Func __DownloadFile($FilePath)
@@ -356,24 +372,24 @@ EndFunc ;==> _JSONDecode
 
 
 #Region "@HTTP Request"
-Func HttpPost($sURL, $sData = "")
+Func HttpPost($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
-    $oHTTP.Open("POST", $sURL, False)
-    If (@error) Then Return SetError(1, 0, 0)
-    $oHTTP.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    $oHTTP.Open("POST",$sURL,False)
+    If (@error) Then Return SetError(1,0,0)
+    $oHTTP.SetRequestHeader("Content-Type","application/x-www-form-urlencoded")
     $oHTTP.Send($sData)
-    If (@error) Then Return SetError(2, 0, 0)
-    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3, 0, 0)
-    Return SetError(0, 0, $oHTTP.ResponseText)
+    If (@error) Then Return SetError(2,0,0)
+    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3,0,0)
+    Return SetError(0,0,$oHTTP.ResponseText)
 EndFunc
 
-Func HttpGet($sURL, $sData = "")
+Func HttpGet($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
-    $oHTTP.Open("GET", $sURL & "?" & $sData, False)
-    If (@error) Then Return SetError(1, 0, 0)
+    $oHTTP.Open("GET",$sURL & "?" & $sData,False)
+    If (@error) Then Return SetError(1,0,0)
     $oHTTP.Send()
-    If (@error) Then Return SetError(2, 0, 0)
-    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3, 0, 0)
-    Return SetError(0, 0, $oHTTP.ResponseText)
+    If (@error) Then Return SetError(2,0,0)
+    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3,0,0)
+    Return SetError(0,0,$oHTTP.ResponseText)
 EndFunc
 #EndRegion
