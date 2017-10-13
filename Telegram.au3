@@ -285,9 +285,12 @@ Func _SendLocation($ChatID,$Latitude,$Longitude,$ReplyToMessage = '')
     Return True
 EndFunc ;==> _SendLocation
 
-Func _SendContact($ChatID,$Phone,$Name,$ReplyToMessage = '',)
+Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $Name
+    If $LastName <> '' Then $Query &= "&last_name=" & $LastName
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    If $DisableNotification = True Then $Query &= "&disable_notification=True"    
     Local $Json = Json_Decode(HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -364,8 +367,80 @@ Func __MsgDecode($Update)
         
         If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
         
+        ;Insert media recognition here
+        
         Return $msgData        
+    
+    ;@GROUP CHAT MESSAGE (Inlude left/new member events)
+    ElseIf(Json_Get($Json,'[result][0][message][chat][type]') = 'group') or (Json_Get($Json,'[result][0][message][chat][type]') = 'supergroup') Then
+        Local $msgData[10] = [ _
+            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+            Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
+            Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = User ID
+            Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
+            Json_Get($Json,'[result][0][message][from][first_name]'), _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][message][chat][id]'), _ ;[5] = Group ID
+            Json_Get($Json,'[result][0][message][chat][title]'), _ ;[6] = Group Name
+        ]
+
+        If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
+            $msgData[7] = 'left' ;[7] = Event
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = Left member ID
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
+        ElseIf(Json_Get($Json,'[result][0][message][new_chat_member]')) Then
+            $msgData[7] = 'new' ;[7] = Event
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = New member ID
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
+            $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
+        Else
+            $msgData[7] = Json_Get($Json,'[result][0][message][text]') ;[7] = Text
+        EndIf
+
+        Return $msgData
+
+    ;@CALLBACK QUERY 
+    ElseIf(Json_Get($Json,'[result][0][callback_query][id]') <> '') Then
+        Local $msgData[10] = [ _
+            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+            Json_Get($Json,'[result][0][callback_query][id]'), _ ;[1] = Callback ID
+            Json_Get($Json,'[result][0][callback_query][from][id]'), _ ;[2] = Chat ID
+            Json_Get($Json,'[result][0][callback_query][from][username]'), _ ;[3] = Username
+            Json_Get($Json,'[result][0][callback_query][from][first_name]') _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][callback_query][data]') _ ;[5] = Callback Data
+        ]
+
+        Return $msgData
+    
+    ;@INLINE QUERY
+    ElseIf(Json_Get($Json,'[result][0][inline_query][id]') <> '') Then
+        Local $msgData[10] = [ _
+            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+            Json_Get($Json,'[result][0][inline_query][id]'), _ ;[1] = Inline Query ID
+            Json_Get($Json,'[result][0][inline_query][from][id]'), _ ;[2] = Chat ID
+            Json_Get($Json,'[result][0][inline_query][from][username]'), _ ;[3] = Username
+            Json_Get($Json,'[result][0][inline_query][from][first_name]') _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][inline_query][query]') _ ;[5] = Inline Query Data
+        ]
+
+        Return $msgData
+    
+    ;@CHANNEL MESSAGE (Where bot is admin)
+    ElseIf(Json_Get($Json,'[result][0][channel_post][message_id]') <> '') Then
+        Local $msgData[10] = [ _
+            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+            Json_Get($Json,'[result][0][channel_post][message_id]'), _ ;[1] = Message ID
+            Json_Get($Json,'[result][0][channel_post][chat][id]'), _ ;[2] = Chat ID
+            Json_Get($Json,'[result][0][channel_post][chat][username]'), _ ;[3] = Username
+            Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[4] = Firstname
+        ]
+
+        If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
+
+        Return $msgData
+
     EndIf
+
 EndFunc ;==> _JSONDecode
 
 #EndRegion

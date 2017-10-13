@@ -5,13 +5,13 @@
   •                                        #  •                                        #  • Messaggio di errore a _InitBot
   •                                        #  •                                        #  • Cambiare tutti i $Json in $Response (Al contrario)
   •                                        #  •                                        #  • Togliere gli spazi tra i parametri
-  •   #  •                                        #  • Sistemare le indentazioni delle _Send
-  • Cambiare le "" in ''                   #  •                                        #  • 
-  • Cambiare KeyboardMarkup in ReplyMarkup #  •                                        #  • 
-  • Guida in _SendChatAction               #  •                                        #  • 
-  • Aggiungere reply_to_message_id a tutto #  •                                        #  • 
-  • Parametri aggiuntivi a _SendContact    #  •                                        #  • 
-  • Smistare i messaggi in __MsgDecode     #  •                                        #  •    
+  •                                        #  •                                        #  • Sistemare le indentazioni delle _Send
+  •                                        #  •                                        #  • Cambiare le "" in '' 
+  •                                        #  •                                        #  • Cambiare KeyboardMarkup in ReplyMarkup
+  •                                        #  •                                        #  • Guida in _SendChatAction
+  •                                        #  •                                        #  • Aggiungere reply_to_message_id a tutto
+  •                                        #  •                                        #  • Parametri aggiuntivi a _SendContact
+  •                                        #  •                                        #  • Smistare i messaggi in __MsgDecode
   • Implementare _SendVenue                #  •                                        #  • 
   • Implementare editMessageLiveLocation   #  •                                        #  • 
   • Implementare stopMessageLiveLocation   #  •                                        #  • 
