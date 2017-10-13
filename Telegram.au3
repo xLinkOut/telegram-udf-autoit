@@ -234,6 +234,18 @@ Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$Dis
     Return __GetFileID($Json,'sticker')
 EndFunc
 
+Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+    Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
+    If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare    
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    If $DisableNotification Then $Query &= "&disable_notification=true"    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
 Func _SendVideoNote($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendPhoto'
     Local $hOpen = _WinHttpOpen()
@@ -276,9 +288,12 @@ Func _SendChatAction($ChatID,$Action)
     Return True
 EndFunc ;==> _SendChatAction
 
-Func _SendLocation($ChatID,$Latitude,$Longitude,$ReplyToMessage = '')
+Func _SendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
+    If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod    
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    If $DisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -299,11 +314,30 @@ EndFunc ;==> _SendContact
 
 #EndRegion
 
-#Region "@CHAT FUNCTIONS"
+#Region "@MISC CHAT FUNCTIONS"
 
-Func _GetUserProfilePhotos($ChatID,$Offset = '')
+Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
+    $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude 
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup        
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
+    $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $ChatID
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
     $Query = $URL & "/getUserProfilePhotos?user_id=" & $ChatID
     If $Offset <> '' Then $Query &= "&offset=" & $Offset
+    If $Limit <> '' Then $Query &= "&limit=" & $Limit
     Local $Json = Json_Decode(HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     Local $count = Json_Get($Json,'[result][total_count]')
@@ -317,12 +351,111 @@ Func _GetUserProfilePhotos($ChatID,$Offset = '')
     Return $photoArray
 EndFunc ;==> _GetUserProfilePhotos
 
-Func _GetChat($ChatID)
-   Local $Query = $URL & "/getChat?chat_id=" & $ChatID
-   Local $Json = HttpGet($Query)
-   ConsoleWrite($Json)
-   Return $Json
+Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
+    $Query = $URL & "/kickChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
+    If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True    
 EndFunc
+
+Func _UnbanChatMember($ChatID,$UserID)
+    $Query = $URL & "/unbanChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True    
+EndFunc
+
+Func _ExportChatInviteLink($ChatID)
+    $Query = $URL & "/exportChatInviteLink?chat_id=" & $ChatID
+    Local $Json = Json_Decode(HttpGet($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return Json_Get($Json,'[result]')
+EndFunc
+
+Func _SetChatPhoto($ChatID,$Path)
+    Local $Query = $URL & '/setChatPhoto'
+    Local $hOpen = _WinHttpOpen()
+    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
+                  '<input type="text" name="chat_id"/>' & _
+                  '<input type="file" name="photo"/>'   & _
+                  '</form>'
+    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+                       "name:chat_id", $ChatID, _
+                       "name:photo"  , $Path,
+    _WinHttpCloseHandle($hOpen)
+    Local $Json = Json_Decode($Response)
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)    
+    Return True
+EndFunc
+
+Func _DeleteChatPhoto($ChatID)
+    $Query = $URL & "/deleteChatPhoto?chat_id=" & $ChatID
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _SetChatTitle($ChatID,$Title)
+    $Query = $URL & "/setChatTitle?chat_id=" & $ChatID & "&title=" & $Title
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _SetChatDescription($ChatID,$Description)
+    $Query = $URL & "/setChatDescription?chat_id=" & $ChatID & "&description=" & $Description
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
+    $Query = $URL & "/pinChatMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
+    If $DisableNotification Then $Query &= "&disable_notification=true"    
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _UnpinChatMessage($ChatID)
+    $Query = $URL & "/unpinChatMessage?chat_id=" & $ChatID
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _LeaveChat($ChatID)
+    $Query = $URL & "/leaveChat?chat_id=" & $ChatID
+    Local $Json = Json_Decode(HttpPost($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Return True
+EndFunc
+
+Func _GetChat($ChatID)
+    Local $Query = $URL & "/getChat?chat_id=" & $ChatID
+    Local $Json = Json_Decode(HttpGet($Query))
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
+    Local $chatData[4] = [ Json_Get($Json,'[result][id]'), _
+                           Json_Get($Json,'[result][username]'), _
+                           Json_Get($Json,'[result][first_name]'), _
+                           Json_Get($Json,'[result][photo][big_file_id]')]
+   Return $chatData
+EndFunc
+
+
+
 
 #EndRegion
 
@@ -441,7 +574,7 @@ Func __MsgDecode($Update)
 
     EndIf
 
-EndFunc ;==> _JSONDecode
+EndFunc ;==> __MsgDecode
 
 #EndRegion
 
