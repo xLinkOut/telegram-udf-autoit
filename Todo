@@ -12,26 +12,27 @@
   •                                        #  •                                        #  • Aggiungere reply_to_message_id a tutto
   •                                        #  •                                        #  • Parametri aggiuntivi a _SendContact
   •                                        #  •                                        #  • Smistare i messaggi in __MsgDecode
-  • Implementare _SendVenue                #  •                                        #  • 
-  • Implementare editMessageLiveLocation   #  •                                        #  • 
-  • Implementare stopMessageLiveLocation   #  •                                        #  • 
-  • Limit a GetUserProfilePhotos           #  •                                        #  • 
-  • Implementare kickChatMember            #  •                                        #  • 
-  • Implementare unbanChatMember           #  •                                        #  • 
+  •                                        #  •                                        #  • Implementare _SendVenue
+  •                                        #  •                                        #  • Implementare editMessageLiveLocation
+  •                                        #  •                                        #  • Implementare stopMessageLiveLocation
+  •                                        #  •                                        #  • Limit a GetUserProfilePhotos
+  •                                        #  •                                        #  • Implementare kickChatMember
+  •                                        #  •                                        #  • Implementare unbanChatMember 
+  • Implementare restrictChatMember        #  •                                        #  • 
   • Implementare promoteChatMember         #  •                                        #  • 
-  • Implementare exportChatInviteLink      #  •                                        #  • 
-  • Implementare setChatPhoto              #  •                                        #  • 
-  • Implementare deleteChatPhoto           #  •                                        #  • 
-  • Implementare setChatTitle              #  •                                        #  • 
-  • Implementare setChatDescription        #  •                                        #  • 
-  • Implementare pinChatMessage            #  •                                        #  • 
-  • Implementare unpinChatMessage          #  •                                        #  • 
-  • Implementare leaveChat                 #  •                                        #  • 
-  • Implementare getChatAdministrators     #  •                                        #  • 
-  • Implementare getChatMembersCount       #  •                                        #  • 
-  • Implementare getChatMember             #  •                                        #  • 
-  • Implementare setChatStickerSet         #  •                                        #  •
-  • Implementare deleteChatStickerSet      #  •                                        #  •
+  •                                        #  •                                        #  • Implementare exportChatInviteLink
+  •                                        #  •                                        #  • Implementare setChatPhoto 
+  •                                        #  •                                        #  • Implementare deleteChatPhoto 
+  •                                        #  •                                        #  • Implementare setChatTitle
+  •                                        #  •                                        #  • Implementare setChatDescription
+  •                                        #  •                                        #  • Implementare pinChatMessage 
+  •                                        #  •                                        #  • Implementare unpinChatMessage  
+  •                                        #  •                                        #  • Implementare leaveChat
+  •                                        #  •                                        #  • Implementare getChatAdministrators 
+  •                                        #  •                                        #  • Implementare getChatMembersCount  
+  •                                        #  •                                        #  • Implementare getChatMember 
+  •                                        #  •                                        #  • Implementare setChatStickerSet  
+  •                                        #  •                                        #  • Implementare deleteChatStickerSet 
   • Implementare answerCallbackQuery       #  •                                        #  •
   • Controllo per webhook                  #  •                                        #  •
   •                                        #  •                                        #  •

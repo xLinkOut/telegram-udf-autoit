@@ -32,35 +32,26 @@ ConsoleWrite("Sending audio..." & _SendVideo($ChatID,'C:\audio.mp3',"This is an 
 ConsoleWrite("Sending documents..." & _SendDocument($ChatID,'C:\text.txt',"This is a document.") & " ...Done!" & @CRLF)
 ConsoleWrite("Sending voice..." & _SendVoice($ChatID,'C:\voice.ogg',"This is a voice.") & " ...Done!" & @CRLF)
 ConsoleWrite("Sending sticker..." & _SendSticker($ChatID,'C:\sticker.webp',"This is a voice.") & " ...Done!" & @CRLF)
+ConsoleWrite("Sending video note..." & _SendVideoNote($ChatID,'C:\video.mp4') & " ...Done!" & @CRLF)
+
+ConsoleWrite("And also, send location and contact:" & @CRLF)
+ConsoleWrite("Sending location... " & _SendLocation($ChatID,"74.808889","-42.275391") & "...Done! " & @CRLF)
+ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","Josh","Doe") & "... Done!" @CRLF)
 
 ConsoleWrite("You can send a 'Chat Action', that mean the user see 'Bot is typing...' or 'Bot is sending a photo...'." & @CRLF)
 _SendChatAction($ChatID,'typing')
 
-ConsoleWrite("And also, send location and contact:" & @CRLF)
-ConsoleWrite("Sending location... " & _SendLocation($ChatID,"74.808889","-42.275391") & "...Done! " & @CRLF)
-ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","Josh") & "... Done!" @CRLF)
-;ConsoleWrite(_GetFilePath('AgADBAADBqoxG23F8FIpebM6YBBqcio-9RkABJXMl3YNNMAIbh4BAAEC'))
+ConsoleWrite("To use the custom keyboard, I wrote an useful function that contruct and encode the keyboard." & _
+             "You have to create an array e simply put in the text of your button. To line break, leave an array position empty." & _
+             "Example, try to pass this array $keyboard[4] = ['TopLeft','TopRight','','SecondRow'] to the _CreateKeyboard function, then send a message.")
 
-;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true}
-;_SendMsg(89966355,"Ciao",Default,'{"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]]}',True,True)
-;_ForwardMsg($ChatID,$ChatID,10729,True)
-;ConsoleWrite("Test _GetMe        -> "  & @TAB & _ArrayToString(_GetMe()) & @CRLF)
-#cs
-ConsoleWrite("Test _GetUpdates   -> "  & @TAB & _GetUpdates() & @CRLF)
+Local $keyboard[4] = ['TopLeft','TopRight','','SecondRow']
+Local $markup = _CreateKeyboard($keyboard)
+ConsoleWrite("In encoded format, the $keyboard look like " & $markup & @CRLF & _
+             "Well, now I'll send this keyboard to you as this: _SendMsg($ChatID,'This is the text',Default,$markup)" & @CRLF)
+_SendMsg($ChatID,'This is the text',Default,$markup)
+ConsoleWrite("_CreateKeyboard function accept two other boolean args, resize and one time keyboard, both false by default." & @CRLF)
 
-ConsoleWrite("Test _SendMsg      -> "  & @TAB & _SendMsg($ChatID,"Test _SendMsg") & @CRLF)
-ConsoleWrite("Test _ForwardMsg   -> "  & @TAB & _ForwardMsg($ChatID,$ChatID,'MsgID') & @CRLF)
+ConsoleWrite("Well.. this is all folks! For the other method read the Telegram Documentation and the Telegram.au3 file, it's commented ;) and see the others example in the folder." & @CRLF)
 
-ConsoleWrite("Test _GetUserProfilePhotos -> " & @TAB & _GetUserProfilePhotos($ChatID) & @CRLF)
-ConsoleWrite("Test _GetChat              -> " & @TAB & _GetChat($ChatID) & @CRLF)
-
-While 1
-   $msgData = _Polling()
-   _SendMsg($msgData[2],$msgData[3])
-WEnd
-#ce
-
-Local $Kb[7] = ["ciao","come","","stai","bene","","si"]
-Local $markup = _CreateKeyboard($Kb,True,False)
-ConsoleWrite($markup)
-_SendMsg($ChatID,'ciao',Default,$markup)
+ConsoleWrite("If you enjoy this UDF, star this repo on GitHub. This mean a lot for me. And if you want to donate me a coffe, there is a PayPal link in the ReadMe, I'll appreciate this. Bye <3")
