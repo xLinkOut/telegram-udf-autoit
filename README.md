@@ -62,8 +62,11 @@ I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-
 
 ### Changelog:
 _03/01/2016_ - v1.0 - First Release.
+
 _07/01/2016_ - v1.1 - Added cURL prompt.
+
 _09/01/2016_ - v2.0 - cURL no more needed, functions now use http api; fix minor bugs.
+
 _16/10/2017_ - v3.0 - Well, a lot of things: Full rewrite of the code; Finally a JSON Parser; _InitBot require only one string with the token, not ID and Token separatly; Added a Const for line break in message; More internal errors catch; All the functions return array or string of information, not JSON formatted; For custom keyboard use CreareKeybord function that return an already encoded keyboard, then pass it to the send function; Coming CreateInlineKeyboard as well; All function now check if everything is ok by reading the JSON and return false + set @error if not; SendMsg and ForwardMsg return the Message ID; All the Send function support optional param as reply\_markup, reply\_to\_message and disable\_notification; Added SendVenue and SendVideoNote; In-code wiki for SendChatAction; LivePeriod param for SendLocation function; LastName param for SendContact; AnswerCallbackQuery is now available; a lot of new (and also not finished) functions; JSONDecode now is MsgDecode and can return custom array if message came from a private chat, a group chat, from a channel, from an inline query or callback query. Finally, I'm not good with changelog.
 
 
