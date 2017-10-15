@@ -375,6 +375,7 @@ Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$Dis
     Return __GetFileID($Json,'sticker')
 EndFunc ;==> _SendSticker
 
+;@TODO Comment
 Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
     If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare    
