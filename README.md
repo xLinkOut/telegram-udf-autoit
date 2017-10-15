@@ -71,11 +71,11 @@ _16/10/2017_ - v3.0 - Well, a lot of things: Full rewrite of the code; Finally a
 
 
 ### Credits:
-Thanks to dragana-r (trancexx on AutoIt Forum) for WinHttp UDF:  
-	https://www.autoitscript.com/forum/topic/84133-winhttp-functions/  
-	https://github.com/dragana-r/autoit-winhttp
+Thanks to dragana-r (trancexx on AutoIt Forum) for WinHttp UDF: https://www.autoitscript.com/forum/topic/84133-winhttp-functions/ and https://github.com/dragana-r/autoit-winhttp
+
 Thanks to zserge for JSON UDF: http://zserge.com/jsmn.html
- and thanks to J2TeamM: https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include
+
+Thanks to J2TeamM: https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include
 
 
 ### Bots:
