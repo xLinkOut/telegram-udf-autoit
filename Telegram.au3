@@ -2,9 +2,13 @@
 #include "include/WinHttp.au3"
 #include "include/JSON.au3"
 
+;@GLOBAL
 Global $TOKEN  = ''
 Global $URL	   = "https://api.telegram.org/bot"
 Global $Offset = 0
+
+;@CONST
+Const $BOT_CRLF = __UrlEncode(@CRLF)
 
 #Region "@BOT MAIN FUNCTIONS"
 Func _InitBot($Token)
@@ -70,17 +74,6 @@ EndFunc ;==> _CreateKeyboard
 ;@TODO
 Func _CreateInlineKeyboard(ByRef $Keyboard)
     Local $jsonKeyboard = '{"inline_keyboard":[['
-    For $i=0 to UBound($Keyboard)-1
-        If($Keyboard[$i] <> '') Then
-            If(StringRight($jsonKeyboard,1) = '"') Then
-                $jsonKeyboard &= ',"'&$Keyboard[$i]&'"'
-            Else
-                $jsonKeyboard &= '["'&$Keyboard[$i]&'"'
-            EndIf
-        Else
-            $jsonKeyboard &= '],'
-        EndIf
-    Next
     Return $jsonKeyboard
 #EndRegion
 
