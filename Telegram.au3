@@ -23,6 +23,7 @@
 #include-once
 #include "include/WinHttp.au3"
 #include "include/JSON.au3"
+#include <String.au3>
 
 ;@GLOBAL
 Global $TOKEN  = ''
