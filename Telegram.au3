@@ -117,10 +117,12 @@ Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     Return $jsonKeyboard
 EndFunc ;==> _CreateKeyboard
 
-;@TODO
+;@TODO (Not use this, still wip)
 Func _CreateInlineKeyboard(ByRef $Keyboard)
     Local $jsonKeyboard = '{"inline_keyboard":[['
     Return $jsonKeyboard
+EndFunc
+
 #EndRegion
 
 #Region "@SEND AND MEDIA FUNCTIONS"
