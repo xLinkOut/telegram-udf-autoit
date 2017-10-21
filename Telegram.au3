@@ -779,7 +779,7 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
             Json_Get($Json,'[result][0][message][from][first_name]'), _ ;[4] = Firstname
             Json_Get($Json,'[result][0][message][chat][id]'), _ ;[5] = Group ID
-            Json_Get($Json,'[result][0][message][chat][title]'), _ ;[6] = Group Name
+            Json_Get($Json,'[result][0][message][chat][title]') _ ;[6] = Group Name
         ]
 
         If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
@@ -805,7 +805,7 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][callback_query][id]'), _ ;[1] = Callback ID
             Json_Get($Json,'[result][0][callback_query][from][id]'), _ ;[2] = Chat ID
             Json_Get($Json,'[result][0][callback_query][from][username]'), _ ;[3] = Username
-            Json_Get($Json,'[result][0][callback_query][from][first_name]') _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][callback_query][from][first_name]'), _ ;[4] = Firstname
             Json_Get($Json,'[result][0][callback_query][data]') _ ;[5] = Callback Data
         ]
 
@@ -818,7 +818,7 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][inline_query][id]'), _ ;[1] = Inline Query ID
             Json_Get($Json,'[result][0][inline_query][from][id]'), _ ;[2] = Chat ID
             Json_Get($Json,'[result][0][inline_query][from][username]'), _ ;[3] = Username
-            Json_Get($Json,'[result][0][inline_query][from][first_name]') _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][inline_query][from][first_name]'), _ ;[4] = Firstname
             Json_Get($Json,'[result][0][inline_query][query]') _ ;[5] = Inline Query Data
         ]
 
