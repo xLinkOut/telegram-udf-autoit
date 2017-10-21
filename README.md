@@ -37,8 +37,8 @@ WEnd
 For a simple text message, the array returned by _Polling() is:
 *	$msgData[0] = Offset of the current update (used to 'switch' to next update)
 *	$msgData[1] = Message ID
-*	$msgData[2] = Username of the user
-*	$msgData[3] = Chat ID, use for interact with the user
+*	$msgData[2] = Chat ID, use for interact with the user
+*	$msgData[3] = Username of the user
 *	$msgData[4] = First name of the user
 *	$msgData[5] = Text of the message
 	
@@ -52,7 +52,7 @@ I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-
 - [ ] Full message decode support
 - [ ] Write all the missing endpoints
 - [ ] Write all the missing comments
-- [ ] CreateInlineKeyboard function
+- [x] CreateInlineKeyboard function
 - [ ] Full Callback support
 - [ ] Full Inline support
 - [ ] Limit to GetUserProfilePicture

@@ -24,6 +24,7 @@
 #include "include/WinHttp.au3"
 #include "include/JSON.au3"
 #include <String.au3>
+#include <Array.au3>
 
 ;@GLOBAL
 Global $TOKEN  = ''
@@ -44,8 +45,9 @@ Func _InitBot($Token)
 	$TOKEN = $Token
 	$URL &= $Token
     If(_GetMe() == False) Then
-        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..."&@CRLF)    
-        Return SetError(1,0,False)
+        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..."&@CRLF)
+        Exit 1
+        ;Return SetError(1,0,False)
     Else
         Return True
     EndIf
@@ -86,13 +88,24 @@ Func _Polling()
     While 1
         Sleep(1000) ;Prevent CPU Overloading
         $newUpdates = _GetUpdates()
+        ConsoleWrite($newUpdates & @CRLF)
         If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
         $msgData = __MsgDecode($newUpdates)
         $Offset = $msgData[0] + 1
+        ConsoleWrite(_ArrayToString($msgData) & @CRLF)
         Return $msgData
     WEnd
 EndFunc ;==> _Polling
 
+#cs ===============================================================================
+   Function Name..:    	_CreateKeyboard
+   Description....:     Create and return a custom keyboard markup
+   Parameter(s)...:     $Keyboard: an array with the keyboard. Use an empty position for line break.
+                            Example: Local $Keyboard[4] = ['Top Left','Top Right','','Second Row']
+                        $Resize: Set true if you want to resize the buttons of the keyboard
+                        $OneTime: Set true if you want to use the keyboard once
+   Return Value(s):		Return custom markup as string, encoded in JSON
+#ce ===============================================================================
 Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
@@ -118,9 +131,36 @@ Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     Return $jsonKeyboard
 EndFunc ;==> _CreateKeyboard
 
-;@TODO (Not use this, still wip)
+#cs ===============================================================================
+   Function Name..:    	_CreateInlineKeyboard
+   Description....:     Create and return a custom inline keyboard markup
+   Parameter(s)...:     $Keyboard: an array with the keyboard. Use an empty position for line break.
+                            Example: Local $InlineKeyboard[5] = ['Button1_Text','Button1_Data','','Button2_Text','Button2_Data']
+   Return Value(s):		Return custom inline markup as string, encoded in JSON
+#ce ===============================================================================
 Func _CreateInlineKeyboard(ByRef $Keyboard)
+
+    ;reply_markup={"inline_keyboard":[[['text':'Yes','callback_data':'pressed_yes'],['text':'No','callback_data':'pressed_no']]]}
     Local $jsonKeyboard = '{"inline_keyboard":[['
+
+    For $i=0 to UBound($Keyboard)-1
+        If($Keyboard[$i] <> '') Then
+            If(StringRight($jsonKeyboard,2) = '[[') Then ;First button
+                $jsonKeyboard &= '{"text":"' & $Keyboard[$i] & '",'
+            ElseIf(StringRight($jsonKeyboard,2) = '",') Then ;CallbackData of a button
+                $jsonKeyboard &= '"callback_data":"' & $Keyboard[$i] & '"}'
+            ElseIf(StringRight($jsonKeyboard,2) = '"}') Then
+                $jsonKeyboard &= ',{"text":"' & $Keyboard[$i] & '",'
+            ElseIf(StringRight($jsonKeyboard,2) = '},') Then
+                $jsonKeyboard &= '{"text":"' & $Keyboard[$i] & '",'
+            EndIf
+        Else
+            $jsonKeyboard &= '},'
+        EndIf
+    Next
+
+    $jsonKeyboard &= ']]}'
+    
     Return $jsonKeyboard
 EndFunc
 
