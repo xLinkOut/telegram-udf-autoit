@@ -71,7 +71,7 @@ EndFunc ;==> _GetUpdates
 #ce ===============================================================================
 Func _GetMe()
 	Local $json = Json_Decode(__HttpGet($URL & "/getMe"))
-	If Not (Json_IsObject($json)) Then Return SetError(1,0,False) ;Check if json is valid    
+	If Not (Json_IsObject($json)) Then Return SetError(1,0,False) ;Check if json is valid
 	Local $data[3] = [Json_Get($json,'[result][id]'), _
 				   	  Json_Get($json,'[result][username]'), _
 			   		  Json_Get($json,'[result][first_name]')]
@@ -107,7 +107,7 @@ EndFunc ;==> _Polling
    Return Value(s):		Return custom markup as string, encoded in JSON
 #ce ===============================================================================
 Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
-    
+
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
     Local $jsonKeyboard = '{"keyboard":['
     For $i=0 to UBound($Keyboard)-1
@@ -160,7 +160,7 @@ Func _CreateInlineKeyboard(ByRef $Keyboard)
     Next
 
     $jsonKeyboard &= ']]}'
-    
+
     Return $jsonKeyboard
 EndFunc
 
@@ -186,7 +186,7 @@ Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyTo
     If $DisableWebPreview = True Then $Query &= "&disable_web_page_preview=True"
     If $DisableNotification = True Then $Query &= "&disable_notification=True"
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
 	If Not (Json_IsObject($Json)) Then Return SetError(1,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
@@ -216,7 +216,7 @@ EndFunc ;==> _ForwardMsg
    Description....:     Send a photo
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$Path: Path to a local file
-						$Caption (optional): Caption to send with photo 
+						$Caption (optional): Caption to send with photo
                         $ReplyMarkup (optional): Custom keyboard markup;
                         $ReplyToMessage (optional): If the message is a reply, ID of the original message
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
@@ -254,7 +254,7 @@ EndFunc ;==> _SendPhoto
 						$Caption (optional): Caption to send with video
                         $ReplyMarkup (optional): Custom keyboard markup;
                         $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound 
+                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the video as string
 #ce ===============================================================================
 Func _SendVideo($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
@@ -267,7 +267,7 @@ Func _SendVideo($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessa
     If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
     If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'   
+    $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
                        "name:chat_id", $ChatID, _
                        "name:video"  , $Path,   _
@@ -286,7 +286,7 @@ EndFunc ;==> _SendVideo
    Description....:     Send an audio
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$Path: Path to a local file
-						$Caption (optional): Caption to send with audio 
+						$Caption (optional): Caption to send with audio
                         $ReplyMarkup (optional): Custom keyboard markup;
                         $ReplyToMessage (optional): If the message is a reply, ID of the original message
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
@@ -302,7 +302,7 @@ Func _SendAudio($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessa
     If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
     If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'   
+    $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
                        "name:chat_id", $ChatID, _
                        "name:audio"  , $Path,   _
@@ -321,7 +321,7 @@ EndFunc ;==> _SendAudio
    Description....:     Send a document
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$Path: Path to a local file
-						$Caption (optional): Caption to send with document 
+						$Caption (optional): Caption to send with document
                         $ReplyMarkup (optional): Custom keyboard markup;
                         $ReplyToMessage (optional): If the message is a reply, ID of the original message
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
@@ -337,7 +337,7 @@ Func _SendDocument($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMe
     If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
     If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'   
+    $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
                        "name:chat_id",  $ChatID, _
                        "name:document", $Path,   _
@@ -421,10 +421,10 @@ EndFunc ;==> _SendSticker
 ;@TODO Comment
 Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
-    If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare    
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
-    If $DisableNotification Then $Query &= "&disable_notification=true"    
+    If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
+    If $DisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -489,9 +489,9 @@ EndFunc ;==> _SendChatAction
 #ce ===============================================================================
 Func _SendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
-    If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod    
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
+    If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
     If $DisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
@@ -514,9 +514,9 @@ EndFunc ;==> _SendLocation
 Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $FirstName
     If $LastName <> '' Then $Query &= "&last_name=" & $LastName
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage    
-    If $DisableNotification = True Then $Query &= "&disable_notification=True"    
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
+    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
+    If $DisableNotification = True Then $Query &= "&disable_notification=True"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -526,9 +526,9 @@ EndFunc ;==> _SendContact
 Func _answerCallbackQuery($CallbackID,$Text = '',$URL = '',$ShowAlert = False,$CacheTime = '')
     Local $Query = $URL & "/_answerCallbackQuery?callback_query_id=" & $CallbackID
     If $Text <> '' Then $Query &= "&text=" & $Text
-    If $URL <> '' Then $Query &= "&url=" & $URL    
-    If $ShowAlert Then $Query &= "&show_alert=true"    
-    If $CacheTime <> '' Then $Query &= "&cache_time=" & $CacheTime    
+    If $URL <> '' Then $Query &= "&url=" & $URL
+    If $ShowAlert Then $Query &= "&show_alert=true"
+    If $CacheTime <> '' Then $Query &= "&cache_time=" & $CacheTime
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -540,8 +540,8 @@ EndFunc ;==> _answerCallbackQuery
 #Region "@MISC CHAT FUNCTIONS"
 
 Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
-    $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude 
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup        
+    $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -550,7 +550,7 @@ EndFunc  ;==> _EditMessageLiveLocation
 
 Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
     $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $ChatID
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup    
+    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -584,11 +584,11 @@ EndFunc ;==> _GetUserProfilePhotos
 
 Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
     $Query = $URL & "/kickChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
-    If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate    
+    If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Return True    
+    Return True
 EndFunc ;==> _KickChatMember
 
 Func _UnbanChatMember($ChatID,$UserID)
@@ -596,7 +596,7 @@ Func _UnbanChatMember($ChatID,$UserID)
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Return True    
+    Return True
 EndFunc ;==> _UnbanChatMember
 
 Func _ExportChatInviteLink($ChatID)
@@ -620,7 +620,7 @@ Func _SetChatPhoto($ChatID,$Path)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
-    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)    
+    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SetChatPhoto
 
@@ -650,7 +650,7 @@ EndFunc ;==> _SetChatDescription
 
 Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
     $Query = $URL & "/pinChatMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
-    If $DisableNotification Then $Query &= "&disable_notification=true"    
+    If $DisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -792,53 +792,85 @@ EndFunc
    Return Value(s):  	Return an array with information about a message (check docs)
 #ce ===============================================================================
 Func __MsgDecode($Update)
-    Local $Json = Json_Decode($Update)
+   Local $Json = Json_Decode($Update)
 
-    ;@PRIVATE CHAT MESSAGE
-    If(Json_Get($Json,'[result][0][message][chat][type]') = 'private') Then
-        Local $msgData[10] = [ _
-            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
-            Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
-            Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = Chat ID
-            Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
-            Json_Get($Json,'[result][0][message][from][first_name]') _ ;[4] = Firstname
-        ] 
-        
-        If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
-        
+   ;@PRIVATE CHAT MESSAGE
+   If(Json_Get($Json,'[result][0][message][chat][type]') = 'private') Then
+ 	  Local $msgData[10] = [ _
+		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+		 Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
+		 Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = Chat ID
+		 Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
+		 Json_Get($Json,'[result][0][message][from][first_name]') _ ;[4] = Firstname
+	  ]
+
+      If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
+
+		 ;Insert media recognition here
+
+		 Return $msgData
+
+   ;@GROUP CHAT MESSAGE (Inlude left/new member events)
+   ElseIf(Json_Get($Json,'[result][0][message][chat][type]') = 'group') or (Json_Get($Json,'[result][0][message][chat][type]') = 'supergroup') Then
+      Local $msgData[10] = [ _
+         Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+         Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
+         Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = User ID
+         Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
+         Json_Get($Json,'[result][0][message][from][first_name]'), _ ;[4] = Firstname
+         Json_Get($Json,'[result][0][message][chat][id]'), _ ;[5] = Group ID
+         Json_Get($Json,'[result][0][message][chat][title]') _ ;[6] = Group Name
+      ]
+
+      If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
+         $msgData[7] = 'left' ;[7] = Event
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = Left member ID
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
+      ElseIf(Json_Get($Json,'[result][0][message][new_chat_member]')) Then
+         $msgData[7] = 'new' ;[7] = Event
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = New member ID
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
+         $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
+      Else
+         $msgData[7] = Json_Get($Json,'[result][0][message][text]') ;[7] = Text
+      EndIf
+
+      Return $msgData
+
+   ;@EDITED PRIVATE CHAT MESSAGE
+   ElseIf(Json_Get($Json,'[result][0][edited_message][chat][type]') = 'private') Then
+      Local $msgData[10] = [ _
+		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
+		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
+		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+	  ]
+
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+
         ;Insert media recognition here
-        
-        Return $msgData        
-    
-    ;@GROUP CHAT MESSAGE (Inlude left/new member events)
-    ElseIf(Json_Get($Json,'[result][0][message][chat][type]') = 'group') or (Json_Get($Json,'[result][0][message][chat][type]') = 'supergroup') Then
-        Local $msgData[10] = [ _
-            Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
-            Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
-            Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = User ID
-            Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
-            Json_Get($Json,'[result][0][message][from][first_name]'), _ ;[4] = Firstname
-            Json_Get($Json,'[result][0][message][chat][id]'), _ ;[5] = Group ID
-            Json_Get($Json,'[result][0][message][chat][title]') _ ;[6] = Group Name
-        ]
-
-        If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
-            $msgData[7] = 'left' ;[7] = Event
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = Left member ID
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
-        ElseIf(Json_Get($Json,'[result][0][message][new_chat_member]')) Then
-            $msgData[7] = 'new' ;[7] = Event
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = New member ID
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
-            $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
-        Else
-            $msgData[7] = Json_Get($Json,'[result][0][message][text]') ;[7] = Text
-        EndIf
 
         Return $msgData
 
-    ;@CALLBACK QUERY 
+;@EDITED GROUP CHAT MESSAGE
+   ElseIf(Json_Get($Json,'[result][0][edited_message][chat][type]') = 'group') Then
+      Local $msgData[10] = [ _
+		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
+		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
+		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+	  ]
+
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+
+        ;Insert media recognition here
+
+        Return $msgData
+
+    ;@CALLBACK QUERY
     ElseIf(Json_Get($Json,'[result][0][callback_query][id]') <> '') Then
         Local $msgData[10] = [ _
             Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
@@ -850,7 +882,7 @@ Func __MsgDecode($Update)
         ]
 
         Return $msgData
-    
+
     ;@INLINE QUERY
     ElseIf(Json_Get($Json,'[result][0][inline_query][id]') <> '') Then
         Local $msgData[10] = [ _
@@ -863,7 +895,7 @@ Func __MsgDecode($Update)
         ]
 
         Return $msgData
-    
+
     ;@CHANNEL MESSAGE (Where bot is admin)
     ElseIf(Json_Get($Json,'[result][0][channel_post][message_id]') <> '') Then
         Local $msgData[10] = [ _
@@ -878,6 +910,21 @@ Func __MsgDecode($Update)
 
         Return $msgData
 
+      ;@EDITED CHANNEL CHAT MESSAGE
+   ElseIf(Json_Get($Json,'[result][0][edited_channel_post][chat][type]') = 'channel') Then
+      Local $msgData[10] = [ _
+		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
+		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
+		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
+		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+	  ]
+
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+
+        ;Insert media recognition here
+
+        Return $msgData
     EndIf
 
 EndFunc ;==> __MsgDecode

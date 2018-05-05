@@ -41,7 +41,7 @@ For a simple text message, the array returned by _Polling() is:
 *	$msgData[3] = Username of the user
 *	$msgData[4] = First name of the user
 *	$msgData[5] = Text of the message
-	
+
 ## What you need to know:
 I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
 
@@ -77,16 +77,17 @@ Thanks to zserge for JSON UDF: http://zserge.com/jsmn.html
 
 Thanks to J2TeamM: https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include
 
+Thanks to Sergey Flakon for fixing issue #8: Edited message in private/group/channel cause crash
 
 ### Bots:
 If you have made a bot with this UDF, pm me and I'll insert the bot in this list, if you want. 🚀
 
 ### Legal:
-**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).  
+**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
 
 ### About:
-If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo  
+If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo
 I'll appreciate. Also, names of those who donated will be written in an **'Awesome list'** (if you agree).
 
 For support, just contact me! Enjoy 🎉
