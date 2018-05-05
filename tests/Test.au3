@@ -1,12 +1,12 @@
-#include "Telegram.au3"
+#include "../Telegram.au3"
 #include <Array.au3>
 
 ConsoleWrite("Test file for Telegram UDF by LinkOut. (https://github.com/xLinkOut)" & @CRLF & _
              "This file need a valid ChatID of a Telegram User to send messages to, and a valid bot's token given by BotFather.\n" & @CRLF & _
              "Insert this data in the source code" & @CRLF)
 
-Local $ChatID = ''
-Local $Token = ''
+Local $ChatID = '89966355'
+Local $Token = '298715981:AAFvduhRIq2KWPeN3h6ecluHC3P0RR4TKBc'
 
 If(($ChatID = '') or ($Token = '')) Then
     ConsoleWrite("Warning! ChatID or Token not specified!")
@@ -36,7 +36,7 @@ ConsoleWrite("Sending video note..." & _SendVideoNote($ChatID,'C:\video.mp4') & 
 
 ConsoleWrite("And also, send location and contact:" & @CRLF)
 ConsoleWrite("Sending location... " & _SendLocation($ChatID,"74.808889","-42.275391") & "...Done! " & @CRLF)
-ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","Josh","Doe") & "... Done!" @CRLF)
+ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","Josh","Doe") & "... Done!" & @CRLF)
 
 ConsoleWrite("You can send a 'Chat Action', that mean the user see 'Bot is typing...' or 'Bot is sending a photo...'." & @CRLF)
 _SendChatAction($ChatID,'typing')
