@@ -1,7 +1,7 @@
 #include "../Telegram.au3"
 
-$Token = '' ;Insert here your token
-$ChatID = '' ;Your Chat ID
+$Token = '' ;Token here
+$ChatID = '' ;Your ChatID here (take this from @MyTelegramID_bot)
 _InitBot($Token)
 
 ;Normal Keyboard

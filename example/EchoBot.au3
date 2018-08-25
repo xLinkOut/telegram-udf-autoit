@@ -2,7 +2,7 @@
 
 HotKeySet("{PAUSE}","_Exit") ;Press 'PAUSE' on your keyboard to force-exit the script
 
-$Token = '' ;Insert here your token
+$Token = '' ;Token here
 _InitBot($Token)
 
 While 1

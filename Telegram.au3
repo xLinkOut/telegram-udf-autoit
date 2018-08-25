@@ -10,8 +10,6 @@
 
    Author Information:
 		GitHub: https://github.com/xLinkOut
-		Telegram: https://t.me/LinkOut
-		Instagram: https://instagram.com/lucacirillo.jpg
 		Email: mailto:luca.cirillo5@gmail.com
 
    Extra:
@@ -44,7 +42,7 @@ Const $BOT_CRLF = __UrlEncode(@CRLF)
 Func _InitBot($Token)
 	$TOKEN = $Token
 	$URL &= $Token
-    If(_GetMe() == False) Then
+    If Not _GetMe() Then
         ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..."&@CRLF)
         Exit 1
         ;Return SetError(1,0,False)
@@ -107,7 +105,6 @@ EndFunc ;==> _Polling
    Return Value(s):		Return custom markup as string, encoded in JSON
 #ce ===============================================================================
 Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
-
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
     Local $jsonKeyboard = '{"keyboard":['
     For $i=0 to UBound($Keyboard)-1
@@ -122,12 +119,9 @@ Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
         EndIf
     Next
     $jsonKeyboard &= ']]'
-
     If $Resize = True Then $jsonKeyboard &= ',"resize_keyboard":true'
     If $OneTime = True Then $jsonKeyboard &= ',"one_time_keyboard":true'
-
     $jsonKeyboard &= '}'
-
     Return $jsonKeyboard
 EndFunc ;==> _CreateKeyboard
 
@@ -139,10 +133,8 @@ EndFunc ;==> _CreateKeyboard
    Return Value(s):		Return custom inline markup as string, encoded in JSON
 #ce ===============================================================================
 Func _CreateInlineKeyboard(ByRef $Keyboard)
-
     ;reply_markup={"inline_keyboard":[[['text':'Yes','callback_data':'pressed_yes'],['text':'No','callback_data':'pressed_no']]]}
     Local $jsonKeyboard = '{"inline_keyboard":[['
-
     For $i=0 to UBound($Keyboard)-1
         If($Keyboard[$i] <> '') Then
             If(StringRight($jsonKeyboard,2) = '[[') Then ;First button
@@ -158,9 +150,7 @@ Func _CreateInlineKeyboard(ByRef $Keyboard)
             $jsonKeyboard &= '},'
         EndIf
     Next
-
     $jsonKeyboard &= ']]}'
-
     Return $jsonKeyboard
 EndFunc
 
@@ -406,12 +396,13 @@ Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$Dis
     If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
     If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
+   Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
                        "name:chat_id", $ChatID, _
                        "name:sticker", $Path, _
                        "name:reply_markup", $ReplyMarkup, _
                        "name:reply_to_message_id", $ReplyToMessage, _
                        "name:disable_notification", $DisableNotification)
+
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
@@ -432,7 +423,7 @@ Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$R
 EndFunc ;==> _SendVenue
 
 Func _SendVideoNote($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
-    Local $Query = $URL & '/sendPhoto'
+    Local $Query = $URL & '/sendVideoNote'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
@@ -733,13 +724,21 @@ EndFunc ;==> _deleteChatStickerSet
    Return Value(s):  	Return the File ID as a string
 #ce ===============================================================================
 Func __GetFileID(ByRef $Json,$type)
-    If($type = 'photo') Then Return Json_Get($Json,'[result][photo][2][file_id]')
-    If($type = 'video') Then Return Json_Get($Json,'[result][video][file_id]')
+
+    ;If($type = 'photo') Then Return Json_Get($Json,'[result][photo][0][file_id]')
+    If($type = 'photo') Then
+	  If(Json_Get($Json,'[result][photo][3][file_id]')) Then Return Json_Get($Json,'[result][photo][3][file_id]')
+	  If(Json_Get($Json,'[result][photo][2][file_id]')) Then Return Json_Get($Json,'[result][photo][2][file_id]')
+	  If(Json_Get($Json,'[result][photo][1][file_id]')) Then Return Json_Get($Json,'[result][photo][1][file_id]')
+	  If(Json_Get($Json,'[result][photo][0][file_id]')) Then Return Json_Get($Json,'[result][photo][0][file_id]')
+	EndIf
+
+	If($type = 'video') Then Return Json_Get($Json,'[result][animation][file_id]')
     If($type = 'audio') Then Return Json_Get($Json,'[result][audio][file_id]')
     If($type = 'document') Then Return Json_Get($Json,'[result][document][file_id]')
     If($type = 'voice') Then Return Json_Get($Json,'[result][voice][file_id]')
     If($type = 'sticker') Then Return Json_Get($Json,'[result][sticker][file_id]')
-    If($type = 'videonote') Then Return Json_Get($Json,'[result][video_note][file_id]')
+    If($type = 'videonote') Then Return Json_Get($Json,'[result][document][file_id]')
 EndFunc ;==> __GetFileID
 
 #cs ===============================================================================
