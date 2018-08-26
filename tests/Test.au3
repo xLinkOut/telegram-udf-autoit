@@ -24,7 +24,6 @@ ConsoleWrite(@TAB & "Sending a simple text message. The function _SendMsg return
 $MsgID = _SendMsg($ChatID,"Hi! I'm " & $myData[2] & " :)")
 ConsoleWrite($MsgID & @CRLF)
 ConsoleWrite(@TAB & "Now I'll forward the same message to you, with the message id saved before: " & _ForwardMsg($ChatID,$ChatID,$MsgID) & @CRLF)
-Exit 1
 ConsoleWrite(@TAB & "Awesome. Now use the other _Send function to send photos, videos, documents and other. Each of this function return the FileID assigned by Telegram." & @CRLF)
 ConsoleWrite("!" & @TAB & @TAB & "Sending photo... " & _SendPhoto($ChatID,'media/image.png',"This is a photo.") & @CRLF)
 ConsoleWrite("!" & @TAB & @TAB & "Sending video... " & _SendVideo($ChatID,'media/video.mp4',"This is a video.") & @CRLF)
