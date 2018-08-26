@@ -2,8 +2,8 @@
 #include <Array.au3>
 
 ConsoleWrite("Test file for Telegram UDF by LinkOut. (https://github.com/xLinkOut)" & @CRLF & _
-             "This file need a valid ChatID of a Telegram User to send messages to, and a valid bot's token given by BotFather.\n" & @CRLF & _
-             "Insert this data in the source code" & @CRLF)
+             "This file need a valid ChatID of a Telegram User to send messages to, and a valid bot's token given by BotFather." & @CRLF & _
+             "Insert this data in the source code." & @CRLF)
 
 Local $ChatID = '' ;Your ChatID here (take this from @MyTelegramID_bot)
 Local $Token = '' ;Token here
@@ -15,15 +15,16 @@ EndIf
 
 ConsoleWrite("Initializing bot... " & _InitBot($Token) & @CRLF)
 
-ConsoleWrite("Who am I? Well..." & @CRLF)
+ConsoleWrite("Who am I?" & @CRLF)
 Local $myData = _GetMe()
 ConsoleWrite("Oh, yeah, my name is " & $myData[2] & ", you can find me at @" & $myData[1] & ". For developers, my Telegram ID is " & $myData[0] & ". That's it!" & @CRLF)
 
 ConsoleWrite("Let's do some test:" & @CRLF)
 ConsoleWrite(@TAB & "Sending a simple text message. The function _SendMsg return the Message ID: ")
-ConsoleWrite(_SendMsg($ChatID,"Hi! I'm " & $myData[2] & " :)") & @CRLF)
-ConsoleWrite(@TAB & "Now I'll forward the same message to you, with the message id saved before." & _ForwardMsg($ChatID,$ChatID,$MsgID) & @CRLF)
-
+$MsgID = _SendMsg($ChatID,"Hi! I'm " & $myData[2] & " :)")
+ConsoleWrite($MsgID & @CRLF)
+ConsoleWrite(@TAB & "Now I'll forward the same message to you, with the message id saved before: " & _ForwardMsg($ChatID,$ChatID,$MsgID) & @CRLF)
+Exit 1
 ConsoleWrite(@TAB & "Awesome. Now use the other _Send function to send photos, videos, documents and other. Each of this function return the FileID assigned by Telegram." & @CRLF)
 ConsoleWrite("!" & @TAB & @TAB & "Sending photo... " & _SendPhoto($ChatID,'media/image.png',"This is a photo.") & @CRLF)
 ConsoleWrite("!" & @TAB & @TAB & "Sending video... " & _SendVideo($ChatID,'media/video.mp4',"This is a video.") & @CRLF)
@@ -34,8 +35,8 @@ ConsoleWrite("!" & @TAB & @TAB & "Sending sticker... " & _SendSticker($ChatID,'m
 ConsoleWrite("!" & @TAB & @TAB & "Sending video note... " & _SendVideoNote($ChatID,'media/video.mp4') & @CRLF)
 
 ConsoleWrite("And also, send location and contact:" & @CRLF)
-ConsoleWrite("Sending location... " & _SendLocation($ChatID,"74.808889","-42.275391") & "...Done! " & @CRLF)
-ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","John","Doe") & "... Done!" & @CRLF)
+ConsoleWrite("Sending location... " & _SendLocation($ChatID,"74.808889","-42.275391") & @CRLF)
+ConsoleWrite("Sending contact... "& _SendContact($ChatID,"0123456789","John","Doe") & @CRLF)
 
 ConsoleWrite("You can send a 'Chat Action', that mean the user see 'Bot is typing...' or 'Bot is sending a photo...'." & @CRLF)
 _SendChatAction($ChatID,'typing')

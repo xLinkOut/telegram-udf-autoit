@@ -42,8 +42,8 @@ Const $BOT_CRLF = __UrlEncode(@CRLF)
 Func _InitBot($Token)
 	$TOKEN = $Token
 	$URL &= $Token
-    If Not _GetMe() Then
-        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..."&@CRLF)
+    If Not IsArray(_GetMe()) Then
+        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
         Exit 1
         ;Return SetError(1,0,False)
     Else
@@ -607,7 +607,7 @@ Func _SetChatPhoto($ChatID,$Path)
                   '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
                        "name:chat_id", $ChatID, _
-                       "name:photo"  , $Path,
+                       "name:photo"  , $Path)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
