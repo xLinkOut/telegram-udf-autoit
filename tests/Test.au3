@@ -1,12 +1,12 @@
 #include "../Telegram.au3"
 #include <Array.au3>
 
-ConsoleWrite("Test file for Telegram UDF by LinkOut. (https://github.com/xLinkOut)" & @CRLF & _
-             "This file need a valid ChatID of a Telegram User to send messages to and a valid bot token given by BotFather." & @CRLF & _
+ConsoleWrite("Test file for Telegram UDF (https://github.com/xLinkOut/telegram-udf-autoit)." & @CRLF & _
+             "This file need a valid ChatID of a Telegram user who has already sent at least a message to the bot, and a valid token given by @BotFather." & @CRLF & _
              "Insert this data in the source code." & @CRLF & @CRLF)
 
 Local $ChatID = '' ;Your ChatID here (take this from @MyTelegramID_bot)
-Local $Token = '' ;Token here
+Local $Token  = '' ;Token here
 
 If(($ChatID = '') or ($Token = '')) Then
     ConsoleWrite("Warning! ChatID or Token not specified!")
