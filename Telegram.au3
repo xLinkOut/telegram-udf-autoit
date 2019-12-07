@@ -25,6 +25,7 @@ Global $Offset = 0
 
 ;@CONST
 Const $BOT_CRLF = __UrlEncode(@CRLF)
+Const $INVALID_TOKEN_ERROR = 1
 
 #Region "@BOT MAIN FUNCTIONS"
 #cs ===============================================================================
@@ -35,14 +36,15 @@ Const $BOT_CRLF = __UrlEncode(@CRLF)
 #ce ===============================================================================
 Func _InitBot($Token)
 	$TOKEN = $Token
-	$URL &= $Token
-    If Not IsArray(_GetMe()) Then
-        ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
-        Exit 1
-        ;Return SetError(1,0,False)
-    Else
+    $URL  &= $TOKEN
+
+    If IsArray(_GetMe()) Then
         Return True
+    Else
+        ;ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
+        Return SetError($INVALID_TOKEN_ERROR,0,False)
     EndIf
+
 EndFunc ;==> _InitBot
 
 #cs ===============================================================================
