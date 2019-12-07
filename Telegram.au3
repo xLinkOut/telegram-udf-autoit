@@ -139,11 +139,12 @@ Func _CreateInlineKeyboard(ByRef $Keyboard)
                 $jsonKeyboard &= '"callback_data":"' & $Keyboard[$i] & '"}'
             ElseIf(StringRight($jsonKeyboard,2) = '"}') Then
                 $jsonKeyboard &= ',{"text":"' & $Keyboard[$i] & '",'
-            ElseIf(StringRight($jsonKeyboard,2) = '},') Then
-                $jsonKeyboard &= '{"text":"' & $Keyboard[$i] & '",'
+            ElseIf(StringRight($jsonKeyboard,2) = '],') Then
+                $jsonKeyboard &= '[{"text":"' & $Keyboard[$i] & '",'
             EndIf
+            
         Else
-            $jsonKeyboard &= '},'
+            $jsonKeyboard &= '],'
         EndIf
     Next
     $jsonKeyboard &= ']]}'
