@@ -1,4 +1,4 @@
-#include "../Telegram.au3"
+#include "../src/Telegram.au3"
 #include <Array.au3>
 
 ConsoleWrite("Test file for Telegram UDF (https://github.com/xLinkOut/telegram-udf-autoit)." & @CRLF & _

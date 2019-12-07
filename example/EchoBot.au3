@@ -1,8 +1,8 @@
-#include "../Telegram.au3"
+#include "../src/Telegram.au3"
 
 HotKeySet("{PAUSE}","_Exit") ;Press 'PAUSE' on your keyboard to force-exit the script
 
-$Token = '' ;Token here
+$Token = "" ;Token here
 _InitBot($Token)
 
 While 1

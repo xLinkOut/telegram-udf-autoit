@@ -1,4 +1,4 @@
-#include "../Telegram.au3"
+#include "../src/Telegram.au3"
 
 $Token  = "" ;Token here
 $ChatID = "" ;Your ChatID here (take this from @MyTelegramID_bot)
