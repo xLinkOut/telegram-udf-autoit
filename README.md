@@ -1,4 +1,4 @@
-# Telegram UDFs for AutoIt <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/telegram_icon.png" width="28"> <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/autoit_icon.png" width="28">
+# Telegram UDFs for AutoIt <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/telegram_icon.png" width="28"> <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/autoit_icon.png" width="28">
 
 <p align="center">
   <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/banner.png"><br>
@@ -14,7 +14,7 @@
 
 ## Setup
 _Telegram.au3_ is the main file that you have to include in your code, but it also need the _include_ folder. Adjust the path as you want. Include the library in your script with `#include "Telegram.au3"`
-**First**, initialize your bot with `_InitBot(12345678:AbCdEfGh....)` and **then** you can use all the bot functions.
+**First** initialize your bot with `_InitBot(12345678:AbCdEfGh....)`, **then** you can use all the bot functions.
 
 ## How it works
 After initializing the bot, you can do whatever you need to do. (Almost) all the APIs are coded, read the wiki for details about all the functions. To put the bot in _polling state_ (i.e. wait for incoming messages) read below.
