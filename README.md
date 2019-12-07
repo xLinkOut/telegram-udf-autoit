@@ -13,7 +13,7 @@
 </p>
 
 ## Setup
-_Telegram.au3_ is the main file that you have to include in your code, but it also need the _include_ folder. Adjust the path as you want. Include the library in your script with `#include "Telegram.au3"`
+_Telegram.au3_ is the main file that you have to include in your code, but it also need the _include_ folder. Adjust the path as you want. Include the library in your script with `#include "Telegram.au3"`.
 **First** initialize your bot with `_InitBot(12345678:AbCdEfGh....)`, **then** you can use all the bot functions.
 
 ## How it works
@@ -40,7 +40,7 @@ $msgData[4] = First name of the user
 $msgData[5] = Text of the message
 ```
 
-If you want to try all the available features, use the Test file into /test folder. Open it, insert your bot's token, your chat id (make sure you have sent at least one message to the bot) and then execute it.
+If you want to try all the available features, use the Test file into /tests folder. Open it, insert your bot's token, your chat id **(make sure you have sent at least one message to the bot)** and then execute it.
 
 ## What you need to know
 I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
