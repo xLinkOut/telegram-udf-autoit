@@ -15,6 +15,7 @@
 ## Setup
 _Telegram.au3_ is the main file that you have to include in your code, but it also need the _include_ folder. Adjust the path as you want. Include the library in your script with `#include "Telegram.au3"`.
 **First** initialize your bot with `_InitBot(12345678:AbCdEfGh....)`, **then** you can use all the bot functions.
+Check the _@error_ flag after invoking _\_Initbot()_ (or its return value) to make sure everything is working: `@error == 1` mean error, and in this case the _InitBot() return False.
 
 ## How it works
 After initializing the bot, you can do whatever you need to do. (Almost) all the APIs are coded, read the wiki for details about all the functions. To put the bot in _polling state_ (i.e. wait for incoming messages) read below.
