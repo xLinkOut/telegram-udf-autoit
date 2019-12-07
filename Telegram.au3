@@ -1,22 +1,16 @@
 #cs ------------------------------------------------------------------------------
    About:
-		Author: Luca (LinkOut)
+		Author: Luca (@LinkOut)
 		Description: Control Telegram Bot with AutoIt
-		Status: Currently WIP
 
    Documentation:
 		Telegram API: https://core.telegram.org/bots/api
-		GitHub Page: https://github.com/xLinkOut/telegram-udf-autoit/
+		GitHub Page:  https://github.com/xLinkOut/telegram-udf-autoit/
 
    Author Information:
 		GitHub: https://github.com/xLinkOut
-		Email: mailto:luca.cirillo5@gmail.com
 
-   Extra:
-		WinHttp UDF provided by trancexx: https://www.autoitscript.com/forum/topic/84133-winhttp-functions/
-		JSON UDF provided by zserge: http://zserge.com/jsmn.html (Downloaded from here https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include)
 #ce ------------------------------------------------------------------------------
-
 
 #include-once
 #include "include/WinHttp.au3"
@@ -25,7 +19,7 @@
 #include <Array.au3>
 
 ;@GLOBAL
-Global $TOKEN  = ''
+Global $TOKEN  = ""
 Global $URL	   = "https://api.telegram.org/bot"
 Global $Offset = 0
 
