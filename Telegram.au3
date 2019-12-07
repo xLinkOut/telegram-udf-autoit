@@ -511,10 +511,14 @@ Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Defaul
     Return True
 EndFunc ;==> _SendContact
 
-Func _answerCallbackQuery($CallbackID,$Text = '',$URL = '',$ShowAlert = False,$CacheTime = '')
-    Local $Query = $URL & "/_answerCallbackQuery?callback_query_id=" & $CallbackID
+Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,$CacheTime = '')
+    ;In Callback context, there's a URL validation/restriction on the Telegram side
+    ;Telegram Docs: https://core.telegram.org/bots/api#answercallbackquery
+    ;cbURL can be a Game's URL or something like "t.me/your_bot?start=XXXX" 
+    ;that open your bot with a parameter.
+    Local $Query = $URL & "/answerCallbackQuery?callback_query_id=" & $CallbackID
     If $Text <> '' Then $Query &= "&text=" & $Text
-    If $URL <> '' Then $Query &= "&url=" & $URL
+    If $cbURL <> '' Then $Query &= "&url=" & $cbURL
     If $ShowAlert Then $Query &= "&show_alert=true"
     If $CacheTime <> '' Then $Query &= "&cache_time=" & $CacheTime
     Local $Json = Json_Decode(__HttpPost($Query))
