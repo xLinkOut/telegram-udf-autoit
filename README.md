@@ -1,15 +1,15 @@
-# Telegram UDFs for AutoIt <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/telegram_icon.png" width="28"> <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/autoit_icon.png" width="28">
+# Telegram UDFs for AutoIt <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/telegram_icon.png" width="28"> <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/autoit_icon.png" width="28">
 
 <p align="center">
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/banner.png"><br>
+  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/banner.png"><br>
 </p>
 <p align="center">
 <b>If you want to control your Telegram Bot with AutoIt, this is for you!</b><br>
 </p>
 <p align="center">
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/star_icon.png" width="20">
+  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/star_icon.png" width="20">
   Telegram UDF is on the official AutoIt Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/assets/star_icon.png" width="20">
+  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/star_icon.png" width="20">
 </p>
 
 ## Setup
