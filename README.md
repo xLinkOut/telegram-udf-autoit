@@ -32,13 +32,15 @@ WEnd
 
 For a simple text message, the array returned by _Polling() is:
 ```
-$msgData[0] = Offset of the current update (used to 'switch' to next update)
+$msgData[0] = Offset of the current update (used to 'switch' to the next update)
 $msgData[1] = Message ID
 $msgData[2] = Chat ID, use for interact with the user
 $msgData[3] = Username of the user
 $msgData[4] = First name of the user
 $msgData[5] = Text of the message
 ```
+
+If you want to try all the available features, use the Test file into /test folder. Open it, insert your bot's token, your chat id (make sure you have sent at least one message to the bot) and then execute it.
 
 ## What you need to know
 I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
