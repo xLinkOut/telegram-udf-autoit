@@ -82,11 +82,11 @@ Func _Polling()
     While 1
         Sleep(1000) ;Prevent CPU Overloading
         $newUpdates = _GetUpdates()
-        ConsoleWrite($newUpdates & @CRLF)
+        ;ConsoleWrite($newUpdates & @CRLF)
         If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
         $msgData = __MsgDecode($newUpdates)
         $Offset = $msgData[0] + 1
-        ConsoleWrite(_ArrayToString($msgData) & @CRLF)
+        ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
         Return $msgData
     WEnd
 EndFunc ;==> _Polling
