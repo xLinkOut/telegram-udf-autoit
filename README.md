@@ -48,7 +48,7 @@ If you want to try all the available features, use the Test file into /tests fol
 I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
 
 ## Todos
-- [ ] \_\_DownloadFile() check and validate downloaded file
+- [x] \_\_DownloadFile() check and validate downloaded file
 - [ ] Limit to GetUserProfilePicture
 - [ ] Match all functions name to original Endpoint name
 - [ ] Write all the missing endpoints
