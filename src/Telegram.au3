@@ -26,6 +26,7 @@ Global $Offset = 0
 ;@CONST
 Const $BOT_CRLF = __UrlEncode(@CRLF)
 Const $INVALID_TOKEN_ERROR = 1
+Const $FILE_NOT_DOWNLOADED = 2
 
 #Region "@BOT MAIN FUNCTIONS"
 #cs ===============================================================================
@@ -757,15 +758,18 @@ EndFunc ;==> __GetFilePath
 #cs ===============================================================================
    Function Name..:		__DownloadFile
    Description....:     Download and save a file from Telegram Server
-   Parameter(s)...:     $FilePath: Path of the file on Telegram Server (Get this from __GetFilePath)
-   Return Value(s):  	Return True ;@TODO add file check
+   Parameter(s)...:     $filePath: Path of the file on Telegram Server (Get this from __GetFilePath)
+   Return Value(s):  	Return file name if success, False otherwise
 #ce ===============================================================================
-Func __DownloadFile($FilePath)
-    Local $firstSplit = StringSplit($FilePath,'/')
-    Local $fileName = $firstSplit[2]
-    Local $Query = "https://api.telegram.org/file/bot" & $TOKEN & "/" & $FilePath
-    InetGet($Query,$fileName)
-    Return True
+Func __DownloadFile($filePath)
+    Local $fileName = StringSplit($filePath,'/')[2]
+    Local $query = "https://api.telegram.org/file/bot" & $TOKEN & "/" & $filePath
+    Local $result = InetGet($query,$fileName)
+    If $result And Not @error And FileExists($fileName) Then
+        Return $fileName
+    Else
+        Return SetError($FILE_NOT_DOWNLOADED,0,False)
+    EndIf
 EndFunc ;==> __DownloadFile
 
 #cs ===============================================================================
