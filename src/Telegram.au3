@@ -27,6 +27,7 @@ Global $Offset = 0
 Const $BOT_CRLF = __UrlEncode(@CRLF)
 Const $INVALID_TOKEN_ERROR = 1
 Const $FILE_NOT_DOWNLOADED = 2
+Const $OFFSET_GRATER_THAN_TOTAL = 3
 
 #Region "@BOT MAIN FUNCTIONS"
 #cs ===============================================================================
@@ -563,13 +564,29 @@ Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
     If $Offset <> '' Then $Query &= "&offset=" & $Offset
     If $Limit <> '' Then $Query &= "&limit=" & $Limit
     Local $Json = Json_Decode(__HttpPost($Query))
-    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False) ;Check if json is valid
+    If Not (Json_IsObject($Json)) Then Return SetError(2,0,False)
+
     Local $count = Json_Get($Json,'[result][total_count]')
-    Local $photoArray[$count + 1]
-    $photoArray[0] = $count
-    For $i=1 to $count
-        ;probabile che non sempre sia disponibile il 2 quindi fare un catch
+    
+    If $Offset >= $count Then Return SetError($OFFSET_GRATER_THAN_TOTAL,0,False)
+
+    If $Limit <> '' And $Limit < $count Then
+        Local $photoArray[$Limit+1]
+        $photoArray[0] = $Limit
+    Else
+        Local $photoArray[$count + 1]
+        $photoArray[0] = $count
+    EndIf
+
+    For $i=1 to $photoArray[0]
         $photoArray[$i] = Json_Get($Json,'[result][photos]['& $i-1 &'][2][file_id]')
+        If $photoArray[$i] == '' Then
+            $photoArray[$i] = Json_Get($Json,'[result][photos]['& $i-1 &'][1][file_id]')
+            If $photoArray[$i] == '' Then
+                $photoArray[$i] = Json_Get($Json,'[result][photos]['& $i-1 &'][0][file_id]')
+            EndIf
+        EndIf
+        ;A way like pythonic len([result][photos]) to know the lenght of this sub-array?
     Next
 
     Return $photoArray

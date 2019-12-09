@@ -49,7 +49,7 @@ I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-
 
 ## Todos
 - [x] \_\_DownloadFile() check and validate downloaded file
-- [ ] Limit to GetUserProfilePicture
+- [x] Limit to GetUserProfilePicture
 - [ ] Match all functions name to original Endpoint name
 - [ ] Write all the missing endpoints
 - [ ] Add some test file
