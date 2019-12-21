@@ -819,14 +819,14 @@ Func __MsgDecode($Update)
    ;@PRIVATE CHAT MESSAGE
    If(Json_Get($Json,'[result][0][message][chat][type]') = 'private') Then
  	  Local $msgData[10] = [ _
-		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
-		 Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
-		 Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = Chat ID
-		 Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
-		 Json_Get($Json,'[result][0][message][from][first_name]') _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][update_id]'), _
+		 Json_Get($Json,'[result][0][message][message_id]'), _
+		 Json_Get($Json,'[result][0][message][from][id]'), _
+		 Json_Get($Json,'[result][0][message][from][username]'), _
+		 Json_Get($Json,'[result][0][message][from][first_name]') _
 	  ]
 
-      If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
+      If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]')
 
 		 ;Insert media recognition here
 
@@ -847,13 +847,13 @@ Func __MsgDecode($Update)
       If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
          $msgData[7] = 'left' ;[7] = Event
          $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = Left member ID
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
+         $msgData[9] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
+         $msgData[10] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
       ElseIf(Json_Get($Json,'[result][0][message][new_chat_member]')) Then
          $msgData[7] = 'new' ;[7] = Event
          $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = New member ID
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
+         $msgData[9] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
+         $msgData[10] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
       Else
          $msgData[7] = Json_Get($Json,'[result][0][message][text]') ;[7] = Text
       EndIf
