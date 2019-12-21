@@ -21,7 +21,7 @@
 ;@GLOBAL
 Global $TOKEN  = ""
 Global $URL	   = "https://api.telegram.org/bot"
-Global $Offset = 0
+Global $OFFSET = 0
 
 ;@CONST
 Const $BOT_CRLF = __UrlEncode(@CRLF)
@@ -56,7 +56,7 @@ EndFunc ;==> _InitBot
    Return Value(s): 	Return string with information encoded in JSON format
 #ce ===============================================================================
 Func _GetUpdates()
-    Return __HttpGet($URL & "/getUpdates?offset=" & $Offset)
+    Return __HttpGet($URL & "/getUpdates?offset=" & $OFFSET)
 EndFunc ;==> _GetUpdates
 
 #cs ===============================================================================
@@ -87,7 +87,7 @@ Func _Polling()
         ;ConsoleWrite($newUpdates & @CRLF)
         If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
         $msgData = __MsgDecode($newUpdates)
-        $Offset = $msgData[0] + 1
+        $OFFSET = $msgData[0] + 1
         ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
         Return $msgData
     WEnd
