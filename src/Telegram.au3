@@ -183,7 +183,7 @@ Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyTo
 EndFunc ;==> _SendMsg
 
 #cs ===============================================================================
-   Function Name..:		_ForwardMsg
+   Function Name..:		_ForwardMessage
    Description....:     Forward a message from a chat to another
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$OriginalChatID: Unique identifier for the chat where the original message was sent
@@ -191,14 +191,14 @@ EndFunc ;==> _SendMsg
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the new Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _ForwardMsg($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
+Func _ForwardMessage($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
     Local $Query = $URL & "/forwardMessage?chat_id=" & $ChatID & "&from_chat_id=" & $OriginalChatID & "&message_id=" & $MsgID
     If $DisableNotification Then $Query &= "&disable_notification=True"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(1,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
-EndFunc ;==> _ForwardMsg
+EndFunc ;==> _ForwardMessage
 
 #cs ===============================================================================
    Function Name..:		_SendPhoto
