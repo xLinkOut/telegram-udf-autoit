@@ -30,25 +30,7 @@ Const $FILE_NOT_DOWNLOADED = 2
 Const $OFFSET_GRATER_THAN_TOTAL = 3
 Const $INVALID_JSON_RESPONSE = 4
 
-#Region "@BOT MAIN FUNCTIONS"
-#cs ===============================================================================
-   Function Name..:    	_InitBot
-   Description....:	   	Initialize the bot
-   Parameter(s)...:    	$Token: Bot's token (123456789:AbCdEf...)
-   Return Value(s):	   	Return True if success, False otherwise
-#ce ===============================================================================
-Func _InitBot($Token)
-	$TOKEN = $Token
-    $URL  &= $TOKEN
-
-    If IsArray(_GetMe()) Then
-        Return True
-    Else
-        ;ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
-        Return SetError($INVALID_TOKEN_ERROR,0,False)
-    EndIf
-
-EndFunc ;==> _InitBot
+#Region "@ENDPOINT FUNCTIONS"
 
 #cs ===============================================================================
    Function Name..:    	_GetUpdates
@@ -75,28 +57,6 @@ Func _GetMe()
 	Return $data
 EndFunc ;==>_GetMe
 
-#cs ===============================================================================
-   Function Name..:    	_Polling
-   Description....:     Wait for incoming messages
-   Parameter(s)...:     None
-   Return Value(s):		Return an array with information about the messages
-#ce ===============================================================================
-Func _Polling()
-    While 1
-        Sleep(1000) ;Prevent CPU Overloading
-        $newUpdates = _GetUpdates()
-        ;ConsoleWrite($newUpdates & @CRLF)
-        If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
-        $msgData = __MsgDecode($newUpdates)
-        $OFFSET = $msgData[0] + 1
-        ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
-        Return $msgData
-    WEnd
-EndFunc ;==> _Polling
-
-#EndRegion
-
-#Region "@SEND AND MEDIA FUNCTIONS"
 #cs ===============================================================================
    Function Name..:		_SendMsg
    Description....:     Send a text message
@@ -470,10 +430,6 @@ Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,
     Return True
 EndFunc ;==> _answerCallbackQuery
 
-#EndRegion
-
-#Region "@MISC CHAT FUNCTIONS"
-
 Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
     $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
@@ -675,6 +631,45 @@ EndFunc ;==> _deleteChatStickerSet
 #EndRegion
 
 #Region "@EXTRA FUNCTIONS"
+
+#cs ===============================================================================
+   Function Name..:    	_InitBot
+   Description....:	   	Initialize the bot
+   Parameter(s)...:    	$Token: Bot's token (123456789:AbCdEf...)
+   Return Value(s):	   	Return True if success, False otherwise
+#ce ===============================================================================
+Func _InitBot($Token)
+	$TOKEN = $Token
+    $URL  &= $TOKEN
+
+    If IsArray(_GetMe()) Then
+        Return True
+    Else
+        ;ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
+        Return SetError($INVALID_TOKEN_ERROR,0,False)
+    EndIf
+
+EndFunc ;==> _InitBot
+
+#cs ===============================================================================
+   Function Name..:    	_Polling
+   Description....:     Wait for incoming messages
+   Parameter(s)...:     None
+   Return Value(s):		Return an array with information about the messages
+#ce ===============================================================================
+Func _Polling()
+    While 1
+        Sleep(1000) ;Prevent CPU Overloading
+        $newUpdates = _GetUpdates()
+        ;ConsoleWrite($newUpdates & @CRLF)
+        If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
+        $msgData = __MsgDecode($newUpdates)
+        $OFFSET = $msgData[0] + 1
+        ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
+        Return $msgData
+    WEnd
+EndFunc ;==> _Polling
+
 
 #cs ===============================================================================
    Function Name..:    	_CreateKeyboard
