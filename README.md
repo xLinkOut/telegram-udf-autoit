@@ -47,29 +47,17 @@ If you want to try all the available features, use the Test file into /tests fol
 ## What you need to know
 I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
 
-## Todos
-- [x] \_\_DownloadFile() check and validate downloaded file
-- [x] Limit to GetUserProfilePicture
-- [ ] Match all functions name to original Endpoint name
-- [ ] Write all the missing endpoints
-- [ ] Add some test file
-- [ ] Add some example files
-- [ ] Write. The. WIKI!
-
-## Bots:
-If you have made a bot with this UDF, pm me and I'll insert the bot in this list, if you want. 🚀
-
-## Credits:
+## Credits
 + Thanks to dragana-r (trancexx on AutoIt Forum) for [WinHttp UDF](https://github.com/dragana-r/autoit-winhttp)/[Forum thread](https://www.autoitscript.com/forum/topic/84133-winhttp-functions/)
 + Thanks to zserge for [JSON UDF](http://zserge.com/jsmn.html)
 + Thanks to J2TeamM for [JSON/Base64 UDF](https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include)
 + Thanks to Sergey Flakon for fixing [issue #8](https://github.com/xLinkOut/telegram-udf-autoit/issues/8)
 
-## Legal:
+## Legal
 **License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
 
-## About:
+## About
 If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo. ❤️
 
 For support, just contact me! Enjoy 🎉
