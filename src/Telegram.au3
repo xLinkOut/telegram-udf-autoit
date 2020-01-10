@@ -1040,19 +1040,32 @@ Func __MsgDecode($Update)
         Return $msgData
 
     ;@CHANNEL MESSAGE (Where bot is admin)
+    ; Sample JSON:
+    #comments-start
+    {"ok":true,"result":[{
+        "update_id":<int>,
+        "channel_post":{
+            "message_id":<int>,
+            "chat":{
+            "id":<int>,
+            "title":"<string>",
+            "type":"channel"},
+            "date":<int>,
+            "text":"<string>"
+    }}]}
+    #comments-end
     ElseIf(Json_Get($Json,'[result][0][channel_post][message_id]') <> '') Then
-        Local $msgData[10] = [ _
+        Local $msgData[5] = [ _
             Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
             Json_Get($Json,'[result][0][channel_post][message_id]'), _ ;[1] = Message ID
             Json_Get($Json,'[result][0][channel_post][chat][id]'), _ ;[2] = Chat ID
-            Json_Get($Json,'[result][0][channel_post][chat][username]'), _ ;[3] = Username
-            Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[4] = Firstname
+            Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[3] = Firstname
         ]
 
         If(Json_Get($Json,'[result][0][channel_post][text]')) Then 
-            $msgData[5] = Json_Get($Json,'[result][0][channel_post][text]') ;[5] = Text (eventually)
+            $msgData[4] = Json_Get($Json,'[result][0][channel_post][text]') ;[4] = Text (eventually)
         EndIf
-        
+
         Return $msgData
 
       ;@EDITED CHANNEL CHAT MESSAGE
