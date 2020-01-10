@@ -1049,8 +1049,10 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[4] = Firstname
         ]
 
-        If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]') ;[5] = Text (eventually)
-
+        If(Json_Get($Json,'[result][0][channel_post][text]')) Then 
+            $msgData[5] = Json_Get($Json,'[result][0][channel_post][text]') ;[5] = Text (eventually)
+        EndIf
+        
         Return $msgData
 
       ;@EDITED CHANNEL CHAT MESSAGE
