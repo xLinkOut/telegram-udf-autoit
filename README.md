@@ -52,7 +52,8 @@ I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-
 + Thanks to zserge for [JSON UDF](http://zserge.com/jsmn.html)
 + Thanks to J2TeamM for [JSON/Base64 UDF](https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include)
 + Thanks to Sergey Flakon for fixing [issue #8](https://github.com/xLinkOut/telegram-udf-autoit/issues/8)
-
++ Thanks to RazTK for fixing [issue #11](https://github.com/xLinkOut/telegram-udf-autoit/issues/11) and [issue #12](https://github.com/xLinkOut/telegram-udf-autoit/issues/12)
++ Thanks to Jefta-387 for fixing [issue #13](https://github.com/xLinkOut/telegram-udf-autoit/issues/13)
 ## Legal
 **License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
 This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
