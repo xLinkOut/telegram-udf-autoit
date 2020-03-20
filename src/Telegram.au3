@@ -730,13 +730,19 @@ Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,
     Return True
 EndFunc ;==> _answerCallbackQuery
 
+; TODO: deletemessage
+Func _deleteMessage($ChatID, $MsgID)
+    Local $Query = $URL & "/deleteMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
+    ConsoleWrite(__HttpGet($Query))
+EndFunc ;==> _deleteMessage
+
+
 
 ; TODO: editmessagetext
 ; TODO: editmessagecaption
 ; TODO: editmessagemedia
 ; TODO: editmessagereplymarkup
 ; TODO: stoppoll
-; TODO: deletemessage
 ; TODO: sendsticker
 ; TODO: getsticketset
 ; TODO: uploadstickerfile
