@@ -44,7 +44,7 @@ EndFunc ;==> _TelegramGetUpdates
 
 #cs ===============================================================================
    Function Name..:    	_TelegramGetMe
-   Description....:     Get information about the bot (ID,Username,Name)
+   Description....:     Get information about the bot (ID,Username,First name,Last name)
    Parameter(s)...:     None
    Return Value(s):		Return an array with information
 #ce ===============================================================================
@@ -677,9 +677,10 @@ Func _TelegramGetChat($ChatID)
     Local $Json = Json_Decode(_Telegram_HttpGet($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Local $chatData[4] = [ Json_Get($Json,'[result][id]'), _
+    Local $chatData[5] = [ Json_Get($Json,'[result][id]'), _
                         Json_Get($Json,'[result][username]'), _
                         Json_Get($Json,'[result][first_name]'), _
+                        Json_Get($Json,'[result][last_name]'), _
                         Json_Get($Json,'[result][photo][big_file_id]')]
     Return $chatData
 EndFunc ;==> _GetChat
@@ -783,7 +784,8 @@ EndFunc ;==> _TelegramInitBot
 							$msgData[2] = Chat ID, use for interact with the user
 							$msgData[3] = Username of the user
 							$msgData[4] = First name of the user
-							$msgData[5] = Text of the message
+							$msgData[5] = Last name of the user
+							$msgData[6] = Text of the message
 #ce ===============================================================================
 Func _TelegramPolling()
     While 1
@@ -946,7 +948,7 @@ Func _Telegram_MsgDecode($Update)
 
     ;@PRIVATE CHAT MESSAGE
     If(Json_Get($Json,'[result][0][message][chat][type]') = 'private') Then
-        Local $msgData[10] = [ _
+        Local $msgData[13] = [ _
             Json_Get($Json,'[result][0][update_id]'), _
             Json_Get($Json,'[result][0][message][message_id]'), _
             Json_Get($Json,'[result][0][message][from][id]'), _
