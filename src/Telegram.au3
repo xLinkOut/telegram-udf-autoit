@@ -24,38 +24,42 @@ Global $URL	   = "https://api.telegram.org/bot"
 Global $OFFSET = 0
 
 ;@CONST
-Const $BOT_CRLF = __UrlEncode(@CRLF)
+Const $BOT_CRLF = _Telegram_UrlEncode(@CRLF)
 Const $INVALID_TOKEN_ERROR = 1
 Const $FILE_NOT_DOWNLOADED = 2
 Const $OFFSET_GRATER_THAN_TOTAL = 3
 Const $INVALID_JSON_RESPONSE = 4
 
+;@ObjEvents
+$oMyError = ObjEvent("AutoIt.Error","_Telegram_HttpCrashHandler")
+
 #Region "@ENDPOINT FUNCTIONS"
 
 #cs ===============================================================================
-   Function Name..:    	_GetUpdates
+   Function Name..:    	_TelegramGetUpdates
    Description....:     Used by _Polling() to get new messages
    Parameter(s)...:     None
    Return Value(s): 	Return string with information encoded in JSON format
 #ce ===============================================================================
-Func _GetUpdates()
-    Return __HttpGet($URL & "/getUpdates?offset=" & $OFFSET)
-EndFunc ;==> _GetUpdates
+Func _TelegramGetUpdates()
+    Return _Telegram_HttpGet($URL & "/getUpdates?offset=" & $OFFSET)
+EndFunc ;==> _TelegramGetUpdates
 
 #cs ===============================================================================
-   Function Name..:    	_GetMe
-   Description....:     Get information about the bot (ID,Username,Name)
+   Function Name..:    	_TelegramGetMe
+   Description....:     Get information about the bot (ID,Username,First name,Last name)
    Parameter(s)...:     None
    Return Value(s):		Return an array with information
 #ce ===============================================================================
-Func _GetMe()
-	Local $json = Json_Decode(__HttpGet($URL & "/getMe"))
+Func _TelegramGetMe()
+	Local $json = Json_Decode(_Telegram_HttpGet($URL & "/getMe"))
 	If Not (Json_IsObject($json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
-	Local $data[3] = [Json_Get($json,'[result][id]'), _
+	Local $data[4] = [Json_Get($json,'[result][id]'), _
 				   	  Json_Get($json,'[result][username]'), _
-			   		  Json_Get($json,'[result][first_name]')]
+			   		  Json_Get($json,'[result][first_name]'), _
+			   		  Json_Get($json,'[result][last_name]')]
 	Return $data
-EndFunc ;==>_GetMe
+EndFunc ;==>_TelegramGetMe
 
 #cs ===============================================================================
    Function Name..:		_SendMsg
@@ -69,7 +73,7 @@ EndFunc ;==>_GetMe
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
+Func _TelegramSendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
     Local $Query = $URL & "/sendMessage?chat_id=" & $ChatID & "&text=" & $Text
     If StringLower($ParseMode) = "markdown" Then $Query &= "&parse_mode=markdown"
     If StringLower($ParseMode) = "html" Then $Query &= "&parse_mode=html"
@@ -77,7 +81,7 @@ Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyTo
     If $DisableNotification = True Then $Query &= "&disable_notification=True"
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
 	If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
     Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
@@ -92,10 +96,10 @@ EndFunc ;==> _SendMsg
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the new Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _ForwardMessage($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
+Func _TelegramForwardMessage($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
     Local $Query = $URL & "/forwardMessage?chat_id=" & $ChatID & "&from_chat_id=" & $OriginalChatID & "&message_id=" & $MsgID
     If $DisableNotification Then $Query &= "&disable_notification=True"
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
@@ -112,7 +116,7 @@ EndFunc ;==> _ForwardMessage
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the photo as string
 #ce ===============================================================================
-Func _SendPhoto($ChatID,$Photo,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendPhoto($ChatID,$Photo,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendPhoto'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -133,7 +137,7 @@ Func _SendPhoto($ChatID,$Photo,$Caption = '',$ReplyMarkup = Default,$ReplyToMess
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'photo')
+    Return _Telegram_GetFileID($Json,'photo')
 EndFunc ;==> _SendPhoto
 
 #cs ===============================================================================
@@ -147,7 +151,7 @@ EndFunc ;==> _SendPhoto
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the audio as string
 #ce ===============================================================================
-Func _SendAudio($ChatID,$Audio,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendAudio($ChatID,$Audio,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendAudio'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -168,7 +172,7 @@ Func _SendAudio($ChatID,$Audio,$Caption = '',$ReplyMarkup = Default,$ReplyToMess
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'audio')
+    Return _Telegram_GetFileID($Json,'audio')
 EndFunc ;==> _SendAudio
 
 #cs ===============================================================================
@@ -182,7 +186,7 @@ EndFunc ;==> _SendAudio
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the document as string
 #ce ===============================================================================
-Func _SendDocument($ChatID,$Document,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendDocument($ChatID,$Document,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendDocument'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -203,7 +207,7 @@ Func _SendDocument($ChatID,$Document,$Caption = '',$ReplyMarkup = Default,$Reply
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'document')
+    Return _Telegram_GetFileID($Json,'document')
 EndFunc ;==> _SendDocument
 
 #cs ===============================================================================
@@ -217,7 +221,7 @@ EndFunc ;==> _SendDocument
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the video as string
 #ce ===============================================================================
-Func _SendVideo($ChatID,$Video,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendVideo($ChatID,$Video,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendVideo'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -238,7 +242,7 @@ Func _SendVideo($ChatID,$Video,$Caption = '',$ReplyMarkup = Default,$ReplyToMess
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'video')
+    Return _Telegram_GetFileID($Json,'video')
 EndFunc ;==> _SendVideo
 
 #cs ===============================================================================
@@ -252,7 +256,7 @@ EndFunc ;==> _SendVideo
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the video as string
 #ce ===============================================================================
-Func _SendAnimation($ChatID,$Animation,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendAnimation($ChatID,$Animation,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendAnimation'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -273,7 +277,7 @@ Func _SendAnimation($ChatID,$Animation,$Caption = '',$ReplyMarkup = Default,$Rep
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'animation')
+    Return _Telegram_GetFileID($Json,'animation')
 EndFunc ;==> _SendAnimation
 
 
@@ -288,7 +292,7 @@ EndFunc ;==> _SendAnimation
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the voice as string
 #ce ===============================================================================
-Func _SendVoice($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendVoice($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendVoice'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -309,7 +313,7 @@ Func _SendVoice($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessa
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'voice')
+    Return _Telegram_GetFileID($Json,'voice')
 EndFunc ;==> _SendVoice
 
 #cs ===============================================================================
@@ -322,7 +326,7 @@ EndFunc ;==> _SendVoice
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the videonote as string
 #ce ===============================================================================
-Func _SendVideoNote($ChatID,$VideoNote,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendVideoNote($ChatID,$VideoNote,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendVideoNote'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -341,7 +345,7 @@ Func _SendVideoNote($ChatID,$VideoNote,$ReplyMarkup = Default,$ReplyToMessage = 
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'videonote')
+    Return _Telegram_GetFileID($Json,'videonote')
 EndFunc ;==> _SendVideoNote
 
 #cs ===============================================================================
@@ -353,7 +357,7 @@ EndFunc ;==> _SendVideoNote
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return an array with all File IDs of the medias sent
 #ce ===============================================================================
-Func _SendMediaGroup($ChatID,$Media,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendMediaGroup($ChatID,$Media,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendMediaGroup'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -371,7 +375,7 @@ Func _SendMediaGroup($ChatID,$Media,$ReplyToMessage = '',$DisableNotification = 
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'mediagroup')
+    Return _Telegram_GetFileID($Json,'mediagroup')
 EndFunc ;==> _SendMediaGroup
 
 #cs ===============================================================================
@@ -385,7 +389,7 @@ EndFunc ;==> _SendMediaGroup
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the sticker as string
 #ce ===============================================================================
-Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & '/sendSticker'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -405,7 +409,7 @@ Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$Dis
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'sticker')
+    Return _Telegram_GetFileID($Json,'sticker')
 EndFunc ;==> _SendSticker
 
 #cs ===============================================================================
@@ -420,33 +424,33 @@ EndFunc ;==> _SendSticker
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
     If $DisableNotification Then $Query &= "&disable_notification=true"
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendLocation
 
 ; TODO: Comments
-Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
+Func _TelegramEditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
     $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc  ;==> _EditMessageLiveLocation
 
 ; TODO: Comments
-Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
+Func _TelegramStopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
     $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $ChatID
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -454,13 +458,13 @@ EndFunc ;==> _StopMessageLiveLocation
 
 
 ;@TODO Comment
-Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
     If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
     If $DisableNotification Then $Query &= "&disable_notification=true"
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -478,13 +482,13 @@ EndFunc ;==> _SendVenue
 						$DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _TelegramSendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $FirstName
     If $LastName <> '' Then $Query &= "&last_name=" & $LastName
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
     If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
     If $DisableNotification = True Then $Query &= "&disable_notification=True"
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -506,9 +510,9 @@ EndFunc ;==> _SendContact
                             record_video_note or upload_video_note for video notes.
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendChatAction($ChatID,$Action)
+Func _TelegramSendChatAction($ChatID,$Action)
     Local $Query = $URL & "/sendChatAction?chat_id=" & $ChatID & "&action=" & $Action
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -522,15 +526,15 @@ EndFunc ;==> _SendChatAction
 						$Limit (optional): if you want only an x number of photos ;@TODO
    Return Value(s):  	Return an array with photo's count and File ID of the photos
 #ce ===============================================================================
-Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
+Func _TelegramGetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
     $Query = $URL & "/getUserProfilePhotos?user_id=" & $ChatID
     If $Offset <> '' Then $Query &= "&offset=" & $Offset
     If $Limit <> '' Then $Query &= "&limit=" & $Limit
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False)
 
     Local $count = Json_Get($Json,'[result][total_count]')
-    
+
     If $Offset >= $count Then Return SetError($OFFSET_GRATER_THAN_TOTAL,0,False)
 
     If $Limit <> '' And $Limit < $count Then
@@ -559,19 +563,19 @@ EndFunc ;==> _GetUserProfilePhotos
 
 
 ; TODO: comment
-Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
+Func _TelegramKickChatMember($ChatID,$UserID,$UntilDate = '')
     $Query = $URL & "/kickChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
     If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _KickChatMember
 
 ; TODO: comment
-Func _UnbanChatMember($ChatID,$UserID)
+Func _TelegramUnbanChatMember($ChatID,$UserID)
     $Query = $URL & "/unbanChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -584,16 +588,16 @@ EndFunc ;==> _UnbanChatMember
 ; TODO: setChatPermission
 
 ; TODO: comment
-Func _ExportChatInviteLink($ChatID)
+Func _TelegramExportChatInviteLink($ChatID)
     $Query = $URL & "/exportChatInviteLink?chat_id=" & $ChatID
-    Local $Json = Json_Decode(__HttpGet($Query))
+    Local $Json = Json_Decode(_Telegram_HttpGet($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return Json_Get($Json,'[result]')
 EndFunc ;==> _ExportChatInviteLink
 
 ; TODO: comment
-Func _SetChatPhoto($ChatID,$Path)
+Func _TelegramSetChatPhoto($ChatID,$Path)
     Local $Query = $URL & '/setChatPhoto'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -611,55 +615,55 @@ Func _SetChatPhoto($ChatID,$Path)
 EndFunc ;==> _SetChatPhoto
 
 ; TODO: comment
-Func _DeleteChatPhoto($ChatID)
+Func _TelegramDeleteChatPhoto($ChatID)
     $Query = $URL & "/deleteChatPhoto?chat_id=" & $ChatID
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _DeleteChatPhoto
 
 ; TODO: comment
-Func _SetChatTitle($ChatID,$Title)
+Func _TelegramSetChatTitle($ChatID,$Title)
     $Query = $URL & "/setChatTitle?chat_id=" & $ChatID & "&title=" & $Title
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SetChatTitle
 
 ; TODO: comment
-Func _SetChatDescription($ChatID,$Description)
+Func _TelegramSetChatDescription($ChatID,$Description)
     $Query = $URL & "/setChatDescription?chat_id=" & $ChatID & "&description=" & $Description
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SetChatDescription
 
 ; TODO: comment
-Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
+Func _TelegramPinChatMessage($ChatID,$MsgID,$DisableNotification = False)
     $Query = $URL & "/pinChatMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
     If $DisableNotification Then $Query &= "&disable_notification=true"
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _PinChatMessage
 
 ; TODO: comment
-Func _UnpinChatMessage($ChatID)
+Func _TelegramUnpinChatMessage($ChatID)
     $Query = $URL & "/unpinChatMessage?chat_id=" & $ChatID
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _UnpinChatMessage
 
 ; TODO: comment
-Func _LeaveChat($ChatID)
+Func _TelegramLeaveChat($ChatID)
     $Query = $URL & "/leaveChat?chat_id=" & $ChatID
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -671,60 +675,61 @@ EndFunc ;==> _LeaveChat
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
    Return Value(s):  	Return an array ;@TODO group support
 #ce ===============================================================================
-Func _GetChat($ChatID)
+Func _TelegramGetChat($ChatID)
     Local $Query = $URL & "/getChat?chat_id=" & $ChatID
-    Local $Json = Json_Decode(__HttpGet($Query))
+    Local $Json = Json_Decode(_Telegram_HttpGet($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Local $chatData[4] = [ Json_Get($Json,'[result][id]'), _
+    Local $chatData[5] = [ Json_Get($Json,'[result][id]'), _
                         Json_Get($Json,'[result][username]'), _
                         Json_Get($Json,'[result][first_name]'), _
+                        Json_Get($Json,'[result][last_name]'), _
                         Json_Get($Json,'[result][photo][big_file_id]')]
     Return $chatData
 EndFunc ;==> _GetChat
 
 ; TODO: getChatAdministrators
-Func _getChatAdministrators($ChatID)
+Func _TelegramgetChatAdministrators($ChatID)
     Local $Query = $URL & "/getChatAdministrators?chat_id=" & $ChatID
-    ConsoleWrite(__HttpGet($Query))
+    ConsoleWrite(_Telegram_HttpGet($Query))
 EndFunc ;==> _getChatAdministrators
 
 ; TODO: getChatMembersCount
-Func _getChatMembersCount($ChatID)
+Func _TelegramgetChatMembersCount($ChatID)
     Local $Query = $URL & "/getChatMembersCount?chat_id=" & $ChatID
-    ConsoleWrite(__HttpGet($Query))
+    ConsoleWrite(_Telegram_HttpGet($Query))
 EndFunc ;==> _getChatMembersCount
 
 ; TODO: getchatmember
-Func _getChatMember($ChatID)
+Func _TelegramgetChatMember($ChatID)
     Local $Query = $URL & "/getChatMember?chat_id=" & $ChatID
-    ConsoleWrite(__HttpGet($Query))
+    ConsoleWrite(_Telegram_HttpGet($Query))
 EndFunc ;==> _getChatMember
 
 ; TODO: sertchatstrickerset
-Func _setChatStickerSet($ChatID)
+Func _TelegramsetChatStickerSet($ChatID)
     Local $Query = $URL & "/setChatStickerSet?chat_id=" & $ChatID
-    ConsoleWrite(__HttpGet($Query))
+    ConsoleWrite(_Telegram_HttpGet($Query))
 EndFunc ;==> _setChatStickerSet
 
 ; TODO: deletechatstrickerset
-Func _deleteChatStickerSet($ChatID)
+Func _TelegramdeleteChatStickerSet($ChatID)
     Local $Query = $URL & "/deleteChatStickerSet?chat_id=" & $ChatID
-    ConsoleWrite(__HttpGet($Query))
+    ConsoleWrite(_Telegram_HttpGet($Query))
 EndFunc ;==> _deleteChatStickerSet
 
 ; TODO: comment
-Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,$CacheTime = '')
+Func _TelegramanswerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,$CacheTime = '')
     ;In Callback context, there's a URL validation/restriction on the Telegram side
     ;Telegram Docs: https://core.telegram.org/bots/api#answercallbackquery
-    ;cbURL can be a Game's URL or something like "t.me/your_bot?start=XXXX" 
+    ;cbURL can be a Game's URL or something like "t.me/your_bot?start=XXXX"
     ;that open your bot with a parameter.
     Local $Query = $URL & "/answerCallbackQuery?callback_query_id=" & $CallbackID
     If $Text <> '' Then $Query &= "&text=" & $Text
     If $cbURL <> '' Then $Query &= "&url=" & $cbURL
     If $ShowAlert Then $Query &= "&show_alert=true"
     If $CacheTime <> '' Then $Query &= "&cache_time=" & $CacheTime
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
@@ -754,37 +759,44 @@ EndFunc ;==> _answerCallbackQuery
 #Region "@EXTRA FUNCTIONS"
 
 #cs ===============================================================================
-   Function Name..:    	_InitBot
+   Function Name..:    	_TelegramInitBot
    Description....:	   	Initialize the bot
    Parameter(s)...:    	$Token: Bot's token (123456789:AbCdEf...)
    Return Value(s):	   	Return True if success, False otherwise
 #ce ===============================================================================
-Func _InitBot($Token)
+Func _TelegramInitBot($Token)
 	$TOKEN = $Token
     $URL  &= $TOKEN
 
-    If IsArray(_GetMe()) Then
+    If IsArray(_TelegramGetMe()) Then
         Return True
     Else
         ;ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
         Return SetError($INVALID_TOKEN_ERROR,0,False)
     EndIf
 
-EndFunc ;==> _InitBot
+EndFunc ;==> _TelegramInitBot
 
 #cs ===============================================================================
    Function Name..:    	_Polling
    Description....:     Wait for incoming messages
    Parameter(s)...:     None
    Return Value(s):		Return an array with information about the messages
+							$msgData[0] = Offset of the current update (used to 'switch' to the next update)
+							$msgData[1] = Message ID
+							$msgData[2] = Chat ID, use for interact with the user
+							$msgData[3] = Username of the user
+							$msgData[4] = First name of the user
+							$msgData[5] = Last name of the user
+							$msgData[6] = Text of the message
 #ce ===============================================================================
-Func _Polling()
+Func _TelegramPolling()
     While 1
-        Sleep(1000) ;Prevent CPU Overloading
-        $newUpdates = _GetUpdates()
+        Sleep(500) ;Prevent CPU Overloading
+        $newUpdates = _TelegramGetUpdates()
         ;ConsoleWrite($newUpdates & @CRLF)
         If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
-        $msgData = __MsgDecode($newUpdates)
+        $msgData = _Telegram_MsgDecode($newUpdates)
         $OFFSET = $msgData[0] + 1
         ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
         Return $msgData
@@ -801,7 +813,7 @@ EndFunc ;==> _Polling
                         $OneTime: Set true if you want to use the keyboard once
    Return Value(s):		Return custom markup as string, encoded in JSON
 #ce ===============================================================================
-Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
+Func _TelegramCreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
     Local $jsonKeyboard = '{"keyboard":['
     For $i=0 to UBound($Keyboard)-1
@@ -829,7 +841,7 @@ EndFunc ;==> _CreateKeyboard
                             Example: Local $InlineKeyboard[5] = ['Button1_Text','Button1_Data','','Button2_Text','Button2_Data']
    Return Value(s):		Return custom inline markup as string, encoded in JSON
 #ce ===============================================================================
-Func _CreateInlineKeyboard(ByRef $Keyboard)
+Func _TelegramCreateInlineKeyboard(ByRef $Keyboard)
     ;reply_markup={"inline_keyboard":[[['text':'Yes','callback_data':'pressed_yes'],['text':'No','callback_data':'pressed_no']]]}
     Local $jsonKeyboard = '{"inline_keyboard":[['
     For $i=0 to UBound($Keyboard)-1
@@ -843,7 +855,7 @@ Func _CreateInlineKeyboard(ByRef $Keyboard)
             ElseIf(StringRight($jsonKeyboard,2) = '],') Then
                 $jsonKeyboard &= '[{"text":"' & $Keyboard[$i] & '",'
             EndIf
-            
+
         Else
             $jsonKeyboard &= '],'
         EndIf
@@ -858,13 +870,13 @@ EndFunc
 #Region "@INTERNAL FUNCTIONS"
 
 #cs ===============================================================================
-   Function Name..:		__GetFileID
+   Function Name..:		_Telegram_GetFileID
    Description....:     Get the 'File ID' of the last sent file
    Parameter(s)...:     $Json: JSON response from Telegram Server;
                         $type: File type, like photo, video, document...
    Return Value(s):  	Return the File ID as a string
 #ce ===============================================================================
-Func __GetFileID(ByRef $Json,$type)
+Func _Telegram_GetFileID(ByRef $Json,$type)
 
     ;If($type = 'photo') Then Return Json_Get($Json,'[result][photo][0][file_id]')
     If($type = 'photo') Then
@@ -880,7 +892,7 @@ Func __GetFileID(ByRef $Json,$type)
     If($type = 'voice') Then Return Json_Get($Json,'[result][voice][file_id]')
     If($type = 'sticker') Then Return Json_Get($Json,'[result][sticker][file_id]')
     If($type = 'videonote') Then Return Json_Get($Json,'[result][document][file_id]')
-EndFunc ;==> __GetFileID
+EndFunc ;==> _Telegram_GetFileID
 
 #cs ===============================================================================
    Function Name..:		__GetFilePath()
@@ -888,9 +900,9 @@ EndFunc ;==> __GetFileID
    Parameter(s)...:     $FileID: Unique identifier for the file
    Return Value(s):  	Return the file path as a string
 #ce ===============================================================================
-Func __GetFilePath($FileID)
+Func _Telegram_GetFilePath($FileID)
     Local $Query = $URL & "/getFile?file_id=" & $FileID
-    Local $Json = Json_Decode(__HttpPost($Query))
+    Local $Json = Json_Decode(_Telegram_HttpPost($Query))
     Return Json_Get($Json,'[result][file_path]')
 EndFunc ;==> __GetFilePath
 
@@ -900,7 +912,7 @@ EndFunc ;==> __GetFilePath
    Parameter(s)...:     $filePath: Path of the file on Telegram Server (Get this from __GetFilePath)
    Return Value(s):  	Return file name if success, False otherwise
 #ce ===============================================================================
-Func __DownloadFile($filePath)
+Func _Telegram_DownloadFile($filePath)
     Local $fileName = StringSplit($filePath,'/')[2]
     Local $query = "https://api.telegram.org/file/bot" & $TOKEN & "/" & $filePath
     Local $result = InetGet($query,$fileName)
@@ -912,12 +924,12 @@ Func __DownloadFile($filePath)
 EndFunc ;==> __DownloadFile
 
 #cs ===============================================================================
-   Function Name..:		__UrlEncode
+   Function Name..:		_Telegram_UrlEncode
    Description....:     Encode text in url format
    Parameter(s)...:     $string: Text to encode
    Return Value(s):  	Return the encoded string
 #ce ===============================================================================
-Func __UrlEncode($string)
+Func _Telegram_UrlEncode($string)
     $string = StringSplit($string, "")
     For $i=1 To $string[0]
         If AscW($string[$i]) < 48 Or AscW($string[$i]) > 122 Then
@@ -929,25 +941,26 @@ Func __UrlEncode($string)
 EndFunc
 
 #cs ===============================================================================
-   Function Name..:		__MsgDecode
+   Function Name..:		_Telegram_MsgDecode
    Description....:     Decode message information from JSON string to an Array
    Parameter(s)...:     $Update: JSON Response from Telegram Server
    Return Value(s):  	Return an array with information about a message (check docs)
 #ce ===============================================================================
-Func __MsgDecode($Update)
+Func _Telegram_MsgDecode($Update)
     Local $Json = Json_Decode($Update)
 
     ;@PRIVATE CHAT MESSAGE
     If(Json_Get($Json,'[result][0][message][chat][type]') = 'private') Then
-        Local $msgData[10] = [ _
+        Local $msgData[13] = [ _
             Json_Get($Json,'[result][0][update_id]'), _
             Json_Get($Json,'[result][0][message][message_id]'), _
             Json_Get($Json,'[result][0][message][from][id]'), _
             Json_Get($Json,'[result][0][message][from][username]'), _
-            Json_Get($Json,'[result][0][message][from][first_name]') _
+            Json_Get($Json,'[result][0][message][from][first_name]'), _
+			Json_Get($json,'[result][0][message][from][last_name]') _
         ]
 
-      If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][message][text]')
+      If(Json_Get($Json,'[result][0][message][text]')) Then $msgData[6] = Json_Get($Json,'[result][0][message][text]')
 
 		; TODO: Media recognition
 
@@ -955,43 +968,47 @@ Func __MsgDecode($Update)
 
    ;@GROUP CHAT MESSAGE (Inlude left/new member events)
    ElseIf(Json_Get($Json,'[result][0][message][chat][type]') = 'group') or (Json_Get($Json,'[result][0][message][chat][type]') = 'supergroup') Then
-      Local $msgData[10] = [ _
+      Local $msgData[13] = [ _
          Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
          Json_Get($Json,'[result][0][message][message_id]'), _ ;[1] = Message ID
          Json_Get($Json,'[result][0][message][from][id]'), _ ;[2] = User ID
          Json_Get($Json,'[result][0][message][from][username]'), _ ;[3] = Username
          Json_Get($Json,'[result][0][message][from][first_name]'), _ ;[4] = Firstname
-         Json_Get($Json,'[result][0][message][chat][id]'), _ ;[5] = Group ID
-         Json_Get($Json,'[result][0][message][chat][title]') _ ;[6] = Group Name
+		 Json_Get($json,'[result][0][message][from][last_name]'), _ ;[5] = Lastname
+         Json_Get($Json,'[result][0][message][chat][id]'), _ ;[6] = Group ID
+         Json_Get($Json,'[result][0][message][chat][title]') _ ;[7] = Group Name
       ]
 
       If(Json_Get($Json,'[result][0][message][left_chat_member]')) Then
-         $msgData[7] = 'left' ;[7] = Event
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = Left member ID
-         $msgData[9] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = Left member Username
-         $msgData[10] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = Left member Firstname
+         $msgData[8] = 'left' ;[8] = Event
+         $msgData[9] = Json_Get($Json,'[result][0][message][from][id]') ;[9] = Left member ID
+         $msgData[10] = Json_Get($Json,'[result][0][message][from][username]') ;[10] = Left member Username
+         $msgData[11] = Json_Get($Json,'[result][0][message][from][first_name]') ;[11] = Left member Firstname
+         $msgData[12] = Json_Get($Json,'[result][0][message][from][last_name]') ;[12] = Left member Lastname
       ElseIf(Json_Get($Json,'[result][0][message][new_chat_member]')) Then
-         $msgData[7] = 'new' ;[7] = Event
-         $msgData[8] = Json_Get($Json,'[result][0][message][from][id]') ;[8] = New member ID
-         $msgData[9] = Json_Get($Json,'[result][0][message][from][username]') ;[9] = New member Username
-         $msgData[10] = Json_Get($Json,'[result][0][message][from][first_name]') ;[10] = New member Firstname
+         $msgData[8] = 'new' ;[7] = Event
+         $msgData[9] = Json_Get($Json,'[result][0][message][from][id]') ;[9] = New member ID
+         $msgData[10] = Json_Get($Json,'[result][0][message][from][username]') ;[10] = New member Username
+         $msgData[11] = Json_Get($Json,'[result][0][message][from][first_name]') ;[11] = New member Firstname
+         $msgData[12] = Json_Get($Json,'[result][0][message][from][last_name]') ;[12] = Left member Lastname
       Else
-         $msgData[7] = Json_Get($Json,'[result][0][message][text]') ;[7] = Text
+         $msgData[8] = Json_Get($Json,'[result][0][message][text]') ;[8] = Text
       EndIf
 
       Return $msgData
 
    ;@EDITED PRIVATE CHAT MESSAGE
    ElseIf(Json_Get($Json,'[result][0][edited_message][chat][type]') = 'private') Then
-      Local $msgData[10] = [ _
+      Local $msgData[13] = [ _
 		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
 		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
 		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
 		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
-		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]'), _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][last_name]') _ ;[5] = Lastname
 	  ]
 
-        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[6] = Json_Get($Json,'[result][0][edited_message][text]') ;[6] = Text (eventually)
 
         ;Insert media recognition here
 
@@ -999,15 +1016,16 @@ Func __MsgDecode($Update)
 
 ;@EDITED GROUP CHAT MESSAGE
    ElseIf(Json_Get($Json,'[result][0][edited_message][chat][type]') = 'group') Then
-      Local $msgData[10] = [ _
+      Local $msgData[13] = [ _
 		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
 		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
 		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
 		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
-		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]'), _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][last_name]') _ ;[5] = Lastname
 	  ]
 
-        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[6] = Json_Get($Json,'[result][0][edited_message][text]') ;[6] = Text (eventually)
 
         ;Insert media recognition here
 
@@ -1015,45 +1033,33 @@ Func __MsgDecode($Update)
 
     ;@CALLBACK QUERY
     ElseIf(Json_Get($Json,'[result][0][callback_query][id]') <> '') Then
-        Local $msgData[10] = [ _
+        Local $msgData[13] = [ _
             Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
             Json_Get($Json,'[result][0][callback_query][id]'), _ ;[1] = Callback ID
             Json_Get($Json,'[result][0][callback_query][from][id]'), _ ;[2] = Chat ID
             Json_Get($Json,'[result][0][callback_query][from][username]'), _ ;[3] = Username
             Json_Get($Json,'[result][0][callback_query][from][first_name]'), _ ;[4] = Firstname
-            Json_Get($Json,'[result][0][callback_query][data]') _ ;[5] = Callback Data
+			Json_Get($Json,'[result][0][callback_query][from][last_name]'), _ ;[5] = Lastname
+            Json_Get($Json,'[result][0][callback_query][data]') _ ;[6] = Callback Data
         ]
 
         Return $msgData
 
     ;@INLINE QUERY
     ElseIf(Json_Get($Json,'[result][0][inline_query][id]') <> '') Then
-        Local $msgData[10] = [ _
+        Local $msgData[13] = [ _
             Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
             Json_Get($Json,'[result][0][inline_query][id]'), _ ;[1] = Inline Query ID
             Json_Get($Json,'[result][0][inline_query][from][id]'), _ ;[2] = Chat ID
             Json_Get($Json,'[result][0][inline_query][from][username]'), _ ;[3] = Username
             Json_Get($Json,'[result][0][inline_query][from][first_name]'), _ ;[4] = Firstname
-            Json_Get($Json,'[result][0][inline_query][query]') _ ;[5] = Inline Query Data
+            Json_Get($Json,'[result][0][inline_query][from][last_name]'), _ ;[5] = Lastname
+            Json_Get($Json,'[result][0][inline_query][query]') _ ;[6] = Inline Query Data
         ]
 
         Return $msgData
 
-    ;@CHANNEL MESSAGE (Where bot is admin)
-    ; Sample JSON:
-    #comments-start
-    {"ok":true,"result":[{
-        "update_id":<int>,
-        "channel_post":{
-            "message_id":<int>,
-            "chat":{
-            "id":<int>,
-            "title":"<string>",
-            "type":"channel"},
-            "date":<int>,
-            "text":"<string>"
-    }}]}
-    #comments-end
+
     ElseIf(Json_Get($Json,'[result][0][channel_post][message_id]') <> '') Then
         Local $msgData[5] = [ _
             Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
@@ -1062,7 +1068,7 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[3] = Firstname
         ]
 
-        If(Json_Get($Json,'[result][0][channel_post][text]')) Then 
+        If(Json_Get($Json,'[result][0][channel_post][text]')) Then
             $msgData[4] = Json_Get($Json,'[result][0][channel_post][text]') ;[4] = Text (eventually)
         EndIf
 
@@ -1070,38 +1076,54 @@ Func __MsgDecode($Update)
 
       ;@EDITED CHANNEL CHAT MESSAGE
    ElseIf(Json_Get($Json,'[result][0][edited_channel_post][chat][type]') = 'channel') Then
-      Local $msgData[10] = [ _
+      Local $msgData[13] = [ _
 		 Json_Get($Json,'[result][0][update_id]'), _ ;[0] = Offset
 		 Json_Get($Json,'[result][0][edited_message][message_id]'), _ ;[1] = Message ID
 		 Json_Get($Json,'[result][0][edited_message][from][id]'), _ ;[2] = Chat ID
 		 Json_Get($Json,'[result][0][edited_message][from][username]'), _ ;[3] = Username
-		 Json_Get($Json,'[result][0][edited_message][from][first_name]') _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][first_name]'), _ ;[4] = Firstname
+		 Json_Get($Json,'[result][0][edited_message][from][last_name]') _ ;[5] = Lastname
 	  ]
 
-        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[5] = Json_Get($Json,'[result][0][edited_message][text]') ;[5] = Text (eventually)
+        If(Json_Get($Json,'[result][0][edited_message][text]')) Then $msgData[6] = Json_Get($Json,'[result][0][edited_message][text]') ;[6] = Text (eventually)
 
         ;Insert media recognition here
 
         Return $msgData
     EndIf
 
-EndFunc ;==> __MsgDecode
+EndFunc ;==> _Telegram_MsgDecode
 
 #EndRegion
 
 
 #Region "@HTTP Request"
-Func __HttpGet($sURL,$sData = '')
-    Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
-    $oHTTP.Open("GET",$sURL & "?" & $sData,False)
-    If (@error) Then Return SetError(1,0,0)
-    $oHTTP.Send()
-    If (@error) Then Return SetError(2,0,0)
-    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3,0,0)
-    Return SetError(0,0,$oHTTP.ResponseText)
-EndFunc ;==> __HttpGet
+Func _Telegram_HttpCrashHandler()
+	Consolewrite("We intercepted a COM Error !"    & @CRLF  & @CRLF & _
+             "err.description is: " & @TAB & $oMyError.description  & @CRLF & _
+             "err.windescription:"   & @TAB & $oMyError.windescription & @CRLF & _
+             "err.number is: "       & @TAB & hex($oMyError.number,8)  & @CRLF & _
+             "err.lastdllerror is: "   & @TAB & $oMyError.lastdllerror   & @CRLF & _
+             "err.scriptline is: "   & @TAB & $oMyError.scriptline   & @CRLF & _
+             "err.source is: "       & @TAB & $oMyError.source       & @CRLF & _
+             "err.helpfile is: "       & @TAB & $oMyError.helpfile     & @CRLF & _
+             "err.helpcontext is: " & @TAB & $oMyError.helpcontext & @CRLF _
+            )
+	Return
+endfunc
 
-Func __HttpPost($sURL,$sData = '')
+Func _Telegram_HttpGet($sURL,$sData = '')
+    Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
+    If (@error) Then Return SetError(1,@error,0)
+    $oHTTP.Open("GET",$sURL & "?" & $sData,False)
+    If (@error) Then Return SetError(2,0,0)
+    $oHTTP.Send()
+    If (@error) Then Return SetError(3,0,0)
+    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(4,0,0)
+    Return SetError(0,0,$oHTTP.ResponseText)
+EndFunc ;==> _Telegram_HttpGet
+
+Func _Telegram_HttpPost($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
     $oHTTP.Open("POST",$sURL,False)
     If (@error) Then Return SetError(1,0,0)
@@ -1110,5 +1132,5 @@ Func __HttpPost($sURL,$sData = '')
     If (@error) Then Return SetError(2,0,0)
     If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3,0,0)
     Return SetError(0,0,$oHTTP.ResponseText)
-EndFunc ;==> __HttpPost
+EndFunc ;==> _Telegram_HttpPost
 #EndRegion
