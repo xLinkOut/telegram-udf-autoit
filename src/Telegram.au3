@@ -1097,11 +1097,12 @@ EndFunc ;==> _Telegram_MsgDecode
 #Region "@HTTP Request"
 Func _Telegram_HttpGet($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
+    If (@error) Then Return SetError(1,@error,0)
     $oHTTP.Open("GET",$sURL & "?" & $sData,False)
-    If (@error) Then Return SetError(1,0,0)
-    $oHTTP.Send()
     If (@error) Then Return SetError(2,0,0)
-    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(3,0,0)
+    $oHTTP.Send()
+    If (@error) Then Return SetError(3,0,0)
+    If ($oHTTP.Status <> $HTTP_STATUS_OK) Then Return SetError(4,0,0)
     Return SetError(0,0,$oHTTP.ResponseText)
 EndFunc ;==> _Telegram_HttpGet
 
