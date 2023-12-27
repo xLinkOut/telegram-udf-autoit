@@ -1,3 +1,2 @@
-# Files
-.DS_Store
-tests/devTest.au3
+# Executables
+*.exe
