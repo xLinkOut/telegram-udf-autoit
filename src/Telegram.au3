@@ -30,6 +30,44 @@ Const $FILE_NOT_DOWNLOADED = 2
 Const $OFFSET_GRATER_THAN_TOTAL = 3
 Const $INVALID_JSON_RESPONSE = 4
 
+;@ERRORS
+;TODO: move to another file, if needed
+Const $ERR_INVALID_TOKEN = 1
+
+
+#cs ===============================================================================
+    Name .........: _Telegram_Init
+    Description...: Initialize the bot with the provided  API token
+    Syntax .......: _Telegram_Init($sToken[, $bValidate = False])
+    Parameters....: $sToken    - API token given by BotFather
+                    $bValidate - [optional] validate the provided token with 
+                                the basic GetMe endpoint. Default is False.
+    Return values.: Success - True
+                    Error   - False and set @error to $ERR_INVALID_TOKEN
+#ce ===============================================================================
+Func _Telegram_Init($sToken, $bValidate = False)
+    ; Check if provided token is not empty
+    If ($sToken = "") Then
+        Return SetError($ERR_INVALID_TOKEN, 0, False)
+    EndIf
+
+    ; Save token
+	$TOKEN = $sToken
+    ; Add token to URL
+    $URL &= $TOKEN
+
+    if ($bValidate) Then
+        ; Validate token calling GetMe endpoint
+        Local $aData = _GetMe()
+        ; Double control on error flag and return value
+        If (@error And Not IsArray($aData)) Then
+            Return SetError($ERR_INVALID_TOKEN, 0, False)
+        EndIf
+    EndIf
+
+    Return True
+EndFunc ;==> _Telegram_Init
+
 #Region "@ENDPOINT FUNCTIONS"
 
 #cs ===============================================================================
@@ -759,24 +797,6 @@ EndFunc ;==> _deleteMessage
 
 #Region "@EXTRA FUNCTIONS"
 
-#cs ===============================================================================
-   Function Name..:    	_InitBot
-   Description....:	   	Initialize the bot
-   Parameter(s)...:    	$Token: Bot's token (123456789:AbCdEf...)
-   Return Value(s):	   	Return True if success, False otherwise
-#ce ===============================================================================
-Func _InitBot($Token)
-	$TOKEN = $Token
-    $URL  &= $TOKEN
-
-    If IsArray(_GetMe()) Then
-        Return True
-    Else
-        ;ConsoleWrite("Ops! Error: reason may be invalid token, webhook active, internet connection..." & @CRLF)
-        Return SetError($INVALID_TOKEN_ERROR,0,False)
-    EndIf
-
-EndFunc ;==> _InitBot
 
 #cs ===============================================================================
    Function Name..:    	_Polling
