@@ -19,21 +19,22 @@
 #include <Array.au3>
 
 ;@GLOBAL
+Global $URL	   = ""
 Global $TOKEN  = ""
-Global $URL	   = "https://api.telegram.org/bot"
 Global $OFFSET = 0
 
 ;@CONST
+Const $BASE_URL = "https://api.telegram.org/bot"
 Const $BOT_CRLF = __UrlEncode(@CRLF)
-Const $INVALID_TOKEN_ERROR = 1
-Const $FILE_NOT_DOWNLOADED = 2
-Const $OFFSET_GRATER_THAN_TOTAL = 3
-Const $INVALID_JSON_RESPONSE = 4
 
 ;@ERRORS
 ;TODO: move to another file, if needed
 Const $ERR_INVALID_TOKEN = 1
-
+Const $ERR_WIN_HTTP = 2
+Const $INVALID_TOKEN_ERROR = 1
+Const $FILE_NOT_DOWNLOADED = 2
+Const $OFFSET_GRATER_THAN_TOTAL = 3
+Const $INVALID_JSON_RESPONSE = 4
 
 #cs ===============================================================================
     Name .........: _Telegram_Init
@@ -53,8 +54,8 @@ Func _Telegram_Init($sToken, $bValidate = False)
 
     ; Save token
 	$TOKEN = $sToken
-    ; Add token to URL
-    $URL &= $TOKEN
+    ; Form URL as BASE_URL + TOKEN
+    $URL = $BASE_URL & $TOKEN
 
     if ($bValidate) Then
         ; Validate token calling GetMe endpoint
