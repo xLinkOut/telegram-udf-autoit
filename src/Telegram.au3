@@ -61,7 +61,7 @@ Func _Telegram_Init($sToken, $bValidate = False)
         ; Validate token calling GetMe endpoint
         Local $aData = _GetMe()
         ; Double control on error flag and return value
-        If (@error Or Not IsArray($aData)) Then
+        If (@error Or Not Json_IsObject($aData)) Then
             Return SetError($ERR_INVALID_TOKEN, 0, False)
         EndIf
     EndIf
@@ -70,6 +70,28 @@ Func _Telegram_Init($sToken, $bValidate = False)
 EndFunc ;==> _Telegram_Init
 
 #Region "@ENDPOINT FUNCTIONS"
+
+#cs ===============================================================================
+	Name .........: _Telegram_GetMe
+	Description...: Get basic information about the bot, and test the authentication token
+	Syntax .......: _Telegram_GetMe()
+	Parameters....: None
+	Return values.: Success - Json Object returned by Telegram
+					Error   - Null
+#ce ===============================================================================
+Func _GetMe()
+	Local $vResponse = __HttpGet($URL & "/getMe")
+	If (@error) Then Return SetError(@error, 0, Null)
+
+	Local $vBody = Json_Decode($vResponse)
+	If (@error) Then Return SetError(@error, 0, Null)
+
+	If (Not Json_IsObject($vBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
+	
+	If (Json_Get($vBody, ".ok") <> "true") Then Return SetError(5, 0, Null)
+
+	Return Json_Get($vBody, ".result")
+EndFunc ;==>_GetMe
 
 #cs ===============================================================================
    Function Name..:    	_GetUpdates
@@ -81,20 +103,6 @@ Func _GetUpdates()
     Return __HttpGet($URL & "/getUpdates?offset=" & $OFFSET)
 EndFunc ;==> _GetUpdates
 
-#cs ===============================================================================
-   Function Name..:    	_GetMe
-   Description....:     Get information about the bot (ID,Username,Name)
-   Parameter(s)...:     None
-   Return Value(s):		Return an array with information
-#ce ===============================================================================
-Func _GetMe()
-	Local $json = Json_Decode(__HttpGet($URL & "/getMe"))
-	If Not (Json_IsObject($json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
-	Local $data[3] = [Json_Get($json,'[result][id]'), _
-				   	  Json_Get($json,'[result][username]'), _
-			   		  Json_Get($json,'[result][first_name]')]
-	Return $data
-EndFunc ;==>_GetMe
 
 #cs ===============================================================================
    Function Name..:		_SendMsg
