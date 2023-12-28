@@ -47,7 +47,7 @@ Const $ERR_INVALID_TOKEN = 1
 #ce ===============================================================================
 Func _Telegram_Init($sToken, $bValidate = False)
     ; Check if provided token is not empty
-    If ($sToken = "") Then
+    If ($sToken = "" Or $sToken = Null) Then
         Return SetError($ERR_INVALID_TOKEN, 0, False)
     EndIf
 
@@ -60,7 +60,7 @@ Func _Telegram_Init($sToken, $bValidate = False)
         ; Validate token calling GetMe endpoint
         Local $aData = _GetMe()
         ; Double control on error flag and return value
-        If (@error And Not IsArray($aData)) Then
+        If (@error Or Not IsArray($aData)) Then
             Return SetError($ERR_INVALID_TOKEN, 0, False)
         EndIf
     EndIf
