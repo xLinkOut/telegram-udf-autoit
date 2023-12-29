@@ -112,8 +112,8 @@ EndFunc ;==> _Telegram_GetUpdates
 #cs ===============================================================================
    Function Name..:	 _Telegram_SendMessage
    Description....:     Send a text message
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
-						$Text: Text of the message
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
+						$sText: Text of the message
 						$ParseMode (optional): Markdown/HTML (optional)- https://core.telegram.org/bots/api#sendmessage
                         $ReplyMarkup (optional): Custom keyboard markup;
 						$ReplyToMessage (optional): If the message is a reply, ID of the original message
@@ -121,18 +121,21 @@ EndFunc ;==> _Telegram_GetUpdates
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _Telegram_SendMessage($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
-    Local $Query = $URL & "/sendMessage?chat_id=" & $ChatID & "&text=" & $Text
-    If StringLower($ParseMode) = "markdown" Then $Query &= "&parse_mode=markdown"
-    If StringLower($ParseMode) = "html" Then $Query &= "&parse_mode=html"
-    If $DisableWebPreview = True Then $Query &= "&disable_web_page_preview=True"
-    If $DisableNotification = True Then $Query &= "&disable_notification=True"
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    Local $Json = Json_Decode(__HttpPost($Query))
-	If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
-    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
-    Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
+Func _Telegram_SendMessage($sChatId, $sText, $ParseMode = Null,$ReplyMarkup = Null,$ReplyToMessage = Null,$DisableWebPreview = False,$DisableNotification = False)
+    ; TODO: Enum for ParseMode
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError(1,0,False)
+    If ($sText = "" Or $sText = Null) Then Return SetError(2,0,False)
+    ; TODO: Validate other params
+
+    Local $sParams = "chat_id=" & $sChatId & "&text=" & $sText & "&disable_web_page_preview=" & $DisableWebPreview & "&disable_notification=" & $DisableNotification
+    If $ParseMode <> Null Then $sParams &= "&parse_mode=" & $ParseMode
+    If $ReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $ReplyMarkup
+    If $ReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $ReplyToMessage
+
+    Local $oResponse = _Telegram_API_Call($URL, "/sendMessage", "POST", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $oResponse
 EndFunc ;==> _Telegram_SendMessage
 
 #cs ===============================================================================
