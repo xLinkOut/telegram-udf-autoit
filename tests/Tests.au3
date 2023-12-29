@@ -1,7 +1,8 @@
 #include "../src/Telegram.au3"
 
-Global Const $sValidToken = "[redacted]" ; TODO: Environment variable or config.ini
+Global Const $sValidToken = "" ; TODO: Environment variable or config.ini
 Global Const $sInvalidToken = "123456789:ABCDEFGH"
+Global Const $sChatId = ""
 
 Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @error, Const $iSln = @ScriptLineNumber)
 	ConsoleWrite("(" & $iSln & ") " & ($bResult ? "Passed" : "Failed (" & $iError & ")") & ": " & $sMsg & @LF)
@@ -30,9 +31,24 @@ Func _Test_GetMe()
     UTAssert(Json_Get($oMe, "[first_name]") <> Null, "Test_GetMe: first name", @error)
 EndFunc
 
+Func _Test_SendMessage()
+    Local $oMessage = _Telegram_SendMessage($sChatId, "Test message")
+    ; TODO: The two following checks should be done in another function
+    UTAssert(Not @error, "Test_SendMessage: no error", @error)
+    UTAssert(Json_IsObject($oMessage), "Test_SendMessage: is object", @error)
+    UTAssert(IsInt(Json_Get($oMessage, "[message_id]")), "Test_SendMessage: message id", @error)
+
+    ; Parse Mode
+    $oMessage = _Telegram_SendMessage($sChatId, "*Test* _message_", "Markdown")
+    UTAssert(Not @error, "Test_SendMessage: no error", @error)
+    UTAssert(UBound(Json_Get($oMessage, "[entities]")) > 0, "Test_SendMessage: entities", @error)
+EndFunc
+
 ; TODO: Test runner
-;_Test_Init()
+_Test_Init()
+
 _Telegram_Init($sValidToken, True)
 If (@error) Then Exit(@error)
 
 _Test_GetMe()
+_Test_SendMessage()
