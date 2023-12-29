@@ -41,6 +41,7 @@ Const $TG_ERR_INIT = 1 ;@error
 Const $TG_ERR_INIT_MISSING_TOKEN = 1 ;@extended
 Const $TG_ERR_INIT_INVALID_TOKEN = 2 ;@extended
 
+; Telegram API Call errors
 Const $TG_ERR_API_CALL = 2 ;@error
 Const $TG_ERR_API_CALL_OPEN = 1 ;@extended
 Const $TG_ERR_API_CALL_SEND = 2 ;@extended
@@ -48,6 +49,10 @@ Const $TG_ERR_API_CALL_HTTP_NOT_SUCCESS = 3 ;@extended
 Const $TG_ERR_API_CALL_NOT_DECODED = 4 ;@extended
 Const $TG_ERR_API_CALL_INVALID_JSON = 5 ;@extended
 Const $TG_ERR_API_CALL_NOT_SUCCESS = 6 ;@extended
+
+; Missing or invalid input errors
+Const $TG_ERR_BAD_INPUT = 3 ;@error
+
 #cs ======================================================================================
     Name .........: _Telegram_Init
     Description...: Initializes a Telegram connection using the provided token
@@ -156,9 +161,9 @@ EndFunc ;==> _Telegram_GetUpdates
 #ce ======================================================================================
 Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
     ; TODO: Enum for ParseMode
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError(1,0,False)
-    If ($sText = "" Or $sText = Null) Then Return SetError(2,0,False)
-    ; TODO: Validate other params
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sText = "" Or $sText = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sParseMode <> Null And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
     Local $sParams = _
         "chat_id=" & $sChatId & _
