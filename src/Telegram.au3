@@ -90,24 +90,19 @@ EndFunc ;==>_Telegram_GetMe
    Return Value(s): 	Return string with information encoded in JSON format
 #ce ===============================================================================
 Func _Telegram_GetUpdates($bUpdateOffset = True)
-	Local $sResponse = __HttpGet($URL & "/getUpdates", "offset=" & $OFFSET)
-	If (@error) Then Return SetError(@error, 0, Null)
+    ; Get updates
+    Local $oResponse = _Telegram_API_Call($URL, "/getUpdates", "GET", "offset=" & $OFFSET)
 
-	Local $oBody = Json_Decode($sResponse)
-	If (@error) Then Return SetError(@error, 0, Null)
-	
-	If (Not Json_IsObject($oBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
-
-	If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
-
-	if ($bUpdateOffset) Then
-        Local $iMessageCount = UBound(Json_Get($oBody, "[result]"))
+    if ($bUpdateOffset) Then
+        ; Get messages count
+        Local $iMessageCount = UBound($oResponse)
         if ($iMessageCount > 0) Then
-            $OFFSET = Json_Get($oBody, "[result][" & $iMessageCount - 1 & "][update_id]") + 1
+            ; Set offset as last message id
+            $OFFSET = Json_Get($oResponse, "[result][" & $iMessageCount - 1 & "][update_id]") + 1
         EndIf
 	EndIf
 
-    Return Json_Get($oBody, "[result]")
+    Return $oResponse
 EndFunc ;==> _Telegram_GetUpdates
 
 #cs ===============================================================================
