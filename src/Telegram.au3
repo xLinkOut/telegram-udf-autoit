@@ -36,6 +36,11 @@ Const $FILE_NOT_DOWNLOADED = 2
 Const $OFFSET_GRATER_THAN_TOTAL = 3
 Const $INVALID_JSON_RESPONSE = 4
 
+; Initialization errors
+Const $TG_ERR_INIT = 1 ;@error
+Const $TG_ERR_INIT_MISSING_TOKEN = 1 ;@extended
+Const $TG_ERR_INIT_INVALID_TOKEN = 2 ;@extended
+
 #cs ======================================================================================
     Name .........: _Telegram_Init
     Description...: Initializes a Telegram connection using the provided token
@@ -46,13 +51,15 @@ Const $INVALID_JSON_RESPONSE = 4
                                 to validate the token (Default is False)
     Return values.: 
                     Success - Returns True upon successful initialization
-                    Error   - Returns False and sets @error flag to $ERR_INVALID_TOKEN 
-                            if token is invalid or empty
+                    Error   - Returns False, sets @error flag to $TG_ERR_INIT and set 
+                              @extended flag to:
+                              - $TG_ERR_INIT_MISSING_TOKEN if token is not provided
+                              - $TG_ERR_INIT_INVALID_TOKEN if token is invalid
 #ce ======================================================================================
 Func _Telegram_Init($sToken, $bValidate = False)
     ; Check if provided token is not empty
     If ($sToken = "" Or $sToken = Null) Then
-        Return SetError($ERR_INVALID_TOKEN, 0, False)
+        Return SetError($TG_ERR_INIT, $TG_ERR_INIT_MISSING_TOKEN, False)
     EndIf
 
     ; Save token
@@ -65,7 +72,7 @@ Func _Telegram_Init($sToken, $bValidate = False)
         Local $aData = _Telegram_GetMe()
         ; Double control on error flag and return value
         If (@error Or Not Json_IsObject($aData)) Then
-            Return SetError($ERR_INVALID_TOKEN, 0, False)
+            Return SetError($TG_ERR_INIT, $TG_ERR_INIT_INVALID_TOKEN, False)
         EndIf
     EndIf
 
