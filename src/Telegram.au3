@@ -182,22 +182,30 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
 EndFunc ;==> _Telegram_SendMessage
 
 #cs ===============================================================================
-   Function Name..:		_ForwardMessage
+   Function Name..:		_Telegram_ForwardMessage
    Description....:     Forward a message from a chat to another
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
-						$OriginalChatID: Unique identifier for the chat where the original message was sent
-						$MsgID: Message identifier in the chat specified in from_chat_id
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
+						$sFromChatId:  Unique identifier for the chat where the original message was sent
+						$iMessageId: Message identifier in the chat specified in from_chat_id
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the new Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _ForwardMessage($ChatID,$OriginalChatID,$MsgID,$DisableNotification = False)
-    Local $Query = $URL & "/forwardMessage?chat_id=" & $ChatID & "&from_chat_id=" & $OriginalChatID & "&message_id=" & $MsgID
-    If $DisableNotification Then $Query &= "&disable_notification=True"
-    Local $Json = Json_Decode(__HttpPost($Query))
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
-    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
-EndFunc ;==> _ForwardMessage
+Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sFromChatId = "" Or $sFromChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&from_chat_id=" & $sFromChatId & _ 
+        "&message_id=" & $iMessageId & _
+        "&disable_notification=" & $bDisableNotification
+
+    Local $oResponse = _Telegram_API_Call($URL, "/forwardMessage", "POST", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $oResponse
+EndFunc ;==> _Telegram_ForwardMessage
 
 #cs ===============================================================================
    Function Name..:		_SendPhoto

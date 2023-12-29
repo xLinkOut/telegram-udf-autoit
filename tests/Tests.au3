@@ -44,6 +44,24 @@ Func _Test_SendMessage()
     UTAssert(UBound(Json_Get($oMessage, "[entities]")) > 0, "Test_SendMessage: entities", @error)
 EndFunc
 
+Func _Test_ForwardMessage()
+    ; Send a message that will be forwarded
+    Local $oSentMessage = _Telegram_SendMessage($sChatId, "Test forward message")
+    ; Get its message id
+    Local $iMessageId = Json_Get($oSentMessage, "[message_id]")
+
+    Local $oForwardedMessage = _Telegram_ForwardMessage($sChatId, $sChatId, $iMessageId)
+    UTAssert(Not @error, "Test_ForwardMessage: no error", @error)
+    UTAssert(Json_IsObject($oForwardedMessage), "Test_ForwardMessage: is object", @error)
+    UTAssert(IsInt(Json_Get($oForwardedMessage, "[message_id]")), "Test_ForwardMessage: message id", @error)
+
+    ; Invalid parameters
+    UTAssert(_Telegram_ForwardMessage("123", $sChatId, $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid chat id", @error)
+    UTAssert(_Telegram_ForwardMessage($sChatId, "123", $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid from chat id", @error)
+    UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id", @error)
+    
+EndFunc
+
 ; TODO: Test runner
 _Test_Init()
 
@@ -52,3 +70,4 @@ If (@error) Then Exit(@error)
 
 _Test_GetMe()
 _Test_SendMessage()
+_Test_ForwardMessage()
