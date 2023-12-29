@@ -80,7 +80,10 @@ EndFunc ;==> _Telegram_Init
 					Error   - Null
 #ce ===============================================================================
 Func _Telegram_GetMe()
-	Return _Telegram_API_Call($URL, "/getMe")
+	Local $oResponse = _Telegram_API_Call($URL, "/getMe")
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $oResponse
 EndFunc ;==>_Telegram_GetMe
 
 #cs ===============================================================================
@@ -92,8 +95,9 @@ EndFunc ;==>_Telegram_GetMe
 Func _Telegram_GetUpdates($bUpdateOffset = True)
     ; Get updates
     Local $oResponse = _Telegram_API_Call($URL, "/getUpdates", "GET", "offset=" & $OFFSET)
+    If (@error) Then Return SetError(@error, @extended, Null)
 
-    if ($bUpdateOffset) Then
+    If ($bUpdateOffset) Then
         ; Get messages count
         Local $iMessageCount = UBound($oResponse)
         if ($iMessageCount > 0) Then
