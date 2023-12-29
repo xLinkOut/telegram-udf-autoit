@@ -120,9 +120,8 @@ Func _Telegram_GetUpdates($bUpdateOffset = True)
     Return Json_Get($oBody, "[result]")
 EndFunc ;==> _Telegram_GetUpdates
 
-
 #cs ===============================================================================
-   Function Name..:		_SendMsg
+   Function Name..:	 _Telegram_SendMessage
    Description....:     Send a text message
    Parameter(s)...:     $ChatID: Unique identifier for the target chat
 						$Text: Text of the message
@@ -133,7 +132,7 @@ EndFunc ;==> _Telegram_GetUpdates
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
+Func _Telegram_SendMessage($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableWebPreview = False,$DisableNotification = False)
     Local $Query = $URL & "/sendMessage?chat_id=" & $ChatID & "&text=" & $Text
     If StringLower($ParseMode) = "markdown" Then $Query &= "&parse_mode=markdown"
     If StringLower($ParseMode) = "html" Then $Query &= "&parse_mode=html"
@@ -145,7 +144,7 @@ Func _SendMsg($ChatID,$Text,$ParseMode = Default,$ReplyMarkup = Default,$ReplyTo
 	If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ;Check if json is valid
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False) ;Return false if send message faild
     Return Json_Get($Json,'[result][message_id]') ;Return message_id instead
-EndFunc ;==> _SendMsg
+EndFunc ;==> _Telegram_SendMessage
 
 #cs ===============================================================================
    Function Name..:		_ForwardMessage
@@ -1141,8 +1140,44 @@ EndFunc ;==> __MsgDecode
 
 #EndRegion
 
-
 #Region "@HTTP Request"
+Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
+    ; Create HTTP request object
+    Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
+
+    ; Set parameters, if any, and open request
+    $oHTTP.Open($sMethod, $sURL & $sPath & ($sParams <> "" ? "?" & $sParams : ""), False)
+    If (@error) Then Return SetError(1,0,Null)
+
+    If ($sMethod = "POST") Then
+        ; Set content type header for POST
+        $oHTTP.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    EndIF
+
+    ; Send request with body if any
+    $vBody <> Null ? $oHTTP.Send($vBody) : $oHTTP.Send()
+    If (@error) Then Return SetError(2,0,Null)
+
+    ; Check status code
+    If ($oHTTP.Status < 200 Or $oHTTP.Status > 299) Then Return SetError(3,0,Null)
+
+    ; Decode JSON
+    Local $oBody = Json_Decode($oHTTP.ResponseText)
+
+    ; Validate Telegram response
+    If ($bValidate) Then
+        ; Decoding error
+        If (@error) Then Return SetError(4,0,Null)
+        ; Invalid JSON
+        If (Not Json_IsObject($oBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
+        ; Unsuccessful response
+        If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
+    EndIF
+
+    ; Return 'result' field as JSON object
+    Return SetError(0, 0, Json_Get($oBody, "[result]"))
+EndFunc
+
 Func __HttpGet($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
     $oHTTP.Open("GET",$sURL & "?" & $sData,False)
