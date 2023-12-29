@@ -94,14 +94,31 @@ Func _GetMe()
 EndFunc ;==>_GetMe
 
 #cs ===============================================================================
-   Function Name..:    	_GetUpdates
+   Function Name..:    	_Telegram_GetUpdates
    Description....:     Used by _Polling() to get new messages
    Parameter(s)...:     None
    Return Value(s): 	Return string with information encoded in JSON format
 #ce ===============================================================================
-Func _GetUpdates()
-    Return __HttpGet($URL & "/getUpdates?offset=" & $OFFSET)
-EndFunc ;==> _GetUpdates
+Func _Telegram_GetUpdates($bUpdateOffset = True)
+	Local $sResponse = __HttpGet($URL & "/getUpdates", "offset=" & $OFFSET)
+	If (@error) Then Return SetError(@error, 0, Null)
+
+	Local $oBody = Json_Decode($sResponse)
+	If (@error) Then Return SetError(@error, 0, Null)
+	
+	If (Not Json_IsObject($oBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
+
+	If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
+
+	if ($bUpdateOffset) Then
+        Local $iMessageCount = UBound(Json_Get($oBody, "[result]"))
+        if ($iMessageCount > 0) Then
+            $OFFSET = Json_Get($oBody, "[result][" & $iMessageCount - 1 & "][update_id]") + 1
+        EndIf
+	EndIf
+
+    Return Json_Get($oBody, "[result]")
+EndFunc ;==> _Telegram_GetUpdates
 
 
 #cs ===============================================================================
@@ -816,7 +833,7 @@ EndFunc ;==> _deleteMessage
 Func _Polling()
     While 1
         Sleep(1000) ;Prevent CPU Overloading
-        $newUpdates = _GetUpdates()
+        $newUpdates = _Telegram_GetUpdates()
         ;ConsoleWrite($newUpdates & @CRLF)
         If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
         $msgData = __MsgDecode($newUpdates)
