@@ -181,15 +181,21 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
     Return $oResponse
 EndFunc ;==> _Telegram_SendMessage
 
-#cs ===============================================================================
-   Function Name..:		_Telegram_ForwardMessage
-   Description....:     Forward a message from a chat to another
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$sFromChatId:  Unique identifier for the chat where the original message was sent
-						$iMessageId: Message identifier in the chat specified in from_chat_id
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the new Message ID if no error encountered, False otherwise
-#ce ===============================================================================
+#cs ======================================================================================
+    Name .........: _Telegram_ForwardMessage
+    Description...: Forwards a message from one chat to another using the Telegram API
+    Syntax .......: _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
+    Parameters....: 
+                    $sChatId               - ID of the chat where the message will be forwarded
+                    $sFromChatId           - ID of the chat where the original message is from
+                    $iMessageId            - ID of the message to be forwarded
+                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                                             (Default is False)
+    Return values.: 
+                    Success                - Returns an object containing information about 
+                                             the forwarded message upon a successful API call
+                    Error                  - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
 Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sFromChatId = "" Or $sFromChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
