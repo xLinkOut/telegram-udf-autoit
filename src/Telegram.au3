@@ -41,6 +41,13 @@ Const $TG_ERR_INIT = 1 ;@error
 Const $TG_ERR_INIT_MISSING_TOKEN = 1 ;@extended
 Const $TG_ERR_INIT_INVALID_TOKEN = 2 ;@extended
 
+Const $TG_ERR_API_CALL = 2 ;@error
+Const $TG_ERR_API_CALL_OPEN = 1 ;@extended
+Const $TG_ERR_API_CALL_SEND = 2 ;@extended
+Const $TG_ERR_API_CALL_HTTP_NOT_SUCCESS = 3 ;@extended
+Const $TG_ERR_API_CALL_NOT_DECODED = 4 ;@extended
+Const $TG_ERR_API_CALL_INVALID_JSON = 5 ;@extended
+Const $TG_ERR_API_CALL_NOT_SUCCESS = 6 ;@extended
 #cs ======================================================================================
     Name .........: _Telegram_Init
     Description...: Initializes a Telegram connection using the provided token
@@ -1186,7 +1193,7 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
 
     ; Set parameters, if any, and open request
     $oHTTP.Open($sMethod, $sURL & $sPath & ($sParams <> "" ? "?" & $sParams : ""), False)
-    If (@error) Then Return SetError(1,0,Null)
+    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
 
     If ($sMethod = "POST") Then
         ; Set content type header for POST
@@ -1199,10 +1206,10 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
     Else
         $oHTTP.send()
     EndIf
-    If (@error) Then Return SetError(2,0,Null)
+    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
 
     ; Check status code
-    If ($oHTTP.Status < 200 Or $oHTTP.Status > 299) Then Return SetError(3,0,Null)
+    If ($oHTTP.Status < 200 Or $oHTTP.Status > 299) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_HTTP_NOT_SUCCESS, Null)
 
     ; Decode JSON
     Local $oBody = Json_Decode($oHTTP.ResponseText)
@@ -1210,11 +1217,11 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
     ; Validate Telegram response
     If ($bValidate) Then
         ; Decoding error
-        If (@error) Then Return SetError(4,0,Null)
+        If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_NOT_DECODED, Null)
         ; Invalid JSON
-        If (Not Json_IsObject($oBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
+        If (Not Json_IsObject($oBody)) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_INVALID_JSON, Null)
         ; Unsuccessful response
-        If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
+        If (Json_Get($oBody, "[ok]") <> True) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_NOT_SUCCESS, Null)
     EndIF
 
     ; Return 'result' field as JSON object
