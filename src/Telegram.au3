@@ -121,13 +121,18 @@ EndFunc ;==> _Telegram_GetUpdates
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the Message ID if no error encountered, False otherwise
 #ce ===============================================================================
-Func _Telegram_SendMessage($sChatId, $sText, $ParseMode = Null,$ReplyMarkup = Null,$ReplyToMessage = Null,$DisableWebPreview = False,$DisableNotification = False)
+Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
     ; TODO: Enum for ParseMode
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError(1,0,False)
     If ($sText = "" Or $sText = Null) Then Return SetError(2,0,False)
     ; TODO: Validate other params
 
-    Local $sParams = "chat_id=" & $sChatId & "&text=" & $sText & "&disable_web_page_preview=" & $DisableWebPreview & "&disable_notification=" & $DisableNotification
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&text=" & $sText & _
+        "&disable_notification=" & $DisableNotification & _
+        "&disable_web_page_preview=" & $DisableWebPreview
+    
     If $ParseMode <> Null Then $sParams &= "&parse_mode=" & $ParseMode
     If $ReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $ReplyMarkup
     If $ReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $ReplyToMessage
