@@ -80,17 +80,17 @@ EndFunc ;==> _Telegram_Init
 					Error   - Null
 #ce ===============================================================================
 Func _GetMe()
-	Local $vResponse = __HttpGet($URL & "/getMe")
+	Local $sResponse = __HttpGet($URL & "/getMe")
 	If (@error) Then Return SetError(@error, 0, Null)
 
-	Local $vBody = Json_Decode($vResponse)
+	Local $oBody = Json_Decode($sResponse)
 	If (@error) Then Return SetError(@error, 0, Null)
 
-	If (Not Json_IsObject($vBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
+	If (Not Json_IsObject($oBody)) Then Return SetError($INVALID_JSON_RESPONSE, 0, Null)
 	
-	If (Json_Get($vBody, ".ok") <> "true") Then Return SetError(5, 0, Null)
+	If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
 
-	Return Json_Get($vBody, ".result")
+	Return Json_Get($oBody, "[result]")
 EndFunc ;==>_GetMe
 
 #cs ===============================================================================
