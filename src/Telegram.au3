@@ -59,7 +59,7 @@ Func _Telegram_Init($sToken, $bValidate = False)
 
     if ($bValidate) Then
         ; Validate token calling GetMe endpoint
-        Local $aData = _GetMe()
+        Local $aData = _Telegram_GetMe()
         ; Double control on error flag and return value
         If (@error Or Not Json_IsObject($aData)) Then
             Return SetError($ERR_INVALID_TOKEN, 0, False)
@@ -79,7 +79,7 @@ EndFunc ;==> _Telegram_Init
 	Return values.: Success - Json Object returned by Telegram
 					Error   - Null
 #ce ===============================================================================
-Func _GetMe()
+Func _Telegram_GetMe()
 	Local $sResponse = __HttpGet($URL & "/getMe")
 	If (@error) Then Return SetError(@error, 0, Null)
 
@@ -91,7 +91,7 @@ Func _GetMe()
 	If (Json_Get($oBody, "[ok]") <> True) Then Return SetError(5, 0, Null)
 
 	Return Json_Get($oBody, "[result]")
-EndFunc ;==>_GetMe
+EndFunc ;==>_Telegram_GetMe
 
 #cs ===============================================================================
    Function Name..:    	_Telegram_GetUpdates

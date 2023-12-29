@@ -16,7 +16,7 @@ EndIf
 ConsoleWrite("! Initializing bot... " & _InitBot($Token) & @CRLF & @CRLF)
 
 ConsoleWrite("Who am I? ")
-Local $myData = _GetMe()
+Local $myData = _Telegram_GetMe()
 ConsoleWrite("Oh, yeah, my name is " & $myData[2] & ", you can find me at @" & $myData[1] & ". For developers, my Telegram ID is " & $myData[0] & @CRLF)
 
 ConsoleWrite("Let's do some test:" & @CRLF)
