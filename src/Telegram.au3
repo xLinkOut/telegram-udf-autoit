@@ -36,16 +36,19 @@ Const $FILE_NOT_DOWNLOADED = 2
 Const $OFFSET_GRATER_THAN_TOTAL = 3
 Const $INVALID_JSON_RESPONSE = 4
 
-#cs ===============================================================================
+#cs ======================================================================================
     Name .........: _Telegram_Init
-    Description...: Initialize the bot with the provided  API token
+    Description...: Initializes a Telegram connection using the provided token
     Syntax .......: _Telegram_Init($sToken[, $bValidate = False])
-    Parameters....: $sToken    - API token given by BotFather
-                    $bValidate - [optional] validate the provided token with 
-                                the basic GetMe endpoint. Default is False.
-    Return values.: Success - True
-                    Error   - False and set @error to $ERR_INVALID_TOKEN
-#ce ===============================================================================
+    Parameters....: 
+                    $sToken    - Token to authenticate with Telegram API
+                    $bValidate - [optional] Boolean flag to indicate whether 
+                                to validate the token (Default is False)
+    Return values.: 
+                    Success - Returns True upon successful initialization
+                    Error   - Returns False and sets @error flag to $ERR_INVALID_TOKEN 
+                            if token is invalid or empty
+#ce ======================================================================================
 Func _Telegram_Init($sToken, $bValidate = False)
     ; Check if provided token is not empty
     If ($sToken = "" Or $sToken = Null) Then
@@ -71,14 +74,16 @@ EndFunc ;==> _Telegram_Init
 
 #Region "@ENDPOINT FUNCTIONS"
 
-#cs ===============================================================================
-	Name .........: _Telegram_GetMe
-	Description...: Get basic information about the bot, and test the authentication token
-	Syntax .......: _Telegram_GetMe()
-	Parameters....: None
-	Return values.: Success - Json Object returned by Telegram
-					Error   - Null
-#ce ===============================================================================
+#cs ======================================================================================
+    Name .........: _Telegram_GetMe
+    Description...: Retrieves information about the current bot using Telegram API
+    Syntax .......: _Telegram_GetMe()
+    Parameters....: None
+    Return values.: 
+                    Success - Returns an object with information about the bot upon a 
+                              successful API call
+                    Error   - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
 Func _Telegram_GetMe()
 	Local $oResponse = _Telegram_API_Call($URL, "/getMe")
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -86,12 +91,19 @@ Func _Telegram_GetMe()
     Return $oResponse
 EndFunc ;==>_Telegram_GetMe
 
-#cs ===============================================================================
-   Function Name..:    	_Telegram_GetUpdates
-   Description....:     Used by _Polling() to get new messages
-   Parameter(s)...:     None
-   Return Value(s): 	Return string with information encoded in JSON format
-#ce ===============================================================================
+#cs ======================================================================================
+    Name .........: _Telegram_GetUpdates
+    Description...: Retrieves updates from the Telegram API, optionally updating the offset
+    Syntax .......: _Telegram_GetUpdates([$bUpdateOffset = True])
+    Parameters....: 
+                    $bUpdateOffset - [optional] Boolean flag indicating whether to update 
+                                     the offset (Default is True)
+    Return values.: 
+                    Success - Returns an object containing updates retrieved from the 
+                              Telegram API. If $bUpdateOffset is True, the offset might 
+                              get updated based on the retrieved updates.
+                    Error   - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
 Func _Telegram_GetUpdates($bUpdateOffset = True)
     ; Get updates
     Local $oResponse = _Telegram_API_Call($URL, "/getUpdates", "GET", "offset=" & $OFFSET)
