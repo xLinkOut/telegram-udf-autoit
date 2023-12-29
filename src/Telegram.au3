@@ -121,18 +121,25 @@ Func _Telegram_GetUpdates($bUpdateOffset = True)
     Return $oResponse
 EndFunc ;==> _Telegram_GetUpdates
 
-#cs ===============================================================================
-   Function Name..:	 _Telegram_SendMessage
-   Description....:     Send a text message
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$sText: Text of the message
-						$ParseMode (optional): Markdown/HTML (optional)- https://core.telegram.org/bots/api#sendmessage
-                        $ReplyMarkup (optional): Custom keyboard markup;
-						$ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableWebPreview (optional): Disables link previews for links in this message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the Message ID if no error encountered, False otherwise
-#ce ===============================================================================
+#cs ======================================================================================
+    Name .........: _Telegram_SendMessage
+    Description...: Sends a message via the Telegram API to a specified chat ID
+    Syntax .......: _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
+    Parameters....: 
+                    $sChatId               - ID of the chat where the message will be sent
+                    $sText                 - Text content of the message
+                    $sParseMode            - [optional] Parse mode for the message (Default is Null)
+                    $sReplyMarkup          - [optional] Reply markup for the message (Default is Null)
+                    $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
+                    $bDisableWebPreview    - [optional] Boolean flag to disable web preview 
+                                             (Default is False)
+                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                                             (Default is False)
+    Return values.: 
+                    Success - Returns an object containing information about 
+                                             the sent message upon a successful API call
+                    Error   - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
 Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
     ; TODO: Enum for ParseMode
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError(1,0,False)
