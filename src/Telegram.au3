@@ -1150,6 +1150,22 @@ EndFunc ;==> __MsgDecode
 #EndRegion
 
 #Region "@HTTP Request"
+#cs ======================================================================================
+    Name .........: _Telegram_API_Call
+    Description...: Sends a request to the Telegram API based on provided parameters
+    Syntax .......: _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
+    Parameters....: 
+                    $sURL        - URL to the Telegram API
+                    $sPath       - [optional] Path to the specific API endpoint (Default is "")
+                    $sMethod     - [optional] HTTP method for the request (Default is "GET")
+                    $sParams     - [optional] Parameters for the request (Default is "")
+                    $vBody       - [optional] Body content for the request (Default is Null)
+                    $bValidate   - [optional] Boolean flag to validate Telegram response (Default is True)
+    Return values.: 
+                    Success      - Returns a JSON object with the 'result' field upon 
+                                   successful API call and validation
+                    Error        - Returns Null and sets @error flag according to encountered errors
+#ce ======================================================================================
 Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
     ; Create HTTP request object
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
