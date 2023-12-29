@@ -1155,7 +1155,11 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
     EndIF
 
     ; Send request with body if any
-    $vBody <> Null ? $oHTTP.Send($vBody) : $oHTTP.Send()
+    If ($vBody) Then
+        $oHTTP.send($vBody)
+    Else
+        $oHTTP.send()
+    EndIf
     If (@error) Then Return SetError(2,0,Null)
 
     ; Check status code
