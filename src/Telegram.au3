@@ -168,12 +168,12 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&text=" & $sText & _
-        "&disable_notification=" & $DisableNotification & _
-        "&disable_web_page_preview=" & $DisableWebPreview
+        "&disable_notification=" & $bDisableNotification & _
+        "&disable_web_page_preview=" & $bDisableWebPreview
     
-    If $ParseMode <> Null Then $sParams &= "&parse_mode=" & $ParseMode
-    If $ReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $ReplyMarkup
-    If $ReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $ReplyToMessage
+    If $sParseMode <> Null Then $sParams &= "&parse_mode=" & $sParseMode
+    If $sReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
 
     Local $oResponse = _Telegram_API_Call($URL, "/sendMessage", "POST", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
