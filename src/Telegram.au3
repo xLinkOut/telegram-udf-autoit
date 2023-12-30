@@ -213,17 +213,6 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     Return $oResponse
 EndFunc ;==> _Telegram_ForwardMessage
 
-#cs ===============================================================================
-   Function Name..:		_SendPhoto
-   Description....:     Send a photo
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
-						$Photo: Path to a local file, a File ID as string or an HTTP URL
-						$Caption (optional): Caption to send with photo
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the photo as string
-#ce ===============================================================================
 Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sPhoto = "" Or $sPhoto = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -241,37 +230,26 @@ Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sReplyMarkup = "", 
     If (@error) Then Return SetError(@error, @extended, Null)
 
     Return $oResponse
-EndFunc ;==> _SendPhoto
+EndFunc ;==> _Telegram_SendPhoto
 
-#cs ===============================================================================
-   Function Name..:		_SendAudio
-   Description....:     Send an audio
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
-                        $Audio: Path to a local file, a File ID as string or an HTTP URL
-                        $Caption (optional): Caption to send with audio
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the audio as string
-#ce ===============================================================================
-Func _SendAudio($ChatID,$Audio,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendAudio($sChatId,$Audio,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendAudio'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="audio"/>'   & _
                   '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:audio"  , $Audio,   _
-                       "name:caption", $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:caption", $sCaption, _
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -281,32 +259,32 @@ EndFunc ;==> _SendAudio
 #cs ===============================================================================
    Function Name..:		_SendDocument
    Description....:     Send a document
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
                         $Document: Path to a local file, a File ID as string or an HTTP URL
-                        $Caption (optional): Caption to send with document
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+                        $sCaption (optional): Caption to send with document
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the document as string
 #ce ===============================================================================
-Func _SendDocument($ChatID,$Document,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendDocument($sChatId,$Document,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendDocument'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>'  & _
                   '<input type="file" name="document"/>' & _
                   '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id",  $ChatID, _
+                       "name:chat_id",  $sChatId, _
                        "name:document", $Document,   _
-                       "name:caption",  $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:caption",  $sCaption, _
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -316,32 +294,32 @@ EndFunc ;==> _SendDocument
 #cs ===============================================================================
    Function Name..:		_SendVideo
    Description....:     Send a video
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Video: Path to a local file, a File ID as string or an HTTP URL
-						$Caption (optional): Caption to send with video
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+						$sCaption (optional): Caption to send with video
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the video as string
 #ce ===============================================================================
-Func _SendVideo($ChatID,$Video,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendVideo($sChatId,$Video,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendVideo'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="video"/>'   & _
                   '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:video"  , $Video,   _
-                       "name:caption", $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:caption", $sCaption, _
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -351,32 +329,32 @@ EndFunc ;==> _SendVideo
 #cs ===============================================================================
    Function Name..:		_SendAnimation
    Description....:     Send animation file (GIF or video without sound)
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Animation: Path to a local file, a File ID as string or an HTTP URL
-						$Caption (optional): Caption to send with;
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+						$sCaption (optional): Caption to send with;
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the video as string
 #ce ===============================================================================
-Func _SendAnimation($ChatID,$Animation,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendAnimation($sChatId,$Animation,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendAnimation'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="animation"/>'   & _
                   '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:animation", $Animation,   _
-                       "name:caption", $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:caption", $sCaption, _
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -387,32 +365,32 @@ EndFunc ;==> _SendAnimation
 #cs ===============================================================================
    Function Name..:		_SendVoice
    Description....:     Send a voice file
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Path: Path to a local file (format: .ogg)
-						$Caption (optional): Caption to send with voice
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+						$sCaption (optional): Caption to send with voice
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the voice as string
 #ce ===============================================================================
-Func _SendVoice($ChatID,$Path,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendVoice($sChatId,$Path,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendVoice'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="voice"/>'   & _
                   '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:voice"  , $Path,   _
-                       "name:caption", $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:caption", $sCaption, _
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -422,29 +400,29 @@ EndFunc ;==> _SendVoice
 #cs ===============================================================================
    Function Name..:		_SendVideoNote
    Description....:     Send a voice file
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$VideoNote: Path to a local file, a File ID as string or an HTTP URL
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the videonote as string
 #ce ===============================================================================
-Func _SendVideoNote($ChatID,$VideoNote,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendVideoNote($sChatId,$VideoNote,$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendVideoNote'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="video_note"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:video_note"  , $VideoNote,   _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -454,26 +432,26 @@ EndFunc ;==> _SendVideoNote
 #cs ===============================================================================
    Function Name..:		_SendMediaGroup
    Description....:     Send a voice file
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Media: JSON-serialized array describing photos and videos to be sent, must include 2–10 items
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return an array with all File IDs of the medias sent
 #ce ===============================================================================
-Func _SendMediaGroup($ChatID,$Media,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendMediaGroup($sChatId,$Media,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendMediaGroup'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="mediagroup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:media", $Media, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
 
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
@@ -485,29 +463,29 @@ EndFunc ;==> _SendMediaGroup
    ; DEPRECATED?
    Function Name..:		_SendSticker
    Description....:     Send a sticker
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Path: Path to a local file (format: .webp)
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the sticker as string
 #ce ===============================================================================
-Func _SendSticker($ChatID,$Path,$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
+Func _SendSticker($sChatId,$Path,$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendSticker'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
                   '<input type="text" name="chat_id"/>' & _
                   '<input type="file" name="sticker"/>'
-    If $ReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
+    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
+    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
+    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
     $Form &= '</form>'
    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:sticker", $Path, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
+                       "name:reply_markup", $sReplyMarkup, _
+                       "name:reply_to_message_id", $iReplyToMessage, _
+                       "name:disable_notification", $bDisableNotification)
 
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
@@ -518,39 +496,39 @@ EndFunc ;==> _SendSticker
 #cs ===============================================================================
    Function Name..:		_SendLocation
    Description....:     Send a location object
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Latitude: Latitute of the location
 						$Longitude: Longitude of the location
 						$LivePeriod : Period in seconds for which the location will be updated, should be between 60 and 86400
-                        $ReplyMarkup (optional): Custom keyboard markup;
-                        $ReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+                        $sReplyMarkup (optional): Custom keyboard markup;
+                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
+                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
-    Local $Query = $URL & "/sendLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
+Func _SendLocation($sChatId,$Latitude,$Longitude,$LivePeriod = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $Query = $URL & "/sendLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
-    If $DisableNotification Then $Query &= "&disable_notification=true"
+    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $iReplyToMessage
+    If $bDisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendLocation
 
-Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
-    $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
+Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = ""t)
+    $Query = $URL & "/editMessageLiveLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
+    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc  ;==> _EditMessageLiveLocation
 
-Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
-    $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $ChatID
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
+Func _StopMessageLiveLocation($sChatId,$sReplyMarkup = ""t)
+    $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $sChatId
+    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -558,12 +536,12 @@ Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
 EndFunc ;==> _StopMessageLiveLocation
 
 
-Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
-    Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
+Func _SendVenue($sChatId,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $Query = $URL & "/sendVenue?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
     If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
-    If $DisableNotification Then $Query &= "&disable_notification=true"
+    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $iReplyToMessage
+    If $bDisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -573,21 +551,21 @@ EndFunc ;==> _SendVenue
 #cs ===============================================================================
    Function Name..:		_SendContact
    Description....:     Send a contact object
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Phone: Phone number of the contact;
 						$FirstName: First name of the contact;
 						$LastName (optional): Last name of the contact;
-						$ReplyMarkup (optional): Custom keyboard markup;
-						$ReplyToMessage (optional): If is a reply to another user's message;
-						$DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
+						$sReplyMarkup (optional): Custom keyboard markup;
+						$iReplyToMessage (optional): If is a reply to another user's message;
+						$bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
-    Local $Query = $URL & "/sendContact?chat_id=" & $ChatID & "&phone_number=" & $Phone & "&first_name=" & $FirstName
+Func _SendContact($sChatId,$Phone,$FirstName,$LastName = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $Query = $URL & "/sendContact?chat_id=" & $sChatId & "&phone_number=" & $Phone & "&first_name=" & $FirstName
     If $LastName <> '' Then $Query &= "&last_name=" & $LastName
-    If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
-    If $ReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $ReplyToMessage
-    If $DisableNotification = True Then $Query &= "&disable_notification=True"
+    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $iReplyToMessage
+    If $bDisableNotification = True Then $Query &= "&disable_notification=True"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -597,7 +575,7 @@ EndFunc ;==> _SendContact
 #cs ===============================================================================
    Function Name..:		_SendChatAction
    Description....:     tell the user that something is happening on the bot's side (Bot is typing...)
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Action: Type of the action:
                             typing for text messages,
                             upload_photo for photos,
@@ -608,8 +586,8 @@ EndFunc ;==> _SendContact
                             record_video_note or upload_video_note for video notes.
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendChatAction($ChatID,$Action)
-    Local $Query = $URL & "/sendChatAction?chat_id=" & $ChatID & "&action=" & $Action
+Func _SendChatAction($sChatId,$Action)
+    Local $Query = $URL & "/sendChatAction?chat_id=" & $sChatId & "&action=" & $Action
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -619,13 +597,13 @@ EndFunc ;==> _SendChatAction
 #cs ===============================================================================
    Function Name..:		_GetUserProfilePhotos
    Description....:     Get (all) the profile pictures of an user
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
 						$Offset (optional): if you want a specific photo
 						$Limit (optional): if you want only an x number of photos ;@TODO
    Return Value(s):  	Return an array with photo's count and File ID of the photos
 #ce ===============================================================================
-Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
-    $Query = $URL & "/getUserProfilePhotos?user_id=" & $ChatID
+Func _GetUserProfilePhotos($sChatId,$Offset = '',$Limit = '')
+    $Query = $URL & "/getUserProfilePhotos?user_id=" & $sChatId
     If $Offset <> '' Then $Query &= "&offset=" & $Offset
     If $Limit <> '' Then $Query &= "&limit=" & $Limit
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -657,8 +635,8 @@ Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
     Return $photoArray
 EndFunc ;==> _GetUserProfilePhotos
 
-Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
-    $Query = $URL & "/kickChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
+Func _KickChatMember($sChatId,$UserID,$UntilDate = '')
+    $Query = $URL & "/kickChatMember?chat_id=" & $sChatId & "&user_id=" & $UserID
     If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
@@ -666,23 +644,23 @@ Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
     Return True
 EndFunc ;==> _KickChatMember
 
-Func _UnbanChatMember($ChatID,$UserID)
-    $Query = $URL & "/unbanChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
+Func _UnbanChatMember($sChatId,$UserID)
+    $Query = $URL & "/unbanChatMember?chat_id=" & $sChatId & "&user_id=" & $UserID
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _UnbanChatMember
 
-Func _ExportChatInviteLink($ChatID)
-    $Query = $URL & "/exportChatInviteLink?chat_id=" & $ChatID
+Func _ExportChatInviteLink($sChatId)
+    $Query = $URL & "/exportChatInviteLink?chat_id=" & $sChatId
     Local $Json = Json_Decode(__HttpGet($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return Json_Get($Json,'[result]')
 EndFunc ;==> _ExportChatInviteLink
 
-Func _SetChatPhoto($ChatID,$Path)
+Func _SetChatPhoto($sChatId,$Path)
     Local $Query = $URL & '/setChatPhoto'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -690,7 +668,7 @@ Func _SetChatPhoto($ChatID,$Path)
                   '<input type="file" name="photo"/>'   & _
                   '</form>'
     Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
+                       "name:chat_id", $sChatId, _
                        "name:photo"  , $Path)
     _WinHttpCloseHandle($hOpen)
     Local $Json = Json_Decode($Response)
@@ -699,49 +677,49 @@ Func _SetChatPhoto($ChatID,$Path)
     Return True
 EndFunc ;==> _SetChatPhoto
 
-Func _DeleteChatPhoto($ChatID)
-    $Query = $URL & "/deleteChatPhoto?chat_id=" & $ChatID
+Func _DeleteChatPhoto($sChatId)
+    $Query = $URL & "/deleteChatPhoto?chat_id=" & $sChatId
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _DeleteChatPhoto
 
-Func _SetChatTitle($ChatID,$Title)
-    $Query = $URL & "/setChatTitle?chat_id=" & $ChatID & "&title=" & $Title
+Func _SetChatTitle($sChatId,$Title)
+    $Query = $URL & "/setChatTitle?chat_id=" & $sChatId & "&title=" & $Title
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SetChatTitle
 
-Func _SetChatDescription($ChatID,$Description)
-    $Query = $URL & "/setChatDescription?chat_id=" & $ChatID & "&description=" & $Description
+Func _SetChatDescription($sChatId,$Description)
+    $Query = $URL & "/setChatDescription?chat_id=" & $sChatId & "&description=" & $Description
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SetChatDescription
 
-Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
-    $Query = $URL & "/pinChatMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
-    If $DisableNotification Then $Query &= "&disable_notification=true"
+Func _PinChatMessage($sChatId,$MsgID,$bDisableNotification = False)
+    $Query = $URL & "/pinChatMessage?chat_id=" & $sChatId & "&message_id=" & $MsgID
+    If $bDisableNotification Then $Query &= "&disable_notification=true"
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _PinChatMessage
 
-Func _UnpinChatMessage($ChatID)
-    $Query = $URL & "/unpinChatMessage?chat_id=" & $ChatID
+Func _UnpinChatMessage($sChatId)
+    $Query = $URL & "/unpinChatMessage?chat_id=" & $sChatId
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _UnpinChatMessage
 
-Func _LeaveChat($ChatID)
-    $Query = $URL & "/leaveChat?chat_id=" & $ChatID
+Func _LeaveChat($sChatId)
+    $Query = $URL & "/leaveChat?chat_id=" & $sChatId
     Local $Json = Json_Decode(__HttpPost($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -751,11 +729,11 @@ EndFunc ;==> _LeaveChat
 #cs ===============================================================================
    Function Name..:		_GetChat
    Description....:     Get information about the specified chat, like username and id of the user, or group name for group chat
-   Parameter(s)...:     $ChatID: Unique identifier for the target chat
+   Parameter(s)...:     $sChatId: Unique identifier for the target chat
    Return Value(s):  	Return an array ;@TODO group support
 #ce ===============================================================================
-Func _GetChat($ChatID)
-    Local $Query = $URL & "/getChat?chat_id=" & $ChatID
+Func _GetChat($sChatId)
+    Local $Query = $URL & "/getChat?chat_id=" & $sChatId
     Local $Json = Json_Decode(__HttpGet($Query))
     If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
@@ -766,28 +744,28 @@ Func _GetChat($ChatID)
     Return $chatData
 EndFunc ;==> _GetChat
 
-Func _getChatAdministrators($ChatID)
-    Local $Query = $URL & "/getChatAdministrators?chat_id=" & $ChatID
+Func _getChatAdministrators($sChatId)
+    Local $Query = $URL & "/getChatAdministrators?chat_id=" & $sChatId
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatAdministrators
 
-Func _getChatMembersCount($ChatID)
-    Local $Query = $URL & "/getChatMembersCount?chat_id=" & $ChatID
+Func _getChatMembersCount($sChatId)
+    Local $Query = $URL & "/getChatMembersCount?chat_id=" & $sChatId
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatMembersCount
 
-Func _getChatMember($ChatID)
-    Local $Query = $URL & "/getChatMember?chat_id=" & $ChatID
+Func _getChatMember($sChatId)
+    Local $Query = $URL & "/getChatMember?chat_id=" & $sChatId
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatMember
 
-Func _setChatStickerSet($ChatID)
-    Local $Query = $URL & "/setChatStickerSet?chat_id=" & $ChatID
+Func _setChatStickerSet($sChatId)
+    Local $Query = $URL & "/setChatStickerSet?chat_id=" & $sChatId
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _setChatStickerSet
 
-Func _deleteChatStickerSet($ChatID)
-    Local $Query = $URL & "/deleteChatStickerSet?chat_id=" & $ChatID
+Func _deleteChatStickerSet($sChatId)
+    Local $Query = $URL & "/deleteChatStickerSet?chat_id=" & $sChatId
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _deleteChatStickerSet
 
@@ -809,8 +787,8 @@ Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,
 EndFunc ;==> _answerCallbackQuery
 
 ; TODO: deletemessage
-Func _deleteMessage($ChatID, $MsgID)
-    Local $Query = $URL & "/deleteMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
+Func _deleteMessage($sChatId, $MsgID)
+    Local $Query = $URL & "/deleteMessage?chat_id=" & $sChatId & "&message_id=" & $MsgID
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _deleteMessage
 
