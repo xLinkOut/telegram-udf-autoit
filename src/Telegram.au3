@@ -544,7 +544,6 @@ Func _SendLocation($ChatID,$Latitude,$Longitude,$LivePeriod = '',$ReplyMarkup = 
     Return True
 EndFunc ;==> _SendLocation
 
-; TODO: Comments
 Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Default)
     $Query = $URL & "/editMessageLiveLocation?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
@@ -554,7 +553,6 @@ Func _EditMessageLiveLocation($ChatID,$Latitude,$Longitude,$ReplyMarkup = Defaul
     Return True
 EndFunc  ;==> _EditMessageLiveLocation
 
-; TODO: Comments
 Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
     $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $ChatID
     If $ReplyMarkup <> Default Then $Query &= "&reply_markup=" & $ReplyMarkup
@@ -565,7 +563,6 @@ Func _StopMessageLiveLocation($ChatID,$ReplyMarkup = Default)
 EndFunc ;==> _StopMessageLiveLocation
 
 
-;@TODO Comment
 Func _SendVenue($ChatID,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
     Local $Query = $URL & "/sendVenue?chat_id=" & $ChatID & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
     If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare
@@ -601,8 +598,6 @@ Func _SendContact($ChatID,$Phone,$FirstName,$LastName = '',$ReplyMarkup = Defaul
     If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
     Return True
 EndFunc ;==> _SendContact
-
-; TODO: sendPoll
 
 #cs ===============================================================================
    Function Name..:		_SendChatAction
@@ -667,10 +662,6 @@ Func _GetUserProfilePhotos($ChatID,$Offset = '',$Limit = '')
     Return $photoArray
 EndFunc ;==> _GetUserProfilePhotos
 
-; TODO: getFile
-
-
-; TODO: comment
 Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
     $Query = $URL & "/kickChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
     If $UntilDate <> '' Then $Query &= "&until_date=" & $UntilDate
@@ -680,7 +671,6 @@ Func _KickChatMember($ChatID,$UserID,$UntilDate = '')
     Return True
 EndFunc ;==> _KickChatMember
 
-; TODO: comment
 Func _UnbanChatMember($ChatID,$UserID)
     $Query = $URL & "/unbanChatMember?chat_id=" & $ChatID & "&user_id=" & $UserID
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -689,13 +679,6 @@ Func _UnbanChatMember($ChatID,$UserID)
     Return True
 EndFunc ;==> _UnbanChatMember
 
-; TODO: restrictChatMember
-
-; TODO: promoteChatMember
-
-; TODO: setChatPermission
-
-; TODO: comment
 Func _ExportChatInviteLink($ChatID)
     $Query = $URL & "/exportChatInviteLink?chat_id=" & $ChatID
     Local $Json = Json_Decode(__HttpGet($Query))
@@ -704,7 +687,6 @@ Func _ExportChatInviteLink($ChatID)
     Return Json_Get($Json,'[result]')
 EndFunc ;==> _ExportChatInviteLink
 
-; TODO: comment
 Func _SetChatPhoto($ChatID,$Path)
     Local $Query = $URL & '/setChatPhoto'
     Local $hOpen = _WinHttpOpen()
@@ -722,7 +704,6 @@ Func _SetChatPhoto($ChatID,$Path)
     Return True
 EndFunc ;==> _SetChatPhoto
 
-; TODO: comment
 Func _DeleteChatPhoto($ChatID)
     $Query = $URL & "/deleteChatPhoto?chat_id=" & $ChatID
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -731,7 +712,6 @@ Func _DeleteChatPhoto($ChatID)
     Return True
 EndFunc ;==> _DeleteChatPhoto
 
-; TODO: comment
 Func _SetChatTitle($ChatID,$Title)
     $Query = $URL & "/setChatTitle?chat_id=" & $ChatID & "&title=" & $Title
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -740,7 +720,6 @@ Func _SetChatTitle($ChatID,$Title)
     Return True
 EndFunc ;==> _SetChatTitle
 
-; TODO: comment
 Func _SetChatDescription($ChatID,$Description)
     $Query = $URL & "/setChatDescription?chat_id=" & $ChatID & "&description=" & $Description
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -749,7 +728,6 @@ Func _SetChatDescription($ChatID,$Description)
     Return True
 EndFunc ;==> _SetChatDescription
 
-; TODO: comment
 Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
     $Query = $URL & "/pinChatMessage?chat_id=" & $ChatID & "&message_id=" & $MsgID
     If $DisableNotification Then $Query &= "&disable_notification=true"
@@ -759,7 +737,6 @@ Func _PinChatMessage($ChatID,$MsgID,$DisableNotification = False)
     Return True
 EndFunc ;==> _PinChatMessage
 
-; TODO: comment
 Func _UnpinChatMessage($ChatID)
     $Query = $URL & "/unpinChatMessage?chat_id=" & $ChatID
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -768,7 +745,6 @@ Func _UnpinChatMessage($ChatID)
     Return True
 EndFunc ;==> _UnpinChatMessage
 
-; TODO: comment
 Func _LeaveChat($ChatID)
     $Query = $URL & "/leaveChat?chat_id=" & $ChatID
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -795,31 +771,26 @@ Func _GetChat($ChatID)
     Return $chatData
 EndFunc ;==> _GetChat
 
-; TODO: getChatAdministrators
 Func _getChatAdministrators($ChatID)
     Local $Query = $URL & "/getChatAdministrators?chat_id=" & $ChatID
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatAdministrators
 
-; TODO: getChatMembersCount
 Func _getChatMembersCount($ChatID)
     Local $Query = $URL & "/getChatMembersCount?chat_id=" & $ChatID
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatMembersCount
 
-; TODO: getchatmember
 Func _getChatMember($ChatID)
     Local $Query = $URL & "/getChatMember?chat_id=" & $ChatID
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _getChatMember
 
-; TODO: sertchatstrickerset
 Func _setChatStickerSet($ChatID)
     Local $Query = $URL & "/setChatStickerSet?chat_id=" & $ChatID
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _setChatStickerSet
 
-; TODO: deletechatstrickerset
 Func _deleteChatStickerSet($ChatID)
     Local $Query = $URL & "/deleteChatStickerSet?chat_id=" & $ChatID
     ConsoleWrite(__HttpGet($Query))
@@ -848,24 +819,6 @@ Func _deleteMessage($ChatID, $MsgID)
     ConsoleWrite(__HttpGet($Query))
 EndFunc ;==> _deleteMessage
 
-
-
-; TODO: editmessagetext
-; TODO: editmessagecaption
-; TODO: editmessagemedia
-; TODO: editmessagereplymarkup
-; TODO: stoppoll
-; TODO: sendsticker
-; TODO: getsticketset
-; TODO: uploadstickerfile
-; TODO: createnewstickerset
-; TODO: addstickertoset
-; TODO: setstickerpositioninset
-; TODO: deletestickerfromset
-; TODO: Inline mode
-; TODO: Payments mode
-; TODO: Game mode
-; TODO: Passport
 
 #EndRegion
 
