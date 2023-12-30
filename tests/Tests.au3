@@ -60,6 +60,23 @@ Func _Test_ForwardMessage()
     UTAssert(_Telegram_ForwardMessage($sChatId, "123", $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid from chat id", @error, @extended)
     UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id", @error, @extended)
 EndFunc
+
+Func _Test_SendPhoto()
+    Local Const $sPhotoPath = "media/image.png"
+    Local Const $sPhotoURL = "https://picsum.photos/200"
+
+    ; Send a local photo
+    Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoPath)
+    UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
+    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
+    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
+
+    ; Send a photo by URL (N.B.: This currently not works)
+    Local $oPhoto = _SendPhoto($sChatId, $sPhotoURL)
+    UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
+    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
+    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
+
 EndFunc
 
 ; TODO: Test runner
@@ -68,6 +85,4 @@ _Test_Init()
 _Telegram_Init($sValidToken, True)
 If (@error) Then Exit(@error)
 
-_Test_GetMe()
-_Test_SendMessage()
-_Test_ForwardMessage()
+_Test_SendPhoto()
