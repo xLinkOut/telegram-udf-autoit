@@ -281,6 +281,51 @@ Func _Telegram_SendMediaGroup($sChatId,$aMedias,$bDisableNotification = False)
     Return $oResponse
 EndFunc
 
+#cs ======================================================================================
+    Name .........: _Telegram_SendLocation
+    Description...: Sends a location to the specified chat.
+    Syntax .......: _Telegram_SendLocation($sChatId, $fLatitude, $fLongitude, $fHorizontalAccuracy = Null, $iLivePeriod = Null, $iProximityAlertRadius = Null, $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    Parameters....: 
+                    $sChatId               - The chat ID.
+                    $fLatitude             - The latitude of the location.
+                    $fLongitude            - The longitude of the location.
+                    $fHorizontalAccuracy   - [optional] The radius of uncertainty for the location, measured in meters.
+                    $iLivePeriod           - [optional] Period in seconds for which the location will be updated (for live locations).
+                    $iProximityAlertRadius - [optional] The radius for triggering proximity alerts.
+                    $sReplyMarkup          - [optional] Additional interface options. Default is an empty string.
+                    $iReplyToMessage       - [optional] ID of the message to reply to.
+                    $bDisableNotification  - [optional] Disables notifications if set to True. Default is False.
+    Return values.: 
+                    Success - Returns the API response.
+                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                                   Possible @error values:
+                                      $TG_ERR_BAD_INPUT - Invalid input parameters.
+                                      Other errors based on the API response.
+#ce ======================================================================================
+Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy = Null, $iLivePeriod = Null,$iProximityAlertRadius = Null, $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($fLatitude = "" Or $fLatitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($fLongitude = "" Or $fLongitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&latitude=" & $fLatitude & _
+        "&longitude=" & $fLongitude
+    
+    If $fHorizontalAccuracy <> Null Then $sParams &= "&horizontal_accuracy=" & $fHorizontalAccuracy
+    If $iLivePeriod <> Null Then $sParams &= "&live_period=" & $iLivePeriod
+    If $iProximityAlertRadius <> Null Then $sParams &= "&proximity_alert_radius=" & $iProximityAlertRadius
+
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> '' Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    If $bDisableNotification Then $sParams &= "&disable_notification=true"
+    
+    Local $oResponse = _Telegram_API_Call($URL, "/sendLocation", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return $oResponse
+
+EndFunc ;==> _Telegram_SendLocation
+
 #cs ===============================================================================
    ; DEPRECATED?
    Function Name..:		_SendSticker
@@ -315,29 +360,7 @@ Func _SendSticker($sChatId,$Path,$sReplyMarkup = "",$iReplyToMessage = Null,$bDi
     Return __GetFileID($Json,'sticker')
 EndFunc ;==> _SendSticker
 
-#cs ===============================================================================
-   Function Name..:		_SendLocation
-   Description....:     Send a location object
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$Latitude: Latitute of the location
-						$Longitude: Longitude of the location
-						$LivePeriod : Period in seconds for which the location will be updated, should be between 60 and 86400
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return True if no error encountered, False otherwise
-#ce ===============================================================================
-Func _SendLocation($sChatId,$Latitude,$Longitude,$LivePeriod = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & "/sendLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
-    If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod
-    If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> '' Then $Query &= "&reply_to_message_id=" & $iReplyToMessage
-    If $bDisableNotification Then $Query &= "&disable_notification=true"
-    Local $Json = Json_Decode(__HttpPost($Query))
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    If Not (Json_Get($Json,'[ok]') = 'true') Then Return SetError(2,0,False)
-    Return True
-EndFunc ;==> _SendLocation
+
 
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
     $Query = $URL & "/editMessageLiveLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
