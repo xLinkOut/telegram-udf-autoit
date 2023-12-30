@@ -1178,7 +1178,7 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
     Else
         $oHTTP.send()
     EndIf
-    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
+    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_SEND, Null)
 
     ; Check status code
     If ($oHTTP.Status < 200 Or $oHTTP.Status > 299) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_HTTP_NOT_SUCCESS, Null)
