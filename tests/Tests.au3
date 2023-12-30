@@ -4,8 +4,8 @@ Global Const $sValidToken = "" ; TODO: Environment variable or config.ini
 Global Const $sInvalidToken = "123456789:ABCDEFGH"
 Global Const $sChatId = ""
 
-Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @error, Const $iSln = @ScriptLineNumber)
-	ConsoleWrite("(" & $iSln & ") " & ($bResult ? "Passed" : "Failed (" & $iError & ")") & ": " & $sMsg & @LF)
+Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @error, Const $iExtended = @extended, Const $iSln = @ScriptLineNumber)
+	ConsoleWrite("(" & $iSln & ") " & ($bResult ? "Passed" : "Failed (" & $iError & "/" & $iExtended & ")") & ": " & $sMsg & @LF)
 	Return $bResult
 EndFunc ;==>UTAssert
 
