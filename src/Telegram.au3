@@ -224,28 +224,23 @@ EndFunc ;==> _Telegram_ForwardMessage
                         $DisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the photo as string
 #ce ===============================================================================
-Func _SendPhoto($ChatID,$Photo,$Caption = '',$ReplyMarkup = Default,$ReplyToMessage = '',$DisableNotification = False)
-    Local $Query = $URL & '/sendPhoto'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="photo"/>'   & _
-                  '<input type="text" name="caption"/>'
-    If $ReplyMarkup <> Default Then $Form &= '<input type="text" name="reply_markup"/>'
-    If $ReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $DisableNotification Then $Form &= '<input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $ChatID, _
-                       "name:photo"  , $Photo,   _
-                       "name:caption", $Caption, _
-                       "name:reply_markup", $ReplyMarkup, _
-                       "name:reply_to_message_id", $ReplyToMessage, _
-                       "name:disable_notification", $DisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'photo')
+Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sPhoto = "" Or $sPhoto = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&photo=" & $sPhoto & _
+        "&disable_notification=" & $bDisableNotification
+
+    If $sReplyMarkup <> "" Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendPhoto", $sParams, $sPhoto, "photo")
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $oResponse
 EndFunc ;==> _SendPhoto
 
 #cs ===============================================================================
@@ -1217,7 +1212,7 @@ Func _Telegram_SendMedia($sURL, $sPath, $sParams, $vMedia, $sMediaType, $bValida
     If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_SEND, Null)
 
     _WinHttpCloseHandle($hOpen)
-    ConsoleWrite($sResponse)
+
     Local $oBody = Json_Decode($sResponse)
 
     ; Validate Telegram response
