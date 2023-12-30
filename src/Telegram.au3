@@ -216,117 +216,44 @@ EndFunc ;==> _Telegram_ForwardMessage
 Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sParseMode = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
     Local $oResponse = _Telegram_SendMedia($sChatId, $sPhoto, "photo", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
 EndFunc ;==> _Telegram_SendPhoto
 
-Func _Telegram_SendAudio($sChatId,$sAudio,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($sAudio = "" Or $sAudio = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendAudio", $sParams, $sAudio, "audio")
+Func _Telegram_SendAudio($sChatId,$sAudio,$sCaption = '', $sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $sAudio, "audio", $sCaption, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
 EndFunc ;==> _Telegram_SendAudio
 
-Func _Telegram_SendDocument($sChatId,$Document,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($Document = "" Or $Document = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendDocument", $sParams, $Document, "document")
+Func _Telegram_SendDocument($sChatId,$Document,$sCaption = '',$sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $Document, "document", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
-
 EndFunc ;==> _Telegram_SendDocument
 
-Func _Telegram_SendVideo($sChatId,$Video,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($Video = "" Or $Video = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendVideo", $sParams, $Video, "video")
+Func _Telegram_SendVideo($sChatId,$Video,$sCaption = '', $sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $Video, "video", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
 EndFunc ;==> _Telegram_SendVideo
 
-Func _Telegram_SendAnimation($sChatId,$Animation,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($Animation = "" Or $Animation = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendAnimation", $sParams, $Animation, "animation")
+Func _Telegram_SendAnimation($sChatId,$Animation,$sCaption = '',$sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $Animation, "animation", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
 EndFunc ;==> _Telegram_SendAnimation
 
-Func _SendVoice($sChatId,$Path,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($Path = "" Or $Path = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendVoice", $sParams, $Path, "voice")
+Func _Telegram_SendVoice($sChatId,$Path,$sCaption = '',$sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $Path, "voice", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
-EndFunc ;==> _SendVoice
+EndFunc ;==> _Telegram_SendVoice
 
-Func _SendVideoNote($sChatId,$VideoNote,$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($VideoNote = "" Or $VideoNote = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendVideoNote", $sParams, $VideoNote, "video_note")
+Func _Telegram_SendVideoNote($sChatId,$VideoNote,$sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $VideoNote, "videonote", $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
-
     Return $oResponse
-EndFunc ;==> _SendVideoNote
+EndFunc ;==> _Telegram_SendVideoNote
 
 #cs ===============================================================================
    Function Name..:		_SendMediaGroup
