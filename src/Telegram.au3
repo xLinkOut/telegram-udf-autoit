@@ -232,201 +232,112 @@ Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sReplyMarkup = "", 
     Return $oResponse
 EndFunc ;==> _Telegram_SendPhoto
 
-Func _SendAudio($sChatId,$Audio,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendAudio'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="audio"/>'   & _
-                  '<input type="text" name="caption"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:audio"  , $Audio,   _
-                       "name:caption", $sCaption, _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'audio')
-EndFunc ;==> _SendAudio
+Func _Telegram_SendAudio($sChatId,$sAudio,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sAudio = "" Or $sAudio = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendAudio", $sParams, $sAudio, "audio")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
+EndFunc ;==> _Telegram_SendAudio
 
-#cs ===============================================================================
-   Function Name..:		_SendDocument
-   Description....:     Send a document
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-                        $Document: Path to a local file, a File ID as string or an HTTP URL
-                        $sCaption (optional): Caption to send with document
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the document as string
-#ce ===============================================================================
-Func _SendDocument($sChatId,$Document,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendDocument'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>'  & _
-                  '<input type="file" name="document"/>' & _
-                  '<input type="text" name="caption"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id",  $sChatId, _
-                       "name:document", $Document,   _
-                       "name:caption",  $sCaption, _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'document')
-EndFunc ;==> _SendDocument
+Func _Telegram_SendDocument($sChatId,$Document,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($Document = "" Or $Document = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendDocument", $sParams, $Document, "document")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
+    
+EndFunc ;==> _Telegram_SendDocument
 
-#cs ===============================================================================
-   Function Name..:		_SendVideo
-   Description....:     Send a video
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$Video: Path to a local file, a File ID as string or an HTTP URL
-						$sCaption (optional): Caption to send with video
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the video as string
-#ce ===============================================================================
-Func _SendVideo($sChatId,$Video,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendVideo'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="video"/>'   & _
-                  '<input type="text" name="caption"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:video"  , $Video,   _
-                       "name:caption", $sCaption, _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'video')
-EndFunc ;==> _SendVideo
+Func _Telegram_SendVideo($sChatId,$Video,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($Video = "" Or $Video = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendVideo", $sParams, $Video, "video")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
+EndFunc ;==> _Telegram_SendVideo
 
-#cs ===============================================================================
-   Function Name..:		_SendAnimation
-   Description....:     Send animation file (GIF or video without sound)
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$Animation: Path to a local file, a File ID as string or an HTTP URL
-						$sCaption (optional): Caption to send with;
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the video as string
-#ce ===============================================================================
-Func _SendAnimation($sChatId,$Animation,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendAnimation'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="animation"/>'   & _
-                  '<input type="text" name="caption"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:animation", $Animation,   _
-                       "name:caption", $sCaption, _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'animation')
-EndFunc ;==> _SendAnimation
+Func _Telegram_SendAnimation($sChatId,$Animation,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($Animation = "" Or $Animation = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendAnimation", $sParams, $Animation, "animation")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
+EndFunc ;==> _Telegram_SendAnimation
 
-
-#cs ===============================================================================
-   Function Name..:		_SendVoice
-   Description....:     Send a voice file
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$Path: Path to a local file (format: .ogg)
-						$sCaption (optional): Caption to send with voice
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the voice as string
-#ce ===============================================================================
-Func _SendVoice($sChatId,$Path,$sCaption = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendVoice'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="voice"/>'   & _
-                  '<input type="text" name="caption"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:voice"  , $Path,   _
-                       "name:caption", $sCaption, _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'voice')
+Func _SendVoice($sChatId,$Path,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($Path = "" Or $Path = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendVoice", $sParams, $Path, "voice")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
 EndFunc ;==> _SendVoice
 
-#cs ===============================================================================
-   Function Name..:		_SendVideoNote
-   Description....:     Send a voice file
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$VideoNote: Path to a local file, a File ID as string or an HTTP URL
-                        $sReplyMarkup (optional): Custom keyboard markup;
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return the File ID of the videonote as string
-#ce ===============================================================================
-Func _SendVideoNote($sChatId,$VideoNote,$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendVideoNote'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="video_note"/>'
-    If $sReplyMarkup <> Default Then $Form &= ' <input type="text" name="reply_markup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:video_note"  , $VideoNote,   _
-                       "name:reply_markup", $sReplyMarkup, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'videonote')
+Func _SendVideoNote($sChatId,$VideoNote,$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($VideoNote = "" Or $VideoNote = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&disable_notification=" & $bDisableNotification
+    
+    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    
+    Local $oResponse = _Telegram_SendMedia($URL, "/sendVideoNote", $sParams, $VideoNote, "video_note")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
 EndFunc ;==> _SendVideoNote
 
 #cs ===============================================================================
@@ -470,7 +381,7 @@ EndFunc ;==> _SendMediaGroup
                         $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return the File ID of the sticker as string
 #ce ===============================================================================
-Func _SendSticker($sChatId,$Path,$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+Func _SendSticker($sChatId,$Path,$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & '/sendSticker'
     Local $hOpen = _WinHttpOpen()
     Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
@@ -505,7 +416,7 @@ EndFunc ;==> _SendSticker
                         $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendLocation($sChatId,$Latitude,$Longitude,$LivePeriod = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+Func _SendLocation($sChatId,$Latitude,$Longitude,$LivePeriod = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & "/sendLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $LivePeriod <> '' Then $Query &= "&live_period=" & $LivePeriod
     If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
@@ -517,7 +428,7 @@ Func _SendLocation($sChatId,$Latitude,$Longitude,$LivePeriod = '',$sReplyMarkup 
     Return True
 EndFunc ;==> _SendLocation
 
-Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = ""t)
+Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
     $Query = $URL & "/editMessageLiveLocation?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude
     If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -526,7 +437,7 @@ Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = ""t)
     Return True
 EndFunc  ;==> _EditMessageLiveLocation
 
-Func _StopMessageLiveLocation($sChatId,$sReplyMarkup = ""t)
+Func _StopMessageLiveLocation($sChatId,$sReplyMarkup = "")
     $Query = $URL & "/stopMessageLiveLocation?chat_id=" & $sChatId
     If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
     Local $Json = Json_Decode(__HttpPost($Query))
@@ -536,7 +447,7 @@ Func _StopMessageLiveLocation($sChatId,$sReplyMarkup = ""t)
 EndFunc ;==> _StopMessageLiveLocation
 
 
-Func _SendVenue($sChatId,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+Func _SendVenue($sChatId,$Latitude,$Longitude,$Title,$Address,$Foursquare = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & "/sendVenue?chat_id=" & $sChatId & "&latitude=" & $Latitude & "&longitude=" & $Longitude & "&title=" & $Title & "&address=" & $Address
     If $Foursquare <> '' Then $Query &= "&foursquare=" & $Foursquare
     If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
@@ -560,7 +471,7 @@ EndFunc ;==> _SendVenue
 						$bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
    Return Value(s):  	Return True if no error encountered, False otherwise
 #ce ===============================================================================
-Func _SendContact($sChatId,$Phone,$FirstName,$LastName = '',$sReplyMarkup = ""t,$iReplyToMessage = Null,$bDisableNotification = False)
+Func _SendContact($sChatId,$Phone,$FirstName,$LastName = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     Local $Query = $URL & "/sendContact?chat_id=" & $sChatId & "&phone_number=" & $Phone & "&first_name=" & $FirstName
     If $LastName <> '' Then $Query &= "&last_name=" & $LastName
     If $sReplyMarkup <> Default Then $Query &= "&reply_markup=" & $sReplyMarkup
