@@ -213,6 +213,26 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     Return $oResponse
 EndFunc ;==> _Telegram_ForwardMessage
 
+#cs ======================================================================================
+    Name .........: _Telegram_Send<Type>
+    Description...: Sends a <Type> via the Telegram API to a specified chat ID
+    Syntax .......: _Telegram_Send<Type>($sChatId, $<Type>, [$sCaption = "" [, $sParseMode = "" [, $sReplyMarkup = "" [, $iReplyToMessage = Null [, $bDisableNotification = False]]]]])
+    Parameters....: 
+                    $sChatId               - ID of the chat where the <Type> will be sent
+                    $<Type>                - <Type> to be sent, a string representing a local path to a file,
+                                             a remote URL or a Telegram File ID. Supported objects are: photo,
+                                             audio, document, video, animation, voice, videonote, mediagroup
+                    $sCaption              - [optional] Caption for the <Type> (Default is "")
+                    $sParseMode            - [optional] Parse mode for the caption (Default is "")
+                    $sReplyMarkup          - [optional] Reply markup for the <Type> (Default is "")
+                    $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
+                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                                             (Default is False)
+    Return values.: 
+                    Success                - Returns an object containing information about 
+                                             the sent <Type> upon a successful API call
+                    Error                  - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
 Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sParseMode = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
     Local $oResponse = _Telegram_SendMedia($sChatId, $sPhoto, "photo", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
