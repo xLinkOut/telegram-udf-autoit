@@ -57,13 +57,13 @@ Const $TG_ERR_BAD_INPUT = 3 ;@error
     Name .........: _Telegram_Init
     Description...: Initializes a Telegram connection using the provided token
     Syntax .......: _Telegram_Init($sToken[, $bValidate = False])
-    Parameters....: 
+    Parameters....:
                     $sToken    - Token to authenticate with Telegram API
-                    $bValidate - [optional] Boolean flag to indicate whether 
+                    $bValidate - [optional] Boolean flag to indicate whether
                                 to validate the token (Default is False)
-    Return values.: 
+    Return values.:
                     Success - Returns True upon successful initialization
-                    Error   - Returns False, sets @error flag to $TG_ERR_INIT and set 
+                    Error   - Returns False, sets @error flag to $TG_ERR_INIT and set
                               @extended flag to:
                               - $TG_ERR_INIT_MISSING_TOKEN if token is not provided
                               - $TG_ERR_INIT_INVALID_TOKEN if token is invalid
@@ -98,8 +98,8 @@ EndFunc ;==> _Telegram_Init
     Description...: Retrieves information about the current bot using Telegram API
     Syntax .......: _Telegram_GetMe()
     Parameters....: None
-    Return values.: 
-                    Success - Returns an object with information about the bot upon a 
+    Return values.:
+                    Success - Returns an object with information about the bot upon a
                               successful API call
                     Error   - Returns Null and sets @error flag to the encountered error code
 #ce ======================================================================================
@@ -114,12 +114,12 @@ EndFunc ;==>_Telegram_GetMe
     Name .........: _Telegram_GetUpdates
     Description...: Retrieves updates from the Telegram API, optionally updating the offset
     Syntax .......: _Telegram_GetUpdates([$bUpdateOffset = True])
-    Parameters....: 
-                    $bUpdateOffset - [optional] Boolean flag indicating whether to update 
+    Parameters....:
+                    $bUpdateOffset - [optional] Boolean flag indicating whether to update
                                      the offset (Default is True)
-    Return values.: 
-                    Success - Returns an object containing updates retrieved from the 
-                              Telegram API. If $bUpdateOffset is True, the offset might 
+    Return values.:
+                    Success - Returns an object containing updates retrieved from the
+                              Telegram API. If $bUpdateOffset is True, the offset might
                               get updated based on the retrieved updates.
                     Error   - Returns Null and sets @error flag to the encountered error code
 #ce ======================================================================================
@@ -144,18 +144,18 @@ EndFunc ;==> _Telegram_GetUpdates
     Name .........: _Telegram_SendMessage
     Description...: Sends a message via the Telegram API to a specified chat ID
     Syntax .......: _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
-    Parameters....: 
+    Parameters....:
                     $sChatId               - ID of the chat where the message will be sent
                     $sText                 - Text content of the message
                     $sParseMode            - [optional] Parse mode for the message (Default is Null)
                     $sReplyMarkup          - [optional] Reply markup for the message (Default is Null)
                     $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
-                    $bDisableWebPreview    - [optional] Boolean flag to disable web preview 
+                    $bDisableWebPreview    - [optional] Boolean flag to disable web preview
                                              (Default is False)
-                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                    $bDisableNotification  - [optional] Boolean flag to disable notification
                                              (Default is False)
-    Return values.: 
-                    Success - Returns an object containing information about 
+    Return values.:
+                    Success - Returns an object containing information about
                                              the sent message upon a successful API call
                     Error   - Returns Null and sets @error flag to the encountered error code
 #ce ======================================================================================
@@ -170,7 +170,7 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
         "&text=" & $sText & _
         "&disable_notification=" & $bDisableNotification & _
         "&disable_web_page_preview=" & $bDisableWebPreview
-    
+
     If $sParseMode <> Null Then $sParams &= "&parse_mode=" & $sParseMode
     If $sReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
@@ -185,14 +185,14 @@ EndFunc ;==> _Telegram_SendMessage
     Name .........: _Telegram_ForwardMessage
     Description...: Forwards a message from one chat to another using the Telegram API
     Syntax .......: _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
-    Parameters....: 
+    Parameters....:
                     $sChatId               - ID of the chat where the message will be forwarded
                     $sFromChatId           - ID of the chat where the original message is from
                     $iMessageId            - ID of the message to be forwarded
-                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                    $bDisableNotification  - [optional] Boolean flag to disable notification
                                              (Default is False)
-    Return values.: 
-                    Success                - Returns an object containing information about 
+    Return values.:
+                    Success                - Returns an object containing information about
                                              the forwarded message upon a successful API call
                     Error                  - Returns Null and sets @error flag to the encountered error code
 #ce ======================================================================================
@@ -200,10 +200,10 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sFromChatId = "" Or $sFromChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
-        "&from_chat_id=" & $sFromChatId & _ 
+        "&from_chat_id=" & $sFromChatId & _
         "&message_id=" & $iMessageId & _
         "&disable_notification=" & $bDisableNotification
 
@@ -213,20 +213,8 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     Return $oResponse
 EndFunc ;==> _Telegram_ForwardMessage
 
-Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
-    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    If ($sPhoto = "" Or $sPhoto = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&photo=" & $sPhoto & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sReplyMarkup <> "" Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-
-    Local $oResponse = _Telegram_SendMedia($URL, "/sendPhoto", $sParams, $sPhoto, "photo")
+Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sParseMode = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $sPhoto, "photo", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
 
     Return $oResponse
@@ -235,108 +223,108 @@ EndFunc ;==> _Telegram_SendPhoto
 Func _Telegram_SendAudio($sChatId,$sAudio,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sAudio = "" Or $sAudio = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&caption=" & $sCaption & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendAudio", $sParams, $sAudio, "audio")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
 EndFunc ;==> _Telegram_SendAudio
 
 Func _Telegram_SendDocument($sChatId,$Document,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($Document = "" Or $Document = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&caption=" & $sCaption & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendDocument", $sParams, $Document, "document")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
-    
+
 EndFunc ;==> _Telegram_SendDocument
 
 Func _Telegram_SendVideo($sChatId,$Video,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($Video = "" Or $Video = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&caption=" & $sCaption & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendVideo", $sParams, $Video, "video")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
 EndFunc ;==> _Telegram_SendVideo
 
 Func _Telegram_SendAnimation($sChatId,$Animation,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($Animation = "" Or $Animation = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&caption=" & $sCaption & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendAnimation", $sParams, $Animation, "animation")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
 EndFunc ;==> _Telegram_SendAnimation
 
 Func _SendVoice($sChatId,$Path,$sCaption = '',$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($Path = "" Or $Path = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&caption=" & $sCaption & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendVoice", $sParams, $Path, "voice")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
 EndFunc ;==> _SendVoice
 
 Func _SendVideoNote($sChatId,$VideoNote,$sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($VideoNote = "" Or $VideoNote = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = _
         "chat_id=" & $sChatId & _
         "&disable_notification=" & $bDisableNotification
-    
+
     If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
     If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    
+
     Local $oResponse = _Telegram_SendMedia($URL, "/sendVideoNote", $sParams, $VideoNote, "video_note")
     If (@error) Then Return SetError(@error, @extended, Null)
-    
+
     Return $oResponse
 EndFunc ;==> _SendVideoNote
 
@@ -521,7 +509,7 @@ Func _GetUserProfilePhotos($sChatId,$Offset = '',$Limit = '')
     If Not (Json_IsObject($Json)) Then Return SetError(2,0,False)
 
     Local $count = Json_Get($Json,'[result][total_count]')
-    
+
     If $Offset >= $count Then Return SetError($OFFSET_GRATER_THAN_TOTAL,0,False)
 
     If $Limit <> '' And $Limit < $count Then
@@ -684,7 +672,7 @@ EndFunc ;==> _deleteChatStickerSet
 Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,$CacheTime = '')
     ;In Callback context, there's a URL validation/restriction on the Telegram side
     ;Telegram Docs: https://core.telegram.org/bots/api#answercallbackquery
-    ;cbURL can be a Game's URL or something like "t.me/your_bot?start=XXXX" 
+    ;cbURL can be a Game's URL or something like "t.me/your_bot?start=XXXX"
     ;that open your bot with a parameter.
     Local $Query = $URL & "/answerCallbackQuery?callback_query_id=" & $CallbackID
     If $Text <> '' Then $Query &= "&text=" & $Text
@@ -780,7 +768,7 @@ Func _CreateInlineKeyboard(ByRef $Keyboard)
             ElseIf(StringRight($jsonKeyboard,2) = '],') Then
                 $jsonKeyboard &= '[{"text":"' & $Keyboard[$i] & '",'
             EndIf
-            
+
         Else
             $jsonKeyboard &= '],'
         EndIf
@@ -999,7 +987,7 @@ Func __MsgDecode($Update)
             Json_Get($Json,'[result][0][channel_post][chat][title]') _ ;[3] = Firstname
         ]
 
-        If(Json_Get($Json,'[result][0][channel_post][text]')) Then 
+        If(Json_Get($Json,'[result][0][channel_post][text]')) Then
             $msgData[4] = Json_Get($Json,'[result][0][channel_post][text]') ;[4] = Text (eventually)
         EndIf
 
@@ -1031,15 +1019,15 @@ EndFunc ;==> __MsgDecode
     Name .........: _Telegram_API_Call
     Description...: Sends a request to the Telegram API based on provided parameters
     Syntax .......: _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
-    Parameters....: 
+    Parameters....:
                     $sURL        - URL to the Telegram API
                     $sPath       - [optional] Path to the specific API endpoint (Default is "")
                     $sMethod     - [optional] HTTP method for the request (Default is "GET")
                     $sParams     - [optional] Parameters for the request (Default is "")
                     $vBody       - [optional] Body content for the request (Default is Null)
                     $bValidate   - [optional] Boolean flag to validate Telegram response (Default is True)
-    Return values.: 
-                    Success      - Returns a JSON object with the 'result' field upon 
+    Return values.:
+                    Success      - Returns a JSON object with the 'result' field upon
                                    successful API call and validation
                     Error        - Returns Null and sets @error flag according to encountered errors
 #ce ======================================================================================
@@ -1087,16 +1075,31 @@ EndFunc
 ; TODO: I didn't figure out how to send a media using WinHttpRequest,
 ; so I'll continue using _WinHttp and form filling, but I'll try again
 ; to drop this dependencies and do everything with the above function.
-Func _Telegram_SendMedia($sURL, $sPath, $sParams, $vMedia, $sMediaType, $bValidate = True)
+Func _Telegram_SendMedia($sChatId, $vMedia, $sMediaType, $sCaption = "", $sParseMode = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False, $bValidate = True)
+    ; Mandatory inputs validation
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($vMedia = "" Or $vMedia = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sMediaType = "" Or $sMediaType = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sParseMode <> "" And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = _
+        "chat_id=" & $sChatId & _
+        "&caption=" & $sCaption & _
+        "&disable_notification=" & $bDisableNotification
+
+    If $sParseMode <> "" Then $sParams &= "&parse_mode=" & $sParseMode
+    If $sReplyMarkup <> "" Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+
     Local $hOpen = _WinHttpOpen()
     If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
-        
+
     ; Params as query params and media as form data
     $sMediaType = StringLower($sMediaType)
     Local $sForm = _
-        "<form action='" & $sURL & $sPath & "?" & $sParams & "' method='POST' enctype='multipart/form-data'>" & _
-        "<input type='file' name='" & $sMediaType & "' /></form>"
-                   
+        "<form action='" & $URL & "/send" & _StringTitleCase($sMediaType) & "?" & $sParams & "' method='POST' enctype='multipart/form-data'>" & _
+        "<input type='file' name='" & $sMediaType & "'/></form>"
+
     Local $sResponse = _WinHttpSimpleFormFill($sForm, $hOpen, Default, "name:" & $sMediaType, $vMedia)
     If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_SEND, Null)
 
