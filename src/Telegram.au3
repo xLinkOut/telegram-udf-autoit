@@ -250,7 +250,7 @@ Func _Telegram_SendVoice($sChatId,$Path,$sCaption = '',$sParseMode = "", $sReply
 EndFunc ;==> _Telegram_SendVoice
 
 Func _Telegram_SendVideoNote($sChatId,$VideoNote,$sParseMode = "", $sReplyMarkup = "",$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $oResponse = _Telegram_SendMedia($sChatId, $VideoNote, "videonote", $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $VideoNote, "video_note", $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     If (@error) Then Return SetError(@error, @extended, Null)
     Return $oResponse
 EndFunc ;==> _Telegram_SendVideoNote
@@ -858,7 +858,7 @@ Func _Telegram_SendMedia($sChatId, $vMedia, $sMediaType, $sCaption = "", $sParse
     ; Params as query params and media as form data
     $sMediaType = StringLower($sMediaType)
     Local $sForm = _
-        "<form action='" & $URL & "/send" & _StringTitleCase($sMediaType) & "?" & $sParams & "' method='POST' enctype='multipart/form-data'>" & _
+        "<form action='" & $URL & "/send" & _StringTitleCase(StringReplace($sMediaType, "_", "")) & "?" & $sParams & "' method='POST' enctype='multipart/form-data'>" & _
         "<input type='file' name='" & $sMediaType & "'/></form>"
 
     Local $sResponse = _WinHttpSimpleFormFill($sForm, $hOpen, Default, "name:" & $sMediaType, $vMedia)
