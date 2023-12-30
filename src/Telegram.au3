@@ -1200,6 +1200,40 @@ Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vB
     Return SetError(0, 0, Json_Get($oBody, "[result]"))
 EndFunc
 
+; TODO: I didn't figure out how to send a media using WinHttpRequest,
+; so I'll continue using _WinHttp and form filling, but I'll try again
+; to drop this dependencies and do everything with the above function.
+Func _Telegram_SendMedia($sURL, $sPath, $sParams, $vMedia, $sMediaType, $bValidate = True)
+    Local $hOpen = _WinHttpOpen()
+    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
+        
+    ; Params as query params and media as form data
+    $sMediaType = StringLower($sMediaType)
+    Local $sForm = _
+        "<form action='" & $sURL & $sPath & "?" & $sParams & "' method='POST' enctype='multipart/form-data'>" & _
+        "<input type='file' name='" & $sMediaType & "' /></form>"
+                   
+    Local $sResponse = _WinHttpSimpleFormFill($sForm, $hOpen, Default, "name:" & $sMediaType, $vMedia)
+    If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_SEND, Null)
+
+    _WinHttpCloseHandle($hOpen)
+    ConsoleWrite($sResponse)
+    Local $oBody = Json_Decode($sResponse)
+
+    ; Validate Telegram response
+    ; (Same check as above)
+    If ($bValidate) Then
+        ; Decoding error
+        If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_NOT_DECODED, Null)
+        ; Invalid JSON
+        If (Not Json_IsObject($oBody)) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_INVALID_JSON, Null)
+        ; Unsuccessful response
+        If (Json_Get($oBody, "[ok]") <> True) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_NOT_SUCCESS, Null)
+    EndIF
+
+    Return SetError(0, 0, Json_Get($oBody, "[result]"))
+EndFunc
+
 Func __HttpGet($sURL,$sData = '')
     Local $oHTTP = ObjCreate("WinHttp.WinHttpRequest.5.1")
     $oHTTP.Open("GET",$sURL & "?" & $sData,False)
