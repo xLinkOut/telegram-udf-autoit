@@ -255,35 +255,11 @@ Func _Telegram_SendVideoNote($sChatId,$VideoNote,$sParseMode = "", $sReplyMarkup
     Return $oResponse
 EndFunc ;==> _Telegram_SendVideoNote
 
-#cs ===============================================================================
-   Function Name..:		_SendMediaGroup
-   Description....:     Send a voice file
-   Parameter(s)...:     $sChatId: Unique identifier for the target chat
-						$Media: JSON-serialized array describing photos and videos to be sent, must include 2–10 items
-                        $iReplyToMessage (optional): If the message is a reply, ID of the original message
-                        $bDisableNotification (optional): Sends the message silently. User will receive a notification with no sound
-   Return Value(s):  	Return an array with all File IDs of the medias sent
-#ce ===============================================================================
-Func _SendMediaGroup($sChatId,$Media,$iReplyToMessage = Null,$bDisableNotification = False)
-    Local $Query = $URL & '/sendMediaGroup'
-    Local $hOpen = _WinHttpOpen()
-    Local $Form = '<form action="' & $Query & '" method="post" enctype="multipart/form-data">' & _
-                  '<input type="text" name="chat_id"/>' & _
-                  '<input type="file" name="mediagroup"/>'
-    If $iReplyToMessage <> '' Then $Query &= '<input type="text" name="reply_to_message_id"/>'
-    If $bDisableNotification Then $Form &= ' <input type="text" name="disable_notification"/>'
-    $Form &= '</form>'
-    Local $Response = _WinHttpSimpleFormFill($Form,$hOpen,Default, _
-                       "name:chat_id", $sChatId, _
-                       "name:media", $Media, _
-                       "name:reply_to_message_id", $iReplyToMessage, _
-                       "name:disable_notification", $bDisableNotification)
-
-    _WinHttpCloseHandle($hOpen)
-    Local $Json = Json_Decode($Response)
-    If Not (Json_IsObject($Json)) Then Return SetError($INVALID_JSON_RESPONSE,0,False) ; JSON Check
-    Return __GetFileID($Json,'mediagroup')
-EndFunc ;==> _SendMediaGroup
+Func _Telegram_SendMediaGroup($sChatId,$aMedias,$bDisableNotification = False)
+    Local $oResponse = _Telegram_SendMedia($sChatId, $aMedias, "media_group", $bDisableNotification)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return $oResponse
+EndFunc
 
 #cs ===============================================================================
    ; DEPRECATED?
