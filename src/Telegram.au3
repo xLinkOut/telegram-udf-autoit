@@ -625,23 +625,18 @@ EndFunc ;==> _deleteMessage
 
 
 #cs ===============================================================================
-   Function Name..:    	_Polling
+   Function Name..:    	_Telegram_Polling
    Description....:     Wait for incoming messages
    Parameter(s)...:     None
    Return Value(s):		Return an array with information about the messages
 #ce ===============================================================================
-Func _Polling()
+Func _Telegram_Polling()
     While 1
         Sleep(1000) ;Prevent CPU Overloading
-        $newUpdates = _Telegram_GetUpdates()
-        ;ConsoleWrite($newUpdates & @CRLF)
-        If Not StringInStr($newUpdates,'update_id') Then ContinueLoop
-        $msgData = __MsgDecode($newUpdates)
-        $OFFSET = $msgData[0] + 1
-        ;ConsoleWrite(_ArrayToString($msgData) & @CRLF)
-        Return $msgData
+        $newMessages = _Telegram_GetUpdates()
+        If (UBound($newMessages) > 0) Then Return $newMessages
     WEnd
-EndFunc ;==> _Polling
+EndFunc ;==> _Telegram_Polling
 
 
 #cs ===============================================================================
