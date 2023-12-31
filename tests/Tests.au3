@@ -9,6 +9,10 @@ Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @e
 	Return $bResult
 EndFunc ;==>UTAssert
 
+Func _Validate_Telegram_Response($oResponse, Const $iError = @error)
+    Return (Not @error And $oResponse <> Null And Json_IsObject($oResponse))
+EndFunc
+
 Func _Test_Telegram_Init()
     Local $bResult
 
@@ -42,10 +46,7 @@ Func _Test_GetMe()
     Local $oMe = _Telegram_GetMe()
 
     ; Test if there are no errors during the call
-    UTAssert(Not @error, "Test_GetMe: No error during API call")
-
-    ; Test if the response is a valid JSON object
-    UTAssert(Json_IsObject($oMe), "Test_GetMe: Response is a JSON object")
+    UTAssert(_Validate_Telegram_Response($oMe), "Test_GetMe: Validate Telegram response")
 
     ; Test if the 'is_bot' field is set to true
     UTAssert(Json_Get($oMe, "[is_bot]") = True, "Test_GetMe: Bot status is 'is_bot'")
