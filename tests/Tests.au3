@@ -104,14 +104,14 @@ Func _Test_Telegram_ForwardMessage()
     Local $iMessageId = Json_Get($oSentMessage, "[message_id]")
 
     Local $oForwardedMessage = _Telegram_ForwardMessage($sChatId, $sChatId, $iMessageId)
-    UTAssert(Not @error, "Test_ForwardMessage: no error", @error, @extended)
-    UTAssert(Json_IsObject($oForwardedMessage), "Test_ForwardMessage: is object", @error, @extended)
-    UTAssert(IsInt(Json_Get($oForwardedMessage, "[message_id]")), "Test_ForwardMessage: message id", @error, @extended)
+    UTAssert(Not @error, "Test_ForwardMessage: no error")
+    UTAssert(Json_IsObject($oForwardedMessage), "Test_ForwardMessage: is object")
+    UTAssert(IsInt(Json_Get($oForwardedMessage, "[message_id]")), "Test_ForwardMessage: message id")
 
     ; Invalid parameters
-    UTAssert(_Telegram_ForwardMessage("123", $sChatId, $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid chat id", @error, @extended)
-    UTAssert(_Telegram_ForwardMessage($sChatId, "123", $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid from chat id", @error, @extended)
-    UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id", @error, @extended)
+    UTAssert(_Telegram_ForwardMessage("123", $sChatId, $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid chat id")
+    UTAssert(_Telegram_ForwardMessage($sChatId, "123", $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid from chat id")
+    UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id")
 EndFunc
 
 Func _Test_Telegram_SendPhoto()
@@ -120,15 +120,15 @@ Func _Test_Telegram_SendPhoto()
 
     ; Send a local photo
     Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoPath)
-    UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
-    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
-    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
+    UTAssert(Not @error, "Test_SendPhoto: no error")
+    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object")
+    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id")
 
     ; Send a photo by URL (N.B.: This currently not works)
     Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoURL)
-    UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
-    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
-    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
+    UTAssert(Not @error, "Test_SendPhoto: no error")
+    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object")
+    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id")
 EndFunc
 
 Func _Test_DeleteMessage()
