@@ -9,16 +9,34 @@ Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @e
 	Return $bResult
 EndFunc ;==>UTAssert
 
-Func _Test_Init()
-    UTAssert(_Telegram_Init($sValidToken) = True, "Test_Init: valid token, no validate", @error, @extended)
-    UTAssert(_Telegram_Init($sValidToken, True) = True, "Test_Init: valid token, validate", @error, @extended)
+Func _Test_Telegram_Init()
+    Local $bResult
+    
+    ; Test with valid token without validation
+    $bResult = _Telegram_Init($sValidToken)
+    UTAssert($bResult = True, "Init with valid token, no validate")
 
-    UTAssert(_Telegram_Init($sInvalidToken) = True, "Test_Init: invalid token, no validate", @error, @extended)
-    UTAssert(_Telegram_Init($sInvalidToken, True) = False And @error = $INVALID_TOKEN_ERROR, "Test_Init: invalid token, validate", @error, @extended)
+    ; Test with valid token with validation
+    $bResult = _Telegram_Init($sValidToken, True)
+    UTAssert($bResult = True, "Init with valid token, validate")
 
-    UTAssert(_Telegram_Init("") = False And @error = $INVALID_TOKEN_ERROR, "Test_Init: empty token, no validate", @error, @extended)
-    UTAssert(_Telegram_Init(Null) = False And @error = $INVALID_TOKEN_ERROR, "Test_Init: null token, no validate", @error, @extended)
-EndFunc ;==> _Test_Init
+    ; Test with invalid token without validation
+    $bResult = _Telegram_Init($sInvalidToken)
+    UTAssert($bResult = True, "Init with invalid token, no validate")
+
+    ; Test with invalid token with validation
+    $bResult = _Telegram_Init($sInvalidToken, True)
+    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with invalid token, validate")
+
+    ; Test with empty token without validation
+    $bResult = _Telegram_Init("")
+    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with empty token, no validate")
+
+    ; Test with null token without validation
+    $bResult = _Telegram_Init(Null)
+    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with null token, no validate")
+EndFunc ;==> _Test_Telegram_Init
+
 
 Func _Test_GetMe()
     ; TODO: A `beforeEach` test that initialize the bot with a valid token should be added
