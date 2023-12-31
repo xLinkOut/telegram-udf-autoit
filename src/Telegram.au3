@@ -165,15 +165,8 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
     If ($sText = "" Or $sText = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sParseMode <> Null And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&text=" & $sText & _
-        "&disable_notification=" & $bDisableNotification & _
-        "&disable_web_page_preview=" & $bDisableWebPreview
-
-    If $sParseMode <> Null Then $sParams &= "&parse_mode=" & $sParseMode
-    If $sReplyMarkup <> Null Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    Local $sParams = __BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification, $bDisableWebPreview)
+    $sParams &= "&text=" & $sText
 
     Local $oResponse = _Telegram_API_Call($URL, "/sendMessage", "POST", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -201,11 +194,10 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     If ($sFromChatId = "" Or $sFromChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
+    Local $sParams = __BuildCommonParams($sChatId, Null, Null, Null, $bDisableNotification)
+    $sParams &= _
         "&from_chat_id=" & $sFromChatId & _
         "&message_id=" & $iMessageId & _
-        "&disable_notification=" & $bDisableNotification
 
     Local $oResponse = _Telegram_API_Call($URL, "/forwardMessage", "POST", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -307,18 +299,14 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
     If ($fLatitude = "" Or $fLatitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($fLongitude = "" Or $fLongitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
+    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    $sParams &= _
         "&latitude=" & $fLatitude & _
         "&longitude=" & $fLongitude
     
-    If $fHorizontalAccuracy <> Null Then $sParams &= "&horizontal_accuracy=" & $fHorizontalAccuracy
     If $iLivePeriod <> Null Then $sParams &= "&live_period=" & $iLivePeriod
+    If $fHorizontalAccuracy <> Null Then $sParams &= "&horizontal_accuracy=" & $fHorizontalAccuracy
     If $iProximityAlertRadius <> Null Then $sParams &= "&proximity_alert_radius=" & $iProximityAlertRadius
-
-    If $sReplyMarkup <> Default Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> '' Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
-    If $bDisableNotification Then $sParams &= "&disable_notification=true"
     
     Local $oResponse = _Telegram_API_Call($URL, "/sendLocation", "GET", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -723,6 +711,20 @@ EndFunc
 
 #Region "@INTERNAL FUNCTIONS"
 
+Func __BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableNotification = Null, $bDisableWebPreview = Null)
+    Local $sParams = ""
+
+    If($sChatId <> Null) Then $sParams = "&chat_id=" & $sChatId
+    If($sParseMode <> Null) Then $sParams &= "&parse_mode=" & $sParseMode
+    If($sReplyMarkup <> Null) Then $sParams &= "&reply_markup=" & $sReplyMarkup
+    If($iReplyToMessage <> Null) Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    If($bDisableNotification <> Null) Then $sParams &= "&disable_notification=" & $bDisableNotification
+    If($bDisableWebPreview <> Null) Then $sParams &= "&disable_web_page_preview=" & $bDisableWebPreview
+    
+    ; Remove the first "&" character
+    Return StringTrimLeft($sParams, 1)
+EndFunc ;==> __BuildCommonParams
+
 #cs ===============================================================================
    Function Name..:		__GetFileID
    Description....:     Get the 'File ID' of the last sent file
@@ -862,14 +864,8 @@ Func _Telegram_SendMedia($sChatId, $vMedia, $sMediaType, $sCaption = "", $sParse
     If ($sMediaType = "" Or $sMediaType = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sParseMode <> "" And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = _
-        "chat_id=" & $sChatId & _
-        "&caption=" & $sCaption & _
-        "&disable_notification=" & $bDisableNotification
-
-    If $sParseMode <> "" Then $sParams &= "&parse_mode=" & $sParseMode
-    If $sReplyMarkup <> "" Then $sParams &= "&reply_markup=" & $sReplyMarkup
-    If $iReplyToMessage <> Null Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
+    Local $sParams = __BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    $sParams &= "&caption=" & $sCaption
 
     Local $hOpen = _WinHttpOpen()
     If (@error) Then Return SetError($TG_ERR_API_CALL, $TG_ERR_API_CALL_OPEN, Null)
