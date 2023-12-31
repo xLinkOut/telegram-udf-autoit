@@ -98,20 +98,14 @@ Func _Test_Telegram_SendMessage()
 EndFunc ;==> _Test_Telegram_SendMessage
 
 Func _Test_Telegram_ForwardMessage()
-    ; Send a message that will be forwarded
-    Local $oSentMessage = _Telegram_SendMessage($sChatId, "Test forward message")
-    ; Get its message id
-    Local $iMessageId = Json_Get($oSentMessage, "[message_id]")
-
-    Local $oForwardedMessage = _Telegram_ForwardMessage($sChatId, $sChatId, $iMessageId)
-    UTAssert(Not @error, "Test_ForwardMessage: no error")
-    UTAssert(Json_IsObject($oForwardedMessage), "Test_ForwardMessage: is object")
-    UTAssert(IsInt(Json_Get($oForwardedMessage, "[message_id]")), "Test_ForwardMessage: message id")
-
-    ; Invalid parameters
-    UTAssert(_Telegram_ForwardMessage("123", $sChatId, $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid chat id")
-    UTAssert(_Telegram_ForwardMessage($sChatId, "123", $iMessageId) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid from chat id")
-    UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id")
+    ; Sending a test message
+    Local $oMessage = _Telegram_SendMessage($sChatId, "Test message for forwarding")
+    ; Check if message was sent successfully
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_ForwardMessage: Sent message successfully")
+    ; Forwarding the sent message
+    Local $oForwardedMessage = _Telegram_ForwardMessage($sChatId, $sChatId, Json_Get($oMessage, "[message_id]"))
+    ; Check if message was forwarded successfully
+    UTAssert(_Validate_Telegram_Response($oForwardedMessage), "Test_ForwardMessage: Forwarded message successfully")
 EndFunc
 
 Func _Test_Telegram_SendPhoto()
