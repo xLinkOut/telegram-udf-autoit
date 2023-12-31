@@ -619,12 +619,18 @@ Func _answerCallbackQuery($CallbackID,$Text = '',$cbURL = '',$ShowAlert = False,
     Return True
 EndFunc ;==> _answerCallbackQuery
 
-; TODO: deletemessage
-Func _deleteMessage($sChatId, $MsgID)
-    Local $Query = $URL & "/deleteMessage?chat_id=" & $sChatId & "&message_id=" & $MsgID
-    ConsoleWrite(__HttpGet($Query))
-EndFunc ;==> _deleteMessage
-
+Func _Telegram_DeleteMessage($sChatId, $iMessageId)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    
+    Local $sParams = __BuildCommonParams($sChatId)
+    $sParams &= "&message_id=" & $iMessageId
+    
+    Local $oResponse = _Telegram_API_Call($URL, "/deleteMessage", "POST", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    
+    Return $oResponse
+EndFunc ;==> _Telegram_DeleteMessage
 
 #EndRegion
 

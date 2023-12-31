@@ -106,8 +106,21 @@ Func _Test_SendPhoto()
     UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
     UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
     UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
-
 EndFunc
+
+Func _Test_DeleteMessage()
+    Local $sText = "Test message for deletion"
+
+    ; Sending a test message to be deleted
+    Local $oMessage = _Telegram_SendMessage($sChatId, $sText)
+    UTAssert(Not @error, "Test_DeleteMessage: message sent successfully")
+    Local $iMessageId = Json_Get($oMessage, "[message_id]")
+
+    ; Deleting the sent message
+    Local $oResponse = _Telegram_DeleteMessage($sChatId, $iMessageId)
+    UTAssert(Not @error, "Test_DeleteMessage: message deleted successfully")
+EndFunc
+
 
 ; @ TEST RUNNER
 #cs ======================================================================================
