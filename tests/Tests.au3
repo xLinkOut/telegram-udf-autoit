@@ -26,17 +26,16 @@ Func _Test_Telegram_Init()
 
     ; Test with invalid token with validation
     $bResult = _Telegram_Init($sInvalidToken, True)
-    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with invalid token, validate")
+    UTAssert($bResult = False And @error = $TG_ERR_INIT, "Init with invalid token, validate")
 
     ; Test with empty token without validation
     $bResult = _Telegram_Init("")
-    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with empty token, no validate")
+    UTAssert($bResult = False And @error = $TG_ERR_INIT, "Init with empty token, no validate")
 
     ; Test with null token without validation
     $bResult = _Telegram_Init(Null)
-    UTAssert($bResult = False And @error = $INVALID_TOKEN_ERROR, "Init with null token, no validate")
+    UTAssert($bResult = False And @error = $TG_ERR_INIT, "Init with null token, no validate")
 EndFunc ;==> _Test_Telegram_Init
-
 
 Func _Test_GetMe()
     ; Get information about the bot
