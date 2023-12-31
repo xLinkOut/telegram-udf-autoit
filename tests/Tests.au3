@@ -81,8 +81,20 @@ Func _Test_Telegram_SendMessage()
     ; Test with Inline Keyboard Markup
     Local $sInlineKeyboardMarkup = '{"inline_keyboard":[[{"text":"Button 1","callback_data":"data_1"}],[{"text":"Button 2","callback_data":"data_2"}]]}'
     $oMessage = _Telegram_SendMessage($sChatId, "Test with Inline Keyboard Markup", Null, $sInlineKeyboardMarkup)
-    MsgBox(0, 0, $oMessage)
     UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Inline Keyboard Markup")
+
+    ; Test with Reply To Message
+    Local $iPreviousMesssageId = Json_Get($oMessage, "[message_id]")
+    $oMessage = _Telegram_SendMessage($sChatId, "Test with Reply To Message", Null, Null, $iPreviousMesssageId)
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Reply To Message")
+
+    ; Test with Disable Web Preview
+    $oMessage = _Telegram_SendMessage($sChatId, "Test with Disable Web Preview (https://github.com)", Null, Null, Null, True)
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Disable Web Preview")
+
+    ; Test with Disable Notification
+    $oMessage = _Telegram_SendMessage($sChatId, "Test with Disable Notification", Null, Null, Null, False, True)
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Disable Notification")
 EndFunc ;==> _Test_Telegram_SendMessage
 
 Func _Test_Telegram_ForwardMessage()
@@ -174,4 +186,6 @@ Func _RunAllTests()
 EndFunc
 #EndRegion
 
-_RunAllTests()
+;_RunAllTests()
+_Telegram_Init($sValidToken)
+_Test_Telegram_SendMessage()
