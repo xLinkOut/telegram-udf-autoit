@@ -97,10 +97,43 @@ Func _Test_SendPhoto()
 
 EndFunc
 
-; TODO: Test runner
-_Test_Init()
+; @ TEST RUNNER
+#cs ======================================================================================
+    Name .........: __GetTestFunctions
+    Description...: Retrieves the names of the test functions present in the current script.
+    Syntax .......: __GetTestFunctions()
+    Parameters....: None
+    Return values.:
+                    Success - Returns an array containing the names of test functions 
+                              based on the specified prefix.
+                    Failure - Returns an empty array if no test functions are found.
+#ce ======================================================================================
+Func __GetTestFunctions()
+    Local $sTestPrefix = "_Test_"
+    Local $aFunctions = StringRegExp(FileRead(@ScriptFullPath), "(?i)(?s)Func\s+" & $sTestPrefix &"(\w+)\s*\(", 3)
 
-_Telegram_Init($sValidToken, True)
-If (@error) Then Exit(@error)
+    For $i = 0 To UBound($aFunctions) - 1
+        $aFunctions[$i] = $sTestPrefix & $aFunctions[$i]
+    Next
+	
+    Return $aFunctions
+EndFunc
 
-_Test_SendPhoto()
+#cs ======================================================================================
+    Name .........: _RunAllTests
+    Description...: Executes all test functions found in the current script.
+    Syntax .......: _RunAllTests()
+    Parameters....: None
+    Return values.:
+                    Success - Executes all test functions present in the script.
+                    Failure - None.
+#ce ======================================================================================
+Func _RunAllTests()
+    Local $aTestFunctions = __GetTestFunctions()
+    For $i = 0 To UBound($aTestFunctions) - 1
+        ConsoleWrite("Running test: " & $aTestFunctions[$i] & @CRLF)
+        Call($aTestFunctions[$i])
+    Next
+EndFunc
+
+_RunAllTests()
