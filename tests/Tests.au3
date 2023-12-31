@@ -131,7 +131,9 @@ EndFunc
 Func _RunAllTests()
     Local $aTestFunctions = __GetTestFunctions()
     For $i = 0 To UBound($aTestFunctions) - 1
-        ConsoleWrite("Running test: " & $aTestFunctions[$i] & @CRLF)
+        ; Like a beforeEach, initialize the bot with a valid token
+        _Telegram_Init($sValidToken)
+        ; Execute the test
         Call($aTestFunctions[$i])
     Next
 EndFunc
