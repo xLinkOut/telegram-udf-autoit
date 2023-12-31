@@ -83,7 +83,7 @@ Func _Telegram_Init($sToken, $bValidate = False)
     Return True
 EndFunc ;==> _Telegram_Init
 
-#Region "API Functions"
+#Region "API Implementation"
 
 #cs ======================================================================================
     Name .........: _Telegram_GetMe
@@ -306,9 +306,6 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
 
 EndFunc ;==> _Telegram_SendLocation
 
-
-#Region "Updating Messages API"
-
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
 EndFunc  ;==> _EditMessageLiveLocation
 
@@ -331,6 +328,7 @@ EndFunc ;==> _Telegram_DeleteMessage
 #EndRegion
 
 #Region "Extra"
+
 #cs ===============================================================================
    Function Name..:    	_Telegram_Polling
    Description....:     Wait for incoming messages
@@ -375,6 +373,8 @@ Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     Return $jsonKeyboard
 EndFunc ;==> _CreateKeyboard
 
+#EndRegion
+
 #cs ===============================================================================
    Function Name..:    	_CreateInlineKeyboard
    Description....:     Create and return a custom inline keyboard markup
@@ -407,7 +407,7 @@ EndFunc
 
 #EndRegion
 
-#Region "@INTERNAL FUNCTIONS"
+#Region "Internal functions"
 
 Func __BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableNotification = Null, $bDisableWebPreview = Null)
     Local $sParams = ""
