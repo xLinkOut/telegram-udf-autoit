@@ -197,7 +197,7 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     Local $sParams = __BuildCommonParams($sChatId, Null, Null, Null, $bDisableNotification)
     $sParams &= _
         "&from_chat_id=" & $sFromChatId & _
-        "&message_id=" & $iMessageId & _
+        "&message_id=" & $iMessageId
 
     Local $oResponse = _Telegram_API_Call($URL, "/forwardMessage", "POST", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -209,7 +209,7 @@ EndFunc ;==> _Telegram_ForwardMessage
     Name .........: _Telegram_Send<Type>
     Description...: Sends a <Type> via the Telegram API to a specified chat ID
     Syntax .......: _Telegram_Send<Type>($sChatId, $<Type>, [$sCaption = "" [, $sParseMode = "" [, $sReplyMarkup = "" [, $iReplyToMessage = Null [, $bDisableNotification = False]]]]])
-    Parameters....: 
+    Parameters....:
                     $sChatId               - ID of the chat where the <Type> will be sent
                     $<Type>                - <Type> to be sent, a string representing a local path to a file,
                                              a remote URL or a Telegram File ID. Supported objects are: photo,
@@ -218,10 +218,10 @@ EndFunc ;==> _Telegram_ForwardMessage
                     $sParseMode            - [optional] Parse mode for the caption (Default is "")
                     $sReplyMarkup          - [optional] Reply markup for the <Type> (Default is "")
                     $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
-                    $bDisableNotification  - [optional] Boolean flag to disable notification 
+                    $bDisableNotification  - [optional] Boolean flag to disable notification
                                              (Default is False)
-    Return values.: 
-                    Success                - Returns an object containing information about 
+    Return values.:
+                    Success                - Returns an object containing information about
                                              the sent <Type> upon a successful API call
                     Error                  - Returns Null and sets @error flag to the encountered error code
 #ce ======================================================================================
@@ -277,7 +277,7 @@ EndFunc
     Name .........: _Telegram_SendLocation
     Description...: Sends a location to the specified chat.
     Syntax .......: _Telegram_SendLocation($sChatId, $fLatitude, $fLongitude, $fHorizontalAccuracy = Null, $iLivePeriod = Null, $iProximityAlertRadius = Null, $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
-    Parameters....: 
+    Parameters....:
                     $sChatId               - The chat ID.
                     $fLatitude             - The latitude of the location.
                     $fLongitude            - The longitude of the location.
@@ -287,7 +287,7 @@ EndFunc
                     $sReplyMarkup          - [optional] Additional interface options. Default is an empty string.
                     $iReplyToMessage       - [optional] ID of the message to reply to.
                     $bDisableNotification  - [optional] Disables notifications if set to True. Default is False.
-    Return values.: 
+    Return values.:
                     Success - Returns the API response.
                     Error   - Returns @error flag along with @extended flag if an error occurs.
                                    Possible @error values:
@@ -298,16 +298,16 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($fLatitude = "" Or $fLatitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($fLongitude = "" Or $fLongitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
-    
+
     Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     $sParams &= _
         "&latitude=" & $fLatitude & _
         "&longitude=" & $fLongitude
-    
+
     If $iLivePeriod <> Null Then $sParams &= "&live_period=" & $iLivePeriod
     If $fHorizontalAccuracy <> Null Then $sParams &= "&horizontal_accuracy=" & $fHorizontalAccuracy
     If $iProximityAlertRadius <> Null Then $sParams &= "&proximity_alert_radius=" & $iProximityAlertRadius
-    
+
     Local $oResponse = _Telegram_API_Call($URL, "/sendLocation", "GET", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
     Return $oResponse
@@ -720,7 +720,7 @@ Func __BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Nu
     If($iReplyToMessage <> Null) Then $sParams &= "&reply_to_message_id=" & $iReplyToMessage
     If($bDisableNotification <> Null) Then $sParams &= "&disable_notification=" & $bDisableNotification
     If($bDisableWebPreview <> Null) Then $sParams &= "&disable_web_page_preview=" & $bDisableWebPreview
-    
+
     ; Remove the first "&" character
     Return StringTrimLeft($sParams, 1)
 EndFunc ;==> __BuildCommonParams
