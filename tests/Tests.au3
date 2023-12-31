@@ -11,7 +11,7 @@ EndFunc ;==>UTAssert
 
 Func _Test_Telegram_Init()
     Local $bResult
-    
+
     ; Test with valid token without validation
     $bResult = _Telegram_Init($sValidToken)
     UTAssert($bResult = True, "Init with valid token, no validate")
@@ -39,14 +39,26 @@ EndFunc ;==> _Test_Telegram_Init
 
 
 Func _Test_GetMe()
-    ; TODO: A `beforeEach` test that initialize the bot with a valid token should be added
+    ; Get information about the bot
     Local $oMe = _Telegram_GetMe()
-    UTAssert(Not @error, "Test_GetMe: no error", @error, @extended)
-    UTAssert(Json_IsObject($oMe), "Test_GetMe: is object", @error, @extended)
-    UTAssert(Json_Get($oMe, "[is_bot]") = True, "Test_GetMe: is bot", @error, @extended)
-    UTAssert(IsInt(Json_Get($oMe, "[id]")), "Test_GetMe: id is int", @error, @extended)
-    UTAssert(Json_Get($oMe, "[username]") <> Null, "Test_GetMe: username", @error, @extended)
-    UTAssert(Json_Get($oMe, "[first_name]") <> Null, "Test_GetMe: first name", @error, @extended)
+
+    ; Test if there are no errors during the call
+    UTAssert(Not @error, "Test_GetMe: No error during API call")
+
+    ; Test if the response is a valid JSON object
+    UTAssert(Json_IsObject($oMe), "Test_GetMe: Response is a JSON object")
+
+    ; Test if the 'is_bot' field is set to true
+    UTAssert(Json_Get($oMe, "[is_bot]") = True, "Test_GetMe: Bot status is 'is_bot'")
+
+    ; Test if the 'id' field is an integer value
+    UTAssert(IsInt(Json_Get($oMe, "[id]")), "Test_GetMe: 'id' field is an integer")
+
+    ; Test if the 'username' field is not empty
+    UTAssert(Json_Get($oMe, "[username]") <> Null, "Test_GetMe: 'username' field is not empty")
+
+    ; Test if the 'first_name' field is not empty
+    UTAssert(Json_Get($oMe, "[first_name]") <> Null, "Test_GetMe: 'first_name' field is not empty")
 EndFunc
 
 Func _Test_SendMessage()
@@ -90,7 +102,7 @@ Func _Test_SendPhoto()
     UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
 
     ; Send a photo by URL (N.B.: This currently not works)
-    Local $oPhoto = _SendPhoto($sChatId, $sPhotoURL)
+    Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoURL)
     UTAssert(Not @error, "Test_SendPhoto: no error", @error, @extended)
     UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object", @error, @extended)
     UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id", @error, @extended)
