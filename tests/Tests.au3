@@ -41,7 +41,7 @@ Func _Test_Telegram_Init()
     UTAssert($bResult = False And @error = $TG_ERR_INIT, "Init with null token, no validate")
 EndFunc ;==> _Test_Telegram_Init
 
-Func _Test_GetMe()
+Func _Test_Telegram_GetMe()
     ; Get information about the bot
     Local $oMe = _Telegram_GetMe()
 
@@ -59,22 +59,33 @@ Func _Test_GetMe()
 
     ; Test if the 'first_name' field is not empty
     UTAssert(Json_Get($oMe, "[first_name]") <> Null, "Test_GetMe: 'first_name' field is not empty")
-EndFunc
+EndFunc ;==> _Test_Telegram_GetMe
 
-Func _Test_SendMessage()
+Func _Test_Telegram_SendMessage()
+    ; Test if the message is successfully sent
     Local $oMessage = _Telegram_SendMessage($sChatId, "Test message")
-    ; TODO: The two following checks should be done in another function
-    UTAssert(Not @error, "Test_SendMessage: no error", @error, @extended)
-    UTAssert(Json_IsObject($oMessage), "Test_SendMessage: is object", @error, @extended)
-    UTAssert(IsInt(Json_Get($oMessage, "[message_id]")), "Test_SendMessage: message id", @error, @extended)
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response")
+    UTAssert(IsInt(Json_Get($oMessage, "[message_id]")), "Test_SendMessage: message id")
 
-    ; Parse Mode
-    $oMessage = _Telegram_SendMessage($sChatId, "*Test* _message_", "Markdown")
-    UTAssert(Not @error, "Test_SendMessage: no error", @error, @extended)
-    UTAssert(UBound(Json_Get($oMessage, "[entities]")) > 0, "Test_SendMessage: entities", @error, @extended)
-EndFunc
+    ; Test with Parse Mode
+    $oMessage = _Telegram_SendMessage($sChatId, "*Test* _message_", "MarkdownV2")
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Parse Mode")
+    UTAssert(UBound(Json_Get($oMessage, "[entities]")) = 2, "Test_SendMessage: entities")
 
-Func _Test_ForwardMessage()
+    ; Test with Keyboard Markup
+    Local $sKeyboardMarkup = '{"keyboard":[["Button 1"],["Button 2"]],"one_time_keyboard":true}'
+    $oMessage = _Telegram_SendMessage($sChatId, "Test with Keyboard Markup", Null, $sKeyboardMarkup)
+    Json_Dump(Json_Encode($oMessage))
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Keyboard Markup")
+
+    ; Test with Inline Keyboard Markup
+    Local $sInlineKeyboardMarkup = '{"inline_keyboard":[[{"text":"Button 1","callback_data":"data_1"}],[{"text":"Button 2","callback_data":"data_2"}]]}'
+    $oMessage = _Telegram_SendMessage($sChatId, "Test with Inline Keyboard Markup", Null, $sInlineKeyboardMarkup)
+    MsgBox(0, 0, $oMessage)
+    UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Inline Keyboard Markup")
+EndFunc ;==> _Test_Telegram_SendMessage
+
+Func _Test_Telegram_ForwardMessage()
     ; Send a message that will be forwarded
     Local $oSentMessage = _Telegram_SendMessage($sChatId, "Test forward message")
     ; Get its message id
@@ -91,7 +102,7 @@ Func _Test_ForwardMessage()
     UTAssert(_Telegram_ForwardMessage($sChatId, $sChatId, 1) = Null And @error = $TG_ERR_BAD_INPUT, "Test_ForwardMessage: invalid message id", @error, @extended)
 EndFunc
 
-Func _Test_SendPhoto()
+Func _Test_Telegram_SendPhoto()
     Local Const $sPhotoPath = "media/image.png"
     Local Const $sPhotoURL = "https://picsum.photos/200"
 
@@ -121,15 +132,14 @@ Func _Test_DeleteMessage()
     UTAssert(Not @error, "Test_DeleteMessage: message deleted successfully")
 EndFunc
 
-
-; @ TEST RUNNER
+#Region "Test runner"
 #cs ======================================================================================
     Name .........: __GetTestFunctions
     Description...: Retrieves the names of the test functions present in the current script.
     Syntax .......: __GetTestFunctions()
     Parameters....: None
     Return values.:
-                    Success - Returns an array containing the names of test functions 
+                    Success - Returns an array containing the names of test functions
                               based on the specified prefix.
                     Failure - Returns an empty array if no test functions are found.
 #ce ======================================================================================
@@ -140,7 +150,7 @@ Func __GetTestFunctions()
     For $i = 0 To UBound($aFunctions) - 1
         $aFunctions[$i] = $sTestPrefix & $aFunctions[$i]
     Next
-	
+
     Return $aFunctions
 EndFunc
 
@@ -162,5 +172,6 @@ Func _RunAllTests()
         Call($aTestFunctions[$i])
     Next
 EndFunc
+#EndRegion
 
 _RunAllTests()
