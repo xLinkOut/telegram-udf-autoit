@@ -306,6 +306,55 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
 
 EndFunc ;==> _Telegram_SendLocation
 
+#cs ======================================================================================
+    Name .........: _Telegram_SendVenue
+    Description...: Sends information about a venue to a specified chat.
+    Syntax .......: _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, $sFoursquareId = "", $sFoursquareType = "", $sGooglePlaceId = "", $sGooglePlaceType = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    Parameters....:
+                    $sChatId                - The chat ID.
+                    $fLatitude              - Latitude of the venue.
+                    $fLongitude             - Longitude of the venue.
+                    $sTitle                 - Name of the venue.
+                    $sAddress               - Address of the venue.
+                    $sFoursquareId          - [optional] Foursquare identifier of the venue (Default is "").
+                    $sFoursquareType        - [optional] Foursquare type of the venue (Default is "").
+                    $sGooglePlaceId         - [optional] Google Places identifier of the venue (Default is "").
+                    $sGooglePlaceType       - [optional] Google Places type of the venue (Default is "").
+                    $sReplyMarkup           - [optional] Additional interface options (Default is "").
+                    $iReplyToMessage        - [optional] ID of the message to reply to (Default is Null).
+                    $bDisableNotification   - [optional] Disables notifications if set to True (Default is False).
+    Return values.:
+                    Success - Returns the API response.
+                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                                   Possible @error values:
+                                      $TG_ERR_BAD_INPUT - Invalid input parameters.
+                                      Other errors based on the API response.
+#ce ======================================================================================
+Func _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, $sFoursquareId = "", $sFoursquareType = "", $sGooglePlaceId = "", $sGooglePlaceType = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($fLatitude = "" Or $fLatitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($fLongitude = "" Or $fLongitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sTitle = "" Or $sTitle = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sAddress = "" Or $sAddress = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    $sParams &= _
+        "&latitude=" & $fLatitude & _
+        "&longitude=" & $fLongitude & _
+        "&title=" & $sTitle & _
+        "&address=" & $sAddress
+
+    If $sFoursquareId <> "" Then $sParams &= "&foursquare_id=" & $sFoursquareId
+    If $sFoursquareType <> "" Then $sParams &= "&foursquare_type=" & $sFoursquareType
+    If $sGooglePlaceId <> "" Then $sParams &= "&google_place_id=" & $sGooglePlaceId
+    If $sGooglePlaceType <> "" Then $sParams &= "&google_place_type=" & $sGooglePlaceType
+
+    Local $oResponse = _Telegram_API_Call($URL, "/sendVenue", "POST", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return $oResponse
+EndFunc ;==> _Telegram_SendVenue
+
+
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
 EndFunc  ;==> _EditMessageLiveLocation
 

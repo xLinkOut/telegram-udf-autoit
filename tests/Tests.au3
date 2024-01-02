@@ -130,6 +130,18 @@ Func _Test_Telegram_SendPhoto()
     UTAssert(_Validate_Telegram_Response($oRecentPhotoMessage), "Test_SendPhoto: Sent photo via File ID successfully")
 EndFunc
 
+Func _Test_SendVenue()
+    Local Const $fLatitude = 40.7128
+    Local Const $fLongitude = -74.0060
+    Local Const $sTitle = "Central Park"
+    Local Const $sAddress = "New York City, NY, USA"
+
+    Local $oResponse = _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress)
+    
+    UTAssert(_Validate_Telegram_Response($oResponse), "Test_SendVenue: Sending venue")
+EndFunc
+
+
 Func _Test_DeleteMessage()
     Local $sText = "Test message for deletion"
 
