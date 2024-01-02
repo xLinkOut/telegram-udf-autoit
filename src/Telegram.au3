@@ -393,6 +393,38 @@ Func _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = ""
     Return $oResponse
 EndFunc ;==> _Telegram_SendContact
 
+#cs
+    Name .........: _Telegram_SendChatAction
+    Description...: Use this method when you need to tell the user that something is happening on the bot's side.
+                    The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+                    Returns True on success.
+    Syntax .......: _Telegram_SendChatAction($sChatId, $sAction)
+    Parameters....:
+                    $sChatId    - Unique identifier for the target chat or username of the target channel (in the format @channelusername).
+                    $sAction    - Type of action to broadcast.
+                                  Choose one, depending on what the user is about to receive: 
+                                  typing, upload_photo, record_video, upload_video, record_voice, upload_voice, 
+                                  upload_document, choose_sticker, find_location, record_video_note, upload_video_note.
+    Return values.:
+                    Success     - Returns True on success.
+                    Error       - Returns Null and sets @error flag if an error occurs.
+                                  Possible @error values:
+                                    $TG_ERR_BAD_INPUT - Invalid input parameters.
+                                    Other errors based on the API response.
+#ce
+Func _Telegram_SendChatAction($sChatId, $sAction)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sAction = "" Or $sAction = Null Or StringInStr("typing,upload_photo,record_video,upload_video,record_voice,upload_voice,upload_document,choose_sticker,find_location,record_video_note,upload_video_note", $sAction) = 0) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = __BuildCommonParams($sChatId)
+    $sParams &= "&action=" & $sAction
+
+    Local $oResponse = _Telegram_API_Call($URL, "/sendChatAction", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return $oResponse
+EndFunc ;==> _Telegram_SendChatAction
+
+
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
 EndFunc  ;==> _EditMessageLiveLocation
 
