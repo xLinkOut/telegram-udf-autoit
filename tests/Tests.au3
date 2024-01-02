@@ -162,6 +162,14 @@ Func _Test_SendChatAction()
     UTAssert(_Telegram_SendChatAction($sChatId, "invalid_action") = Null And @error = $TG_ERR_BAD_INPUT, "Test_SendChatAction: invalid action")
 EndFunc ;==> _Test_SendChatAction
 
+Func _Test_GetChat()
+    ; Valid parameters
+    UTAssert(_Telegram_GetChat($sChatId), "Test_GetChat: valid parameters")
+    
+    ; Invalid parameters
+    UTAssert(Not _Telegram_GetChat(""), "Test_GetChat: empty chat ID")
+EndFunc
+
 Func _Test_DeleteMessage()
     Local $sText = "Test message for deletion"
 
