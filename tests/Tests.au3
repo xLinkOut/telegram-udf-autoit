@@ -109,20 +109,25 @@ Func _Test_Telegram_ForwardMessage()
 EndFunc
 
 Func _Test_Telegram_SendPhoto()
-    Local Const $sPhotoPath = "media/image.png"
-    Local Const $sPhotoURL = "https://picsum.photos/200"
+    Local Const $sLocalMedia = "media/image.png"
+    Local Const $sRemoteMedia = "https://picsum.photos/200"
 
-    ; Send a local photo
-    Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoPath)
-    UTAssert(Not @error, "Test_SendPhoto: no error")
-    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object")
-    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id")
+    ; Sending a local photo
+    Local $oLocalPhotoMessage = _Telegram_SendPhoto($sChatId, $sLocalMedia, "Test caption")
+    ; Check if the local photo was sent successfully
+    UTAssert(_Validate_Telegram_Response($oLocalPhotoMessage), "Test_SendPhoto: Sent local photo successfully")
 
-    ; Send a photo by URL (N.B.: This currently not works)
-    Local $oPhoto = _Telegram_SendPhoto($sChatId, $sPhotoURL)
-    UTAssert(Not @error, "Test_SendPhoto: no error")
-    UTAssert(Json_IsObject($oPhoto), "Test_SendPhoto: is object")
-    UTAssert(IsInt(Json_Get($oPhoto, "[message_id]")), "Test_SendPhoto: message id")
+    ; Sending a photo from a URL
+    Local $oRemotePhotoMessage = _Telegram_SendPhoto($sChatId, $sRemoteMedia, "Test caption")
+    ; Check if the photo from URL was sent successfully
+    UTAssert(_Validate_Telegram_Response($oRemotePhotoMessage), "Test_SendPhoto: Sent photo from URL successfully")
+
+    ; Get File ID of the last sent photo
+    Local $sFileID = Json_Get($oLocalPhotoMessage, "[photo][0][file_id]")
+    ; Resend the photo using the File ID
+    Local $oRecentPhotoMessage = _Telegram_SendPhoto($sChatId, $sFileID, "Test caption")
+    ; Check if the photo sent via File ID was successful
+    UTAssert(_Validate_Telegram_Response($oRecentPhotoMessage), "Test_SendPhoto: Sent photo via File ID successfully")
 EndFunc
 
 Func _Test_DeleteMessage()
@@ -180,6 +185,8 @@ Func _RunAllTests()
 EndFunc
 #EndRegion
 
-;_RunAllTests()
-_Telegram_Init($sValidToken)
-_Test_Telegram_SendMessage()
+_RunAllTests()
+
+; Here for debug purposes (run tests manually)
+;_Telegram_Init($sValidToken)
+;_Test_Telegram_SendPhoto()
