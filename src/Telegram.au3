@@ -355,6 +355,44 @@ Func _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, 
 EndFunc ;==> _Telegram_SendVenue
 
 
+#cs ======================================================================================
+    Name .........: _Telegram_SendContact
+    Description...: Sends a contact to the specified chat.
+    Syntax .......: _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = "", $vCard = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    Parameters....:
+                    $sChatId               - The chat ID.
+                    $sPhoneNumber          - Contact's phone number.
+                    $sFirstName            - Contact's first name.
+                    $sLastName             - [optional] Contact's last name. Default is an empty string.
+                    $vCard                 - [optional] Additional data about the contact in the form of a vCard. Default is an empty string.
+                    $sReplyMarkup          - [optional] Additional interface options. Default is an empty string.
+                    $iReplyToMessage       - [optional] ID of the message to reply to. Default is Null.
+                    $bDisableNotification  - [optional] Disables notifications if set to True. Default is False.
+    Return values.:
+                    Success - Returns the API response.
+                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                                   Possible @error values:
+                                      $TG_ERR_BAD_INPUT - Invalid input parameters.
+                                      Other errors based on the API response.
+#ce ======================================================================================
+Func _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = "", $vCard = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sPhoneNumber = "" Or $sPhoneNumber = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sFirstName = "" Or $sFirstName = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    $sParams &= _
+        "&phone_number=" & $sPhoneNumber & _
+        "&first_name=" & $sFirstName
+
+    If $sLastName <> "" Then $sParams &= "&last_name=" & $sLastName
+    If $vCard <> "" Then $sParams &= "&vcard=" & $vCard
+
+    Local $oResponse = _Telegram_API_Call($URL, "/sendContact", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return $oResponse
+EndFunc ;==> _Telegram_SendContact
+
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
 EndFunc  ;==> _EditMessageLiveLocation
 

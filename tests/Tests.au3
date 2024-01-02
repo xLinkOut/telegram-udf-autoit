@@ -141,6 +141,15 @@ Func _Test_SendVenue()
     UTAssert(_Validate_Telegram_Response($oResponse), "Test_SendVenue: Sending venue")
 EndFunc
 
+Func _Test_SendContact()
+    Const $sPhoneNumber = "123456789"
+    Const $sFirstName = "John"
+    Const $sLastName = "Doe"
+
+    Local $oResponse = _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName)
+    
+    UTAssert(_Validate_Telegram_Response($oResponse), "Test_SendContact: Sending contact")
+EndFunc
 
 Func _Test_DeleteMessage()
     Local $sText = "Test message for deletion"
