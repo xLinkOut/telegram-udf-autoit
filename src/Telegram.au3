@@ -420,6 +420,10 @@ Func _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = ""
     Return $oResponse
 EndFunc ;==> _Telegram_SendContact
 
+; TODO: sendPoll (https://core.telegram.org/bots/api#sendpoll)
+
+; TODO: sendDice (https://core.telegram.org/bots/api#senddice)
+
 #cs ======================================================================================
     Name .........: _Telegram_SendChatAction
     Description...: Use this method when you need to tell the user that something is happening on the bot's side.
@@ -451,6 +455,56 @@ Func _Telegram_SendChatAction($sChatId, $sAction)
     Return $oResponse
 EndFunc ;==> _Telegram_SendChatAction
 
+; TODO: setMessageReaction (https://core.telegram.org/bots/api#setmessagereaction)
+
+; TODO: getUserProfilePhotos (https://core.telegram.org/bots/api#getuserprofilephotos)
+
+; TODO: getFile (https://core.telegram.org/bots/api#getfile)
+
+; TODO: banChatMember (https://core.telegram.org/bots/api#banchatmember)
+
+; TODO: unbanChatMember (https://core.telegram.org/bots/api#unbanchatmember)
+
+; TODO: restrictChatMember (https://core.telegram.org/bots/api#restrictchatmember)
+
+; TODO: propoteChatMember (https://core.telegram.org/bots/api#promotechatmember)
+
+; TODO: setChatAdministratorCustomTitle (https://core.telegram.org/bots/api#setchatadministratorcustomtitle)
+
+; TODO: banChatSenderChat (https://core.telegram.org/bots/api#banchatsenderchat)
+
+; TODO: unbanChatSenderChat (https://core.telegram.org/bots/api#unbanchatsenderchat)
+
+; TODO: setChatPermissions (https://core.telegram.org/bots/api#setchatpermissions)
+
+; TODO: exportChatInviteLink (https://core.telegram.org/bots/api#exportchatinvitelink)
+
+; TODO: createChatInviteLink (https://core.telegram.org/bots/api#createchatinvitelink)
+
+; TODO: editChatInviteLink (https://core.telegram.org/bots/api#editchatinvitelink)
+
+; TODO: revokeChatInviteLink (https://core.telegram.org/bots/api#revokechatinvitelink)
+
+; TODO: approveChatJoinRequest (https://core.telegram.org/bots/api#approvechatjoinrequest)
+
+; TODO: declineChatJoinRequest (https://core.telegram.org/bots/api#declinechatjoinrequest)
+
+; TODO: setChatPhoto (https://core.telegram.org/bots/api#setchatphoto)
+
+; TODO: deleteChatPhoto (https://core.telegram.org/bots/api#deletechatphoto)
+
+; TODO: setChatTitle (https://core.telegram.org/bots/api#setchattitle)
+
+; TODO: setChatDescription (https://core.telegram.org/bots/api#setchatdescription)
+
+; TODO: pinChatMessage (https://core.telegram.org/bots/api#pinchatmessage)
+
+; TODO: unpinChatMessage (https://core.telegram.org/bots/api#unpinchatmessage)
+
+; TODO: unpinAllChatMessages (https://core.telegram.org/bots/api#unpinallchatmessages)
+
+; TODO: leaveChat (https://core.telegram.org/bots/api#leavechat)
+
 #cs ======================================================================================
     Name .........: _Telegram_GetChat
     Description...: Retrieves up-to-date information about a specific chat.
@@ -474,6 +528,74 @@ Func _Telegram_GetChat($sChatId)
 
     Return $oResponse
 EndFunc ;==> _Telegram_GetChat
+
+; TODO: getChatAdministrators (https://core.telegram.org/bots/api#getchatadministrators)
+
+; TODO: getChatMembersCount (https://core.telegram.org/bots/api#getchatmemberscount)
+
+; TODO: getChatMember (https://core.telegram.org/bots/api#getchatmember)
+
+; TODO: setChatStickerSet (https://core.telegram.org/bots/api#setchatstickerset)
+
+; TODO: deleteChatStickerSet (https://core.telegram.org/bots/api#deletechatstickerset)
+
+; TODO: getForumTopicIconSticker (https://core.telegram.org/bots/api#getforumtopiciconsticker)
+
+; TODO: createForumTopic (https://core.telegram.org/bots/api#createforumtopic)
+
+; TODO: editForumTopic (https://core.telegram.org/bots/api#editforumtopic)
+
+; TODO: closeForumTopic (https://core.telegram.org/bots/api#closeforumtopic)
+
+; TODO: reopenForumTopic (https://core.telegram.org/bots/api#reopenforumtopic)
+
+; TODO: deleteForumTopic (https://core.telegram.org/bots/api#deleteforumtopic)
+
+; TODO: unpinAllForumTopicMessages (https://core.telegram.org/bots/api#unpinallforumtopicmessages)
+
+; TODO: editGeneralForumTopic (https://core.telegram.org/bots/api#editgeneralforumtopic)
+
+; TODO: closeGeneralForumTopic (https://core.telegram.org/bots/api#closegeneralforumtopic)
+
+; TODO: reopenGeneralForumTopic (https://core.telegram.org/bots/api#reopengeneralforumtopic)
+
+; TODO: hideGeneralForumTopic (https://core.telegram.org/bots/api#hidegeneralforumtopic)
+
+; TODO: unhideGeneralForumTopic (https://core.telegram.org/bots/api#unhidegeneralforumtopic)
+
+; TODO: unpinAllGeneralForumTopicMessages (https://core.telegram.org/bots/api#unpinallgeneralforumtopicmessages)
+
+; TODO: answerCallbackQuery (https://core.telegram.org/bots/api#answercallbackquery)
+
+; TODO: getUserChatBoosts (https://core.telegram.org/bots/api#getuserchatboosts)
+
+; TODO: getBusinessConnection (https://core.telegram.org/bots/api#getbusinessconnection)
+
+; TODO: setMyCommands (https://core.telegram.org/bots/api#setmycommands)
+
+; TODO: deleteMyCommands (https://core.telegram.org/bots/api#deletemycommands)
+
+; TODO: getMyCommands (https://core.telegram.org/bots/api#getmycommands)
+
+; TODO: setMyName (https://core.telegram.org/bots/api#setmyname)
+
+; TODO: getMyName (https://core.telegram.org/bots/api#getmyname)
+
+; TODO: setMyDescription (https://core.telegram.org/bots/api#setmydescription)
+
+; TODO: getMyDescription (https://core.telegram.org/bots/api#getmydescription)
+
+; TODO: setMyShortDescription (https://core.telegram.org/bots/api#setmyshortdescription)
+
+; TODO: getMyShortDescription (https://core.telegram.org/bots/api#getmyshortdescription)
+
+; TODO: setChatMenuButton (https://core.telegram.org/bots/api#setchatmenubutton)
+
+; TODO: getChatMenuButton (https://core.telegram.org/bots/api#getchatmenubutton)
+
+; TODO: setMyDefaultAdministratorRights (https://core.telegram.org/bots/api#setmydefaultadministratorrights)
+
+; TODO: getMyDefaultAdministratorRights (https://core.telegram.org/bots/api#getmydefaultadministratorrights)
 
 Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
 EndFunc  ;==> _EditMessageLiveLocation
