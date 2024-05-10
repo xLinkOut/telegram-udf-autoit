@@ -168,7 +168,7 @@ EndFunc
 Func _Test_SendChatAction()
     Const $sTestAction = "typing"
 
-    UTAssert(_Validate_Telegram_Response(_Telegram_SendChatAction($sChatId, $sTestAction)), "Test_SendChatAction: sending action")
+    UTAssert(_Telegram_SendChatAction($sChatId, $sTestAction) = True, "Test_SendChatAction: sending action")
     UTAssert(_Telegram_SendChatAction("", $sTestAction) = Null And @error = $TG_ERR_BAD_INPUT, "Test_SendChatAction: empty chat ID")
     UTAssert(_Telegram_SendChatAction($sChatId, "") = Null And @error = $TG_ERR_BAD_INPUT, "Test_SendChatAction: empty action")
     
