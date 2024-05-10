@@ -645,7 +645,7 @@ EndFunc ;==> _Telegram_Polling
                         $OneTime: Set true if you want to use the keyboard once
    Return Value(s):		Return custom markup as string, encoded in JSON
 #ce ===============================================================================
-Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
+Func _Telegram_CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
     Local $jsonKeyboard = '{"keyboard":['
     For $i=0 to UBound($Keyboard)-1
@@ -664,7 +664,7 @@ Func _CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     If $OneTime = True Then $jsonKeyboard &= ',"one_time_keyboard":true'
     $jsonKeyboard &= '}'
     Return $jsonKeyboard
-EndFunc ;==> _CreateKeyboard
+EndFunc ;==> _Telegram_CreateKeyboard
 
 #EndRegion
 

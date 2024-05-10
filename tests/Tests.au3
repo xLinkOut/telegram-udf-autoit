@@ -197,6 +197,45 @@ Func _Test_Telegram_DeleteMessage()
     UTAssert(Not @error, "Test_DeleteMessage: message deleted successfully")
 EndFunc ;==> _Test_Telegram_DeleteMessage
 
+Func _Test_Telegram_CreateKeyboard()
+    
+    ; Keyboard with one row
+    Local $aKeyboard = ['Option 1', 'Option 2', 'Option 3']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["Option 1","Option 2","Option 3"]]}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard) = $sKeyboardExpectedResult, "Test_CreateKeyboard: one row")
+    
+    ; Keyboard with two rows
+    Local $aKeyboard = ['Button1', 'Button2', '', 'Button3']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["Button1","Button2"],["Button3"]]}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard) = $sKeyboardExpectedResult, "Test_CreateKeyboard: two rows")
+    
+    ; Keyboard with two rows and empty spaces
+    Local $aKeyboard = ['Button A', '', 'Button B', 'Button C', '']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["Button A"],["Button B","Button C"]]}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard) = $sKeyboardExpectedResult, "Test_CreateKeyboard: two rows and empty spaces")
+    
+    ; Keyboard with only one row and resize
+    Local $aKeyboard = ['First Button', 'Second Button', 'Third Button']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["First Button","Second Button","Third Button"]],"resize_keyboard":true}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard, True) = $sKeyboardExpectedResult, "Test_CreateKeyboard: one row and resize")
+    
+    ; Keyboard with only one row and one-time
+    Local $aKeyboard = ['First Button', 'Second Button', 'Third Button']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["First Button","Second Button","Third Button"]],"one_time_keyboard":true}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard, False, True) = $sKeyboardExpectedResult, "Test_CreateKeyboard: one row and one-time")
+  
+    ; Keyboard with only one row and resize and one-time
+    Local $aKeyboard = ['First Button', 'Second Button', 'Third Button']
+    Local $sKeyboardExpectedResult = '{"keyboard":[["First Button","Second Button","Third Button"]],"resize_keyboard":true,"one_time_keyboard":true}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard, True, True) = $sKeyboardExpectedResult, "Test_CreateKeyboard: one row and resize and one-time")
+    
+    ; Keyboard with no buttons
+    Local $aKeyboard = []
+    Local $sKeyboardExpectedResult = '{"keyboard":[]}'
+    UTAssert(_Telegram_CreateKeyboard($aKeyboard) = $sKeyboardExpectedResult, "Test_CreateKeyboard: empty keyboard")
+
+EndFunc ;==> _Test_Telegram_CreateKeyboard
+
 #Region "Test runner"
 #cs ======================================================================================
     Name .........: __GetTestFunctions
@@ -240,8 +279,8 @@ EndFunc ;==> _RunAllTests
 
 #EndRegion
 
-_RunAllTests()
+;~ _RunAllTests()
 
 ; Here for debug purposes (run tests manually)
-;_Telegram_Init($sValidToken)
-;_Test_Telegram_SendPhoto()
+_Telegram_Init($sValidToken)
+_Test_Telegram_CreateKeyboard()
