@@ -471,14 +471,16 @@ EndFunc ;==> _Telegram_DeleteMessage
 #Region "Extra"
 
 #cs ===============================================================================
-   Function Name..:    	_Telegram_Polling
-   Description....:     Wait for incoming messages
-   Parameter(s)...:     None
-   Return Value(s):		Return an array with information about the messages
+    Function Name..: _Telegram_Polling
+    Description....: Wait for incoming messages
+    Syntax.........: _Telegram_Polling([$iSleep = 1000])
+    Parameter(s)...:     
+                        $iSleep - The time to wait in milliseconds between polling requests. Default is 1000 ms.
+    Return Value(s): An array of JSON objects with information about messages
 #ce ===============================================================================
-Func _Telegram_Polling()
+Func _Telegram_Polling($iSleep = 1000)
     While 1
-        Sleep(1000) ;Prevent CPU Overloading
+        Sleep($iSleep) ;Wait for $iSleep ms between polling requests
         $newMessages = _Telegram_GetUpdates()
         If (UBound($newMessages) > 0) Then Return $newMessages
     WEnd
