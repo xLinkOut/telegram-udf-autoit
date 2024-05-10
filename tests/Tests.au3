@@ -120,7 +120,7 @@ Func _Test_Telegram_ForwardMessage()
     Local $oForwardedMessage = _Telegram_ForwardMessage($sChatId, $sChatId, Json_Get($oMessage, "[message_id]"))
     ; Check if message was forwarded successfully
     UTAssert(_Validate_Telegram_Response($oForwardedMessage), "Test_ForwardMessage: Forwarded message successfully")
-EndFunc
+EndFunc ;==> _Test_Telegram_ForwardMessage
 
 Func _Test_Telegram_SendPhoto()
     Local Const $sLocalMedia = "media/image.png"
@@ -142,9 +142,9 @@ Func _Test_Telegram_SendPhoto()
     Local $oRecentPhotoMessage = _Telegram_SendPhoto($sChatId, $sFileID, "Test caption")
     ; Check if the photo sent via File ID was successful
     UTAssert(_Validate_Telegram_Response($oRecentPhotoMessage), "Test_SendPhoto: Sent photo via File ID successfully")
-EndFunc
+EndFunc ;==> _Test_Telegram_SendPhoto
 
-Func _Test_SendVenue()
+Func _Test_Telegram_SendVenue()
     Local Const $fLatitude = 40.7128
     Local Const $fLongitude = -74.0060
     Local Const $sTitle = "Central Park"
@@ -153,9 +153,9 @@ Func _Test_SendVenue()
     Local $oResponse = _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress)
     
     UTAssert(_Validate_Telegram_Response($oResponse), "Test_SendVenue: Sending venue")
-EndFunc
+EndFunc ;==> _Test_Telegram_SendVenue
 
-Func _Test_SendContact()
+Func _Test_Telegram_SendContact()
     Const $sPhoneNumber = "123456789"
     Const $sFirstName = "John"
     Const $sLastName = "Doe"
@@ -163,9 +163,9 @@ Func _Test_SendContact()
     Local $oResponse = _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName)
     
     UTAssert(_Validate_Telegram_Response($oResponse), "Test_SendContact: Sending contact")
-EndFunc
+EndFunc ;==> _Test_Telegram_SendContact
 
-Func _Test_SendChatAction()
+Func _Test_Telegram_SendChatAction()
     Const $sTestAction = "typing"
 
     UTAssert(_Telegram_SendChatAction($sChatId, $sTestAction) = True, "Test_SendChatAction: sending action")
@@ -174,17 +174,17 @@ Func _Test_SendChatAction()
     
     ; Invalid action
     UTAssert(_Telegram_SendChatAction($sChatId, "invalid_action") = Null And @error = $TG_ERR_BAD_INPUT, "Test_SendChatAction: invalid action")
-EndFunc ;==> _Test_SendChatAction
+EndFunc ;==> _Test_Telegram_SendChatAction
 
-Func _Test_GetChat()
+Func _Test_Telegram_GetChat()
     ; Valid parameters
     UTAssert(_Telegram_GetChat($sChatId), "Test_GetChat: valid parameters")
     
     ; Invalid parameters
     UTAssert(Not _Telegram_GetChat(""), "Test_GetChat: empty chat ID")
-EndFunc
+EndFunc ;==> _Test_Telegram_GetChat
 
-Func _Test_DeleteMessage()
+Func _Test_Telegram_DeleteMessage()
     Local $sText = "Test message for deletion"
 
     ; Sending a test message to be deleted
@@ -195,7 +195,7 @@ Func _Test_DeleteMessage()
     ; Deleting the sent message
     Local $oResponse = _Telegram_DeleteMessage($sChatId, $iMessageId)
     UTAssert(Not @error, "Test_DeleteMessage: message deleted successfully")
-EndFunc
+EndFunc ;==> _Test_Telegram_DeleteMessage
 
 #Region "Test runner"
 #cs ======================================================================================
@@ -209,7 +209,7 @@ EndFunc
                     Failure - Returns an empty array if no test functions are found.
 #ce ======================================================================================
 Func __GetTestFunctions()
-    Local $sTestPrefix = "_Test_"
+    Local $sTestPrefix = "_Test_Telegram_"
     Local $aFunctions = StringRegExp(FileRead(@ScriptFullPath), "(?i)(?s)Func\s+" & $sTestPrefix &"(\w+)\s*\(", 3)
 
     For $i = 0 To UBound($aFunctions) - 1
@@ -217,7 +217,7 @@ Func __GetTestFunctions()
     Next
 
     Return $aFunctions
-EndFunc
+EndFunc ;==> __GetTestFunctions
 
 #cs ======================================================================================
     Name .........: _RunAllTests
@@ -236,7 +236,8 @@ Func _RunAllTests()
         ; Execute the test
         Call($aTestFunctions[$i])
     Next
-EndFunc
+EndFunc ;==> _RunAllTests
+
 #EndRegion
 
 _RunAllTests()
