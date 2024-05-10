@@ -1,2 +1,5 @@
 # Executables
 *.exe
+
+# Test config
+tests/config.ini

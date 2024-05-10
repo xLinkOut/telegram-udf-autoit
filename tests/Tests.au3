@@ -1,8 +1,23 @@
 #include "../src/Telegram.au3"
 
-Global Const $sValidToken = "" ; TODO: Environment variable or config.ini
-Global Const $sInvalidToken = "123456789:ABCDEFGH"
-Global Const $sChatId = ""
+Const $sConfigFilePath = @ScriptDir & "\config.ini"
+ConsoleWrite("Using config file located at " & $sConfigFilePath & @CRLF)
+
+Global Const $sValidToken = IniRead($sConfigFilePath, "Init", "ValidToken", "")
+Global Const $sInvalidToken = IniRead($sConfigFilePath, "Init", "InvalidToken", "")
+Global Const $sChatId = IniRead($sConfigFilePath, "Init", "ChatId", "")
+
+; Check if the config file read was successful
+If @error Then
+    ConsoleWrite("An error occurred while reading the config file" & @CRLF)
+    Exit 1
+EndIf
+
+; Check if the config file is missing required parameters
+If $sValidToken = "" Or $sChatId = "" Then
+    ConsoleWrite("The config file is missing required parameters" & @CRLF)
+    Exit 2
+EndIf
 
 Func UTAssert(Const $bResult, Const $sMsg = "Assert Failure", Const $iError = @error, Const $iExtended = @extended, Const $iSln = @ScriptLineNumber)
 	ConsoleWrite("(" & $iSln & ") " & ($bResult ? "Passed" : "Failed (" & $iError & "/" & $iExtended & ")") & ": " & $sMsg & @LF)
