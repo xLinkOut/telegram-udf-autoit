@@ -90,7 +90,6 @@ Func _Test_Telegram_SendMessage()
     ; Test with Keyboard Markup
     Local $sKeyboardMarkup = '{"keyboard":[["Button 1"],["Button 2"]],"one_time_keyboard":true}'
     $oMessage = _Telegram_SendMessage($sChatId, "Test with Keyboard Markup", Null, $sKeyboardMarkup)
-    Json_Dump(Json_Encode($oMessage))
     UTAssert(_Validate_Telegram_Response($oMessage), "Test_SendMessage: valid response with Keyboard Markup")
 
     ; Test with Inline Keyboard Markup
