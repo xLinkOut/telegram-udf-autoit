@@ -133,6 +133,34 @@ Func _Telegram_GetUpdates($bUpdateOffset = True)
 EndFunc ;==> _Telegram_GetUpdates
 
 #cs ======================================================================================
+    Name .........: _Telegram_LogOut
+    Description...: Logs out from the cloud Bot API server before launching the bot locally.
+    Syntax .......: _Telegram_LogOut()
+    Parameters....: None
+    Return values.: Success - Returns True on success.
+                    Failure - Returns False and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_LogOut()
+    Local $oResponse = _Telegram_API_Call($URL, "/logOut", "GET", "")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return True
+EndFunc ;==> _Telegram_LogOut
+
+#cs ======================================================================================
+    Name .........: _Telegram_Close
+    Description...: Use this method to close the bot instance before moving it from one local server to another.
+    Syntax .......: _Telegram_Close()
+    Parameters....: None
+    Return values.: Success - Returns True on success.
+                    Failure - Returns False and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_Close()
+    Local $oResponse = _Telegram_API_Call($URL, "/close", "GET", "")
+    If (@error) Then Return SetError(@error, @extended, Null)
+    Return True
+EndFunc ;==> _Telegram_Close
+
+#cs ======================================================================================
     Name .........: _Telegram_SendMessage
     Description...: Sends a message via the Telegram API to a specified chat ID
     Syntax .......: _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
