@@ -117,19 +117,20 @@ EndFunc ;==>_Telegram_GetMe
 #ce ======================================================================================
 Func _Telegram_GetUpdates($bUpdateOffset = True)
     ; Get updates
-    Local $oResponse = _Telegram_API_Call($URL, "/getUpdates", "GET", "offset=" & $OFFSET)
+    Local $aMessages = _Telegram_API_Call($URL, "/getUpdates", "GET", "offset=" & $OFFSET)
     If (@error) Then Return SetError(@error, @extended, Null)
 
     If ($bUpdateOffset) Then
         ; Get messages count
-        Local $iMessageCount = UBound($oResponse)
+        Local $iMessageCount = UBound($aMessages)
         if ($iMessageCount > 0) Then
-            ; Set offset as last message id
-            $OFFSET = Json_Get($oResponse, "[result][" & $iMessageCount - 1 & "][update_id]") + 1
+            ; Set offset as last message id + 1
+            $iUpdateId = Json_Get($aMessages[$iMessageCount - 1], "[update_id]")
+            $OFFSET = $iUpdateId + 1
         EndIf
 	EndIf
 
-    Return $oResponse
+    Return $aMessages
 EndFunc ;==> _Telegram_GetUpdates
 
 #cs ======================================================================================

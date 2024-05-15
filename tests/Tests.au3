@@ -279,8 +279,8 @@ EndFunc ;==> _RunAllTests
 
 #EndRegion
 
-;~ _RunAllTests()
+_RunAllTests()
 
 ; Here for debug purposes (run tests manually)
-_Telegram_Init($sValidToken)
-_Test_Telegram_CreateKeyboard()
+;~ _Telegram_Init($sValidToken)
+;~ _Test_Telegram_CreateKeyboard()
