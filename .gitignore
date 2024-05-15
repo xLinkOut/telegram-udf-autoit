@@ -1,3 +1,5 @@
-# Files
-.DS_Store
-tests/devTest.au3
+# Executables
+*.exe
+
+# Test config
+tests/config.ini
