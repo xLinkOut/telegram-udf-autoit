@@ -13,10 +13,10 @@
 #ce ------------------------------------------------------------------------------
 
 #include-once
-#include "include/WinHttp.au3"
-#include "include/JSON.au3"
-#include <String.au3>
 #include <Array.au3>
+#include <String.au3>
+#include "include/JSON.au3"
+#include "include/WinHttp.au3"
 
 ;@GLOBAL
 Global $URL	   = ""
@@ -25,7 +25,7 @@ Global $OFFSET = 0
 
 ;@CONST
 Const $BASE_URL = "https://api.telegram.org/bot"
-Const $BOT_CRLF = __UrlEncode(@CRLF)
+Const $BOT_CRLF = _Telegram_UrlEncode(@CRLF)
 
 ;@ERRORS
 ; Initialization errors
@@ -186,7 +186,7 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
     If ($sText = "" Or $sText = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sParseMode <> Null And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification, $bDisableWebPreview)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification, $bDisableWebPreview)
     $sParams &= "&text=" & $sText
 
     Local $oResponse = _Telegram_API_Call($URL, "/sendMessage", "POST", $sParams)
@@ -215,7 +215,7 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
     If ($sFromChatId = "" Or $sFromChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, Null, Null, Null, $bDisableNotification)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, Null, Null, Null, $bDisableNotification)
     $sParams &= _
         "&from_chat_id=" & $sFromChatId & _
         "&message_id=" & $iMessageId
@@ -320,7 +320,7 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
     If ($fLatitude = "" Or $fLatitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($fLongitude = "" Or $fLongitude = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     $sParams &= _
         "&latitude=" & $fLatitude & _
         "&longitude=" & $fLongitude
@@ -366,7 +366,7 @@ Func _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, 
     If ($sTitle = "" Or $sTitle = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sAddress = "" Or $sAddress = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     $sParams &= _
         "&latitude=" & $fLatitude & _
         "&longitude=" & $fLongitude & _
@@ -408,7 +408,7 @@ Func _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = ""
     If ($sPhoneNumber = "" Or $sPhoneNumber = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sFirstName = "" Or $sFirstName = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, Null, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     $sParams &= _
         "&phone_number=" & $sPhoneNumber & _
         "&first_name=" & $sFirstName
@@ -448,7 +448,7 @@ Func _Telegram_SendChatAction($sChatId, $sAction)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sAction = "" Or $sAction = Null Or StringInStr("typing,upload_photo,record_video,upload_video,record_voice,upload_voice,upload_document,choose_sticker,find_location,record_video_note,upload_video_note", $sAction) = 0) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
     $sParams &= "&action=" & $sAction
 
     Local $oResponse = _Telegram_API_Call($URL, "/sendChatAction", "GET", $sParams)
@@ -522,7 +522,7 @@ EndFunc ;==> _Telegram_SendChatAction
 Func _Telegram_GetChat($sChatId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
 
     Local $oResponse = _Telegram_API_Call($URL, "/getChat", "GET", $sParams)
     If (@error) Then Return SetError(@error, @extended, Null)
@@ -598,17 +598,15 @@ EndFunc ;==> _Telegram_GetChat
 
 ; TODO: getMyDefaultAdministratorRights (https://core.telegram.org/bots/api#getmydefaultadministratorrights)
 
-Func _EditMessageLiveLocation($sChatId,$Latitude,$Longitude,$sReplyMarkup = "")
-EndFunc  ;==> _EditMessageLiveLocation
+; TODO: editMessageLiveLocation (https://core.telegram.org/bots/api#editmessagelivelocation)
 
-Func _StopMessageLiveLocation($sChatId,$sReplyMarkup = "")
-EndFunc ;==> _StopMessageLiveLocation
+; TODO: stopMessageLiveLocation (https://core.telegram.org/bots/api#stopmessagelivelocation) 
 
 Func _Telegram_DeleteMessage($sChatId, $iMessageId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     
-    Local $sParams = __BuildCommonParams($sChatId)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
     $sParams &= "&message_id=" & $iMessageId
     
     Local $oResponse = _Telegram_API_Call($URL, "/deleteMessage", "POST", $sParams)
@@ -670,13 +668,13 @@ EndFunc ;==> _Telegram_CreateKeyboard
 #EndRegion
 
 #cs ===============================================================================
-   Function Name..:    	_CreateInlineKeyboard
+   Function Name..:    	_Telegram_CreateInlineKeyboard
    Description....:     Create and return a custom inline keyboard markup
    Parameter(s)...:     $Keyboard: an array with the keyboard. Use an empty position for line break.
                             Example: Local $InlineKeyboard[5] = ['Button1_Text','Button1_Data','','Button2_Text','Button2_Data']
    Return Value(s):		Return custom inline markup as string, encoded in JSON
 #ce ===============================================================================
-Func _CreateInlineKeyboard(ByRef $Keyboard)
+Func _Telegram_CreateInlineKeyboard(ByRef $Keyboard)
     ;reply_markup={"inline_keyboard":[[['text':'Yes','callback_data':'pressed_yes'],['text':'No','callback_data':'pressed_no']]]}
     Local $jsonKeyboard = '{"inline_keyboard":[['
     For $i=0 to UBound($Keyboard)-1
@@ -703,7 +701,7 @@ EndFunc
 
 #Region "Internal functions"
 
-Func __BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableNotification = Null, $bDisableWebPreview = Null)
+Func _Telegram_BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableNotification = Null, $bDisableWebPreview = Null)
     Local $sParams = ""
 
     If($sChatId <> Null) Then $sParams = "&chat_id=" & $sChatId
@@ -715,15 +713,15 @@ Func __BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMarkup = Nu
 
     ; Remove the first "&" character
     Return StringTrimLeft($sParams, 1)
-EndFunc ;==> __BuildCommonParams
+EndFunc ;==> _Telegram_BuildCommonParams
 
 #cs ===============================================================================
-   Function Name..:		__UrlEncode
+   Function Name..:		_Telegram_UrlEncode
    Description....:     Encode text in url format
    Parameter(s)...:     $string: Text to encode
    Return Value(s):  	Return the encoded string
 #ce ===============================================================================
-Func __UrlEncode($string)
+Func _Telegram_UrlEncode($string)
     $string = StringSplit($string, "")
     For $i=1 To $string[0]
         If AscW($string[$i]) < 48 Or AscW($string[$i]) > 122 Then
@@ -802,7 +800,7 @@ Func _Telegram_SendMedia($sChatId, $vMedia, $sMediaType, $sCaption = "", $sParse
     If ($sMediaType = "" Or $sMediaType = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($sParseMode <> "" And $sParseMode <> "MarkdownV2" And $sParseMode <> "HTML") Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
 
-    Local $sParams = __BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
+    Local $sParams = _Telegram_BuildCommonParams($sChatId, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
     $sParams &= "&caption=" & $sCaption
 
     Local $hOpen = _WinHttpOpen()
