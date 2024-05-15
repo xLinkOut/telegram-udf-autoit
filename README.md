@@ -1,68 +1,25 @@
-# Telegram UDFs for AutoIt <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/telegram_icon.png" width="28"> <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/autoit_icon.png" width="28">
+# Telegram UDFs for AutoIt
+A collection of user defined functions to seamlessly control your Telegram Bot with AutoIt.
+It support [most](https://github.com/xLinkOut/telegram-udf-autoit/wiki/Supported-APIs) of the Telegram Bot API and offer a whole set of useful features to interact with them.
 
-<p align="center">
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/banner.png"><br>
-</p>
-<p align="center">
-<b>If you want to control your Telegram Bot with AutoIt, this is for you!</b><br>
-</p>
-<p align="center">
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/star_icon.png" width="20">
-  Telegram UDF is on the official AutoIt Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
-  <img src="https://github.com/xLinkOut/telegram-udf-autoit/blob/master/assets/star_icon.png" width="20">
-</p>
+> [!NOTE]
+> This library is listed in the official [AutoIt Script Wiki!](https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API). Also, refer to the [original forum topic](https://www.autoitscript.com/forum/topic/186381-telegram-bot-udf/) for more details.
 
-## Notice
 > [!IMPORTANT]  
-> After over 4 years of inactivity, I am rewriting the library code from scratch with the intention of updating, optimizing it, fixing all the reported issues accumulated over the years, and supporting the latest Telegram features. You can find the development in the dev branch. I appreciate any kind of contribution. Thank you for the support. ❤️
+> I've rewritten the library code from scratch after years of inactivity. The aim is to update, optimize it, fix all reported issues accumulated over the years, and support the latest Telegram features. It's still in work in progress and, obviously, there are breaking changes. You can find the development in the dev branch; I appreciate any kind of contribution. Also, in the release section, you can find the previous version for backward compatibility. Thank you for the support!
 
-> [!WARNING]  
-> I'd like to inform you that the license for this project has been updated from GPL to MIT. This means that you are now free to use this work in your projects, with the condition that you acknowledge and cite this library within your own work. Thank you for your support and cooperation.
+## How to use
+The library itself is in the `src/Telegram.au3` file. It need all the dependencies in the `src/include` folder: [WinHttp](https://www.autoitscript.com/forum/topic/84133-winhttp-functions/), [JSON](https://www.autoitscript.com/forum/topic/148114-a-non-strict-json-udf-jsmn).
 
-## Setup
-_Telegram.au3_ is the main file that you have to include in your code, but it also need the _include_ folder. Adjust the path as you want. Include the library in your script with `#include "Telegram.au3"`.
+First, include the library in your script with `#include "path/to/Telegram.au3"`. Then, you can initialize the bot with the `_Telegram_Init` function: it take the bot token as first parameter (given to you by BotFather), and a boolean that validate the token as second parameter. I recommend to always validate your token, so the script fail immediately if it is invalid.
+The function return True if everything is ok, or False otherwise, and set `@error` and `@extended` accordingly.
 
-First initialize your bot with `_InitBot(12345678:AbCdEfGh....)`, then you can use all the bot functions.
-Check the @error flag after invoking _InitBot() (or its return value) to make sure everything is working: `@error == 1` mean error, and in this case the _InitBot() return False.
+After this initialization step, you can use all the other functions. Refer to the [wiki](https://github.com/xLinkOut/telegram-udf-autoit/wiki/) for more examples.
 
-## How it works
-After initializing the bot, you can do whatever you need to do. (Almost) all the APIs are coded, read the wiki for details about all the functions. To put the bot in _polling state_ (i.e. wait for incoming messages) read below.
+## What functions return
+The main difference from previous version of this library is that every Telegram API call return the response object almost as-is; it check the response status and return the `result` inner object to the caller. If any error occurs during the HTTP request, the function return `Null` and set `@error` and `@extended` flags.
 
-### How to wait for incoming messages
-To wait incoming messages you have to put the bot in Polling State. This state is **blocking**, therefore your script will wait here until it's closed or it exit from the main while, maybe if a certain condition is verified.
+That said, when you call any Telegram-related functions, expect in return an object as described in the Telegram API documentation. Use the JSON library to retrieve the information you need.
 
-#### Example:
-```autoit
-While 1 ;Create a While that restart Polling
-	$msgData = _Polling() ;_Polling function return an array with information about a message
-	_SendMsg($msgData[2],$msgData[5]) ;Send a message to the same user with the same text
-WEnd
-```
-
-For a simple text message, the array returned by _Polling() is:
-```
-$msgData[0] = Offset of the current update (used to 'switch' to the next update)
-$msgData[1] = Message ID
-$msgData[2] = Chat ID, use for interact with the user
-$msgData[3] = Username of the user
-$msgData[4] = First name of the user
-$msgData[5] = Text of the message
-```
-
-If you want to try all the available features, use the Test file into /tests folder. Open it, insert your bot's token, your chat id **(make sure you have sent at least one message to the bot)** and then execute it.
-
-## What you need to know
-I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
-
-## Credits
-+ Thanks to dragana-r (trancexx on AutoIt Forum) for [WinHttp UDF](https://github.com/dragana-r/autoit-winhttp)/[Forum thread](https://www.autoitscript.com/forum/topic/84133-winhttp-functions/)
-+ Thanks to zserge for [JSON UDF](http://zserge.com/jsmn.html)
-+ Thanks to J2TeamM for [JSON/Base64 UDF](https://github.com/J2TeaM/AutoIt-Imgur-UDF/tree/master/include)
-+ Thanks to Sergey Flakon for fixing [issue #8](https://github.com/xLinkOut/telegram-udf-autoit/issues/8)
-+ Thanks to RazTK for fixing [issue #11](https://github.com/xLinkOut/telegram-udf-autoit/issues/11) and [issue #12](https://github.com/xLinkOut/telegram-udf-autoit/issues/12)
-+ Thanks to Jefta-387 for fixing [issue #13](https://github.com/xLinkOut/telegram-udf-autoit/issues/13)
-
-## About
-If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo. ❤️
-
-For support, just contact me! Enjoy 🎉
+## License
+The license for this project has been updated from GPL to MIT. This means that you are now free to use this work in your projects, with the condition that you acknowledge and cite this library within your own work. Thank you for your support and cooperation.
