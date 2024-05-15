@@ -21,5 +21,18 @@ The main difference from previous version of this library is that every Telegram
 
 That said, when you call any Telegram-related functions, expect in return an object as described in the Telegram API documentation. Use the JSON library to retrieve the information you need.
 
+## Read incoming messages
+If you want to read incoming messages, you can put the bot in polling mode: the script will poll for incoming messages and return them. This state is blocking, therefore your script will wait here until a message is received or it exit. For example, to create a simple echo bot that receive a message and send it back, you can do the following:
+```autoit
+; Retrieve an array of messages from Telegram
+$aMessages = _Telegram_Polling()
+; For each message, send it back
+For $i = 0 To UBound($aMessages) - 1
+    $sChatId = Json_Get($aMessages[$i], "[message][chat][id]")
+    $sMessage = Json_Get($aMessages[$i], "[message][text]")
+    _Telegram_SendMessage($sChatId, $sMessage)
+Next
+```
+
 ## License
 The license for this project has been updated from GPL to MIT. This means that you are now free to use this work in your projects, with the condition that you acknowledge and cite this library within your own work. Thank you for your support and cooperation.
