@@ -530,7 +530,26 @@ Func _Telegram_GetChat($sChatId)
     Return $oResponse
 EndFunc ;==> _Telegram_GetChat
 
-; TODO: getChatAdministrators (https://core.telegram.org/bots/api#getchatadministrators)
+#cs ======================================================================================
+    Name .......: _Telegram_GetChatAdministrators
+    Description.: Get a list of administrators in a chat.
+    References..: https://core.telegram.org/bots/api#getchatadministrators
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat
+    Return......:
+                    Success - Array of ChatMember objects
+                    Error - Null and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_GetChatAdministrators($sChatId)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
+
+    Local $aResponse = _Telegram_API_Call($URL, "/getChatAdministrators", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $aResponse
+EndFunc
 
 ; TODO: getChatMembersCount (https://core.telegram.org/bots/api#getchatmemberscount)
 
