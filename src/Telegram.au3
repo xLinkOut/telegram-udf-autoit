@@ -46,19 +46,17 @@ Const $TG_ERR_API_CALL_NOT_SUCCESS = 6 ;@extended
 Const $TG_ERR_BAD_INPUT = 3 ;@error
 
 #cs ======================================================================================
-    Name .........: _Telegram_Init
-    Description...: Initializes a Telegram connection using the provided token
-    Syntax .......: _Telegram_Init($sToken[, $bValidate = False])
-    Parameters....:
-                    $sToken    - Token to authenticate with Telegram API
-                    $bValidate - [optional] Boolean flag to indicate whether
-                                to validate the token (Default is False)
-    Return values.:
-                    Success - Returns True upon successful initialization
-                    Error   - Returns False, sets @error flag to $TG_ERR_INIT and set
-                              @extended flag to:
-                              - $TG_ERR_INIT_MISSING_TOKEN if token is not provided
-                              - $TG_ERR_INIT_INVALID_TOKEN if token is invalid
+    Name .......: _Telegram_Init
+    Description.: Initializes a Telegram connection using the provided token
+    Parameters..:
+                    $sToken - Token to authenticate with Telegram API
+                    $bValidate - [optional] Boolean flag to indicate whether to validate 
+                        the token (Default is False)
+    Return......:
+                    Success - True upon successful initialization
+                    Failure - False, sets @error to $TG_ERR_INIT and set @extended to:
+ - $TG_ERR_INIT_MISSING_TOKEN if token is empty
+ - $TG_ERR_INIT_INVALID_TOKEN if token is invalid
 #ce ======================================================================================
 Func _Telegram_Init($sToken, $bValidate = False)
     ; Check if provided token is not empty
@@ -86,14 +84,13 @@ EndFunc ;==> _Telegram_Init
 #Region "API Implementation"
 
 #cs ======================================================================================
-    Name .........: _Telegram_GetMe
-    Description...: Retrieves information about the current bot using Telegram API
-    Syntax .......: _Telegram_GetMe()
-    Parameters....: None
-    Return values.:
-                    Success - Returns an object with information about the bot upon a
-                              successful API call
-                    Error   - Returns Null and sets @error flag to the encountered error code
+    Name .......: _Telegram_GetMe
+    Description.: Retrieves information about the current bot using Telegram API
+    Reference...: https://core.telegram.org/bots/api#getme
+    Parameters..: None
+    Return......:
+                    Success - An object with information about the bot
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_GetMe()
 	Local $oResponse = _Telegram_API_Call($URL, "/getMe")
@@ -103,17 +100,16 @@ Func _Telegram_GetMe()
 EndFunc ;==>_Telegram_GetMe
 
 #cs ======================================================================================
-    Name .........: _Telegram_GetUpdates
-    Description...: Retrieves updates from the Telegram API, optionally updating the offset
-    Syntax .......: _Telegram_GetUpdates([$bUpdateOffset = True])
-    Parameters....:
+    Name .......: _Telegram_GetUpdates
+    Description.: Retrieves updates from the Telegram API, optionally updating the offset
+    Reference...: https://core.telegram.org/bots/api#getupdates
+    Parameters..:
                     $bUpdateOffset - [optional] Boolean flag indicating whether to update
-                                     the offset (Default is True)
-    Return values.:
-                    Success - Returns an object containing updates retrieved from the
-                              Telegram API. If $bUpdateOffset is True, the offset might
-                              get updated based on the retrieved updates.
-                    Error   - Returns Null and sets @error flag to the encountered error code
+                        the offset (Default is True)
+    Return......:
+                    Success - A list of Message objects. If $bUpdateOffset is True, the 
+                        offset might get updated based on the retrieved updates
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_GetUpdates($bUpdateOffset = True)
     ; Get updates
@@ -134,26 +130,29 @@ Func _Telegram_GetUpdates($bUpdateOffset = True)
 EndFunc ;==> _Telegram_GetUpdates
 
 #cs ======================================================================================
-    Name .........: _Telegram_LogOut
-    Description...: Logs out from the cloud Bot API server before launching the bot locally.
-    Syntax .......: _Telegram_LogOut()
-    Parameters....: None
-    Return values.: Success - Returns True on success.
-                    Failure - Returns False and sets @error flag to the encountered error code
+    Name .......: _Telegram_LogOut
+    Description.: Logs out from the cloud Bot API server before launching the bot locally
+    Reference...: https://core.telegram.org/bots/api#logout
+    Parameters..: None
+    Return......: 
+                    Success - True
+                    Failure - False, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_LogOut()
     Local $oResponse = _Telegram_API_Call($URL, "/logOut", "GET", "")
     If (@error) Then Return SetError(@error, @extended, Null)
+
     Return True
 EndFunc ;==> _Telegram_LogOut
 
 #cs ======================================================================================
-    Name .........: _Telegram_Close
-    Description...: Use this method to close the bot instance before moving it from one local server to another.
-    Syntax .......: _Telegram_Close()
-    Parameters....: None
-    Return values.: Success - Returns True on success.
-                    Failure - Returns False and sets @error flag to the encountered error code
+    Name .......: _Telegram_Close
+    Description.: Close the bot instance before moving it from one local server to another
+    Reference...: https://core.telegram.org/bots/api#close
+    Parameters..: None
+    Return......: 
+                    Success - True
+                    Failure - False, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_Close()
     Local $oResponse = _Telegram_API_Call($URL, "/close", "GET", "")
@@ -162,23 +161,20 @@ Func _Telegram_Close()
 EndFunc ;==> _Telegram_Close
 
 #cs ======================================================================================
-    Name .........: _Telegram_SendMessage
-    Description...: Sends a message via the Telegram API to a specified chat ID
-    Syntax .......: _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
-    Parameters....:
-                    $sChatId               - ID of the chat where the message will be sent
-                    $sText                 - Text content of the message
-                    $sParseMode            - [optional] Parse mode for the message (Default is Null)
-                    $sReplyMarkup          - [optional] Reply markup for the message (Default is Null)
-                    $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
-                    $bDisableWebPreview    - [optional] Boolean flag to disable web preview
-                                             (Default is False)
-                    $bDisableNotification  - [optional] Boolean flag to disable notification
-                                             (Default is False)
-    Return values.:
-                    Success - Returns an object containing information about
-                                             the sent message upon a successful API call
-                    Error   - Returns Null and sets @error flag to the encountered error code
+    Name .......: _Telegram_SendMessage
+    Description.: Sends a message via the Telegram API to a specified chat ID
+    Reference...: https://core.telegram.org/bots/api#sendmessage
+    Parameters..:
+                    $sChatId - ID of the chat where the message will be sent
+                    $sText - Text content of the message
+                    $sParseMode - [optional] Parse mode for the message (Default is Null)
+                    $sReplyMarkup - [optional] Reply markup for the message (Default is Null)
+                    $iReplyToMessage - [optional] ID of the message to reply to (Default is Null)
+                    $bDisableWebPreview - [optional] Boolean flag to disable web preview (Default is False)
+                    $bDisableNotification - [optional] Boolean flag to disable notification (Default is False)
+    Return......:
+                    Success - An object containing information about the sent message
+                    Failure - Null,, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup = Null, $iReplyToMessage = Null, $bDisableWebPreview = False, $bDisableNotification = False)
     ; TODO: Enum for ParseMode
@@ -196,19 +192,17 @@ Func _Telegram_SendMessage($sChatId, $sText, $sParseMode = Null, $sReplyMarkup =
 EndFunc ;==> _Telegram_SendMessage
 
 #cs ======================================================================================
-    Name .........: _Telegram_ForwardMessage
-    Description...: Forwards a message from one chat to another using the Telegram API
-    Syntax .......: _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
-    Parameters....:
-                    $sChatId               - ID of the chat where the message will be forwarded
-                    $sFromChatId           - ID of the chat where the original message is from
-                    $iMessageId            - ID of the message to be forwarded
-                    $bDisableNotification  - [optional] Boolean flag to disable notification
-                                             (Default is False)
-    Return values.:
-                    Success                - Returns an object containing information about
-                                             the forwarded message upon a successful API call
-                    Error                  - Returns Null and sets @error flag to the encountered error code
+    Name .......: _Telegram_ForwardMessage
+    Description.: Forwards a message from one chat to another using the Telegram API
+    Reference...: https://core.telegram.org/bots/api#forwardmessage
+    Parameters..:
+                    $sChatId - ID of the chat where the message will be forwarded
+                    $sFromChatId - ID of the chat where the original message is from
+                    $iMessageId - ID of the message to be forwarded
+                    $bDisableNotification - [optional] Boolean flag to disable notification (Default is False)
+    Return......:
+                    Success - An object containing information about the forwarded message
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNotification = False)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -227,24 +221,23 @@ Func _Telegram_ForwardMessage($sChatId, $sFromChatId, $iMessageId, $bDisableNoti
 EndFunc ;==> _Telegram_ForwardMessage
 
 #cs ======================================================================================
-    Name .........: _Telegram_Send<Type>
-    Description...: Sends a <Type> via the Telegram API to a specified chat ID
-    Syntax .......: _Telegram_Send<Type>($sChatId, $<Type>, [$sCaption = "" [, $sParseMode = "" [, $sReplyMarkup = "" [, $iReplyToMessage = Null [, $bDisableNotification = False]]]]])
-    Parameters....:
-                    $sChatId               - ID of the chat where the <Type> will be sent
-                    $<Type>                - <Type> to be sent, a string representing a local path to a file,
-                                             a remote URL or a Telegram File ID. Supported objects are: photo,
-                                             audio, document, video, animation, voice, videonote, mediagroup
-                    $sCaption              - [optional] Caption for the <Type> (Default is "")
-                    $sParseMode            - [optional] Parse mode for the caption (Default is "")
-                    $sReplyMarkup          - [optional] Reply markup for the <Type> (Default is "")
-                    $iReplyToMessage       - [optional] ID of the message to reply to (Default is Null)
-                    $bDisableNotification  - [optional] Boolean flag to disable notification
-                                             (Default is False)
-    Return values.:
-                    Success                - Returns an object containing information about
-                                             the sent <Type> upon a successful API call
-                    Error                  - Returns Null and sets @error flag to the encountered error code
+    Name .......: _Telegram_Send<Type>
+    Description.: Sends a <Type> via the Telegram API to a specified chat ID
+    Reference...: https://core.telegram.org/bots/api#sendphoto
+    Parameters..:
+                    $sChatId - ID of the chat where the <Type> will be sent
+                    $<Type> - <Type> to be sent, a string representing a local path to a file, 
+                        a remote URL or a Telegram File ID. Supported objects are: photo,
+                        audio, document, video, animation, voice, videonote, mediagroup
+                    $sCaption - [optional] Caption for the <Type> (Default is "")
+                    $sParseMode - [optional] Parse mode for the caption (Default is "")
+                    $sReplyMarkup - [optional] Reply markup for the <Type> (Default is "")
+                    $iReplyToMessage - [optional] ID of the message to reply to (Default is Null)
+                    $bDisableNotification - [optional] Boolean flag to disable notification (Default is False)
+    Return......:
+                    Success - An object containing information about
+                                             the sent <Type>
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_SendPhoto($sChatId, $sPhoto, $sCaption = "", $sParseMode = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
     Local $oResponse = _Telegram_SendMedia($sChatId, $sPhoto, "photo", $sCaption, $sParseMode, $sReplyMarkup, $iReplyToMessage, $bDisableNotification)
@@ -295,22 +288,21 @@ Func _Telegram_SendMediaGroup($sChatId,$aMedias,$bDisableNotification = False)
 EndFunc
 
 #cs ======================================================================================
-    Name .........: _Telegram_SendLocation
-    Description...: Sends a location to the specified chat.
-    Syntax .......: _Telegram_SendLocation($sChatId, $fLatitude, $fLongitude, $fHorizontalAccuracy = Null, $iLivePeriod = Null, $iProximityAlertRadius = Null, $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
-    Parameters....:
-                    $sChatId               - The chat ID.
-                    $fLatitude             - The latitude of the location.
-                    $fLongitude            - The longitude of the location.
-                    $fHorizontalAccuracy   - [optional] The radius of uncertainty for the location, measured in meters.
-                    $iLivePeriod           - [optional] Period in seconds for which the location will be updated (for live locations).
+    Name .......: _Telegram_SendLocation
+    Description.: Sends a location to the specified chat.
+    Parameters..:
+                    $sChatId - The chat ID.
+                    $fLatitude - The latitude of the location.
+                    $fLongitude - The longitude of the location.
+                    $fHorizontalAccuracy - [optional] The radius of uncertainty for the location, measured in meters.
+                    $iLivePeriod - [optional] Period in seconds for which the location will be updated (for live locations).
                     $iProximityAlertRadius - [optional] The radius for triggering proximity alerts.
-                    $sReplyMarkup          - [optional] Additional interface options. Default is an empty string.
-                    $iReplyToMessage       - [optional] ID of the message to reply to.
-                    $bDisableNotification  - [optional] Disables notifications if set to True. Default is False.
-    Return values.:
+                    $sReplyMarkup - [optional] Additional interface options. Default is an empty string.
+                    $iReplyToMessage - [optional] ID of the message to reply to.
+                    $bDisableNotification - [optional] Disables notifications if set to True. Default is False.
+    Return......:
                     Success - Returns the API response.
-                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                    Failure - Returns @error flag along with @extended flag if an error occurs.
                                    Possible @error values:
                                       $TG_ERR_BAD_INPUT - Invalid input parameters.
                                       Other errors based on the API response.
@@ -336,25 +328,24 @@ Func _Telegram_SendLocation($sChatId,$fLatitude,$fLongitude,$fHorizontalAccuracy
 EndFunc ;==> _Telegram_SendLocation
 
 #cs ======================================================================================
-    Name .........: _Telegram_SendVenue
-    Description...: Sends information about a venue to a specified chat.
-    Syntax .......: _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, $sFoursquareId = "", $sFoursquareType = "", $sGooglePlaceId = "", $sGooglePlaceType = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
-    Parameters....:
-                    $sChatId                - The chat ID.
-                    $fLatitude              - Latitude of the venue.
-                    $fLongitude             - Longitude of the venue.
-                    $sTitle                 - Name of the venue.
-                    $sAddress               - Address of the venue.
-                    $sFoursquareId          - [optional] Foursquare identifier of the venue (Default is "").
-                    $sFoursquareType        - [optional] Foursquare type of the venue (Default is "").
-                    $sGooglePlaceId         - [optional] Google Places identifier of the venue (Default is "").
-                    $sGooglePlaceType       - [optional] Google Places type of the venue (Default is "").
-                    $sReplyMarkup           - [optional] Additional interface options (Default is "").
-                    $iReplyToMessage        - [optional] ID of the message to reply to (Default is Null).
-                    $bDisableNotification   - [optional] Disables notifications if set to True (Default is False).
-    Return values.:
+    Name .......: _Telegram_SendVenue
+    Description.: Sends information about a venue to a specified chat.
+    Parameters..:
+                    $sChatId - The chat ID.
+                    $fLatitude - Latitude of the venue.
+                    $fLongitude - Longitude of the venue.
+                    $sTitle - Name of the venue.
+                    $sAddress - Address of the venue.
+                    $sFoursquareId - [optional] Foursquare identifier of the venue (Default is "").
+                    $sFoursquareType - [optional] Foursquare type of the venue (Default is "").
+                    $sGooglePlaceId - [optional] Google Places identifier of the venue (Default is "").
+                    $sGooglePlaceType - [optional] Google Places type of the venue (Default is "").
+                    $sReplyMarkup - [optional] Additional interface options (Default is "").
+                    $iReplyToMessage - [optional] ID of the message to reply to (Default is Null).
+                    $bDisableNotification - [optional] Disables notifications if set to True (Default is False).
+    Return......:
                     Success - Returns the API response.
-                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                    Failure - Returns @error flag along with @extended flag if an error occurs.
                                    Possible @error values:
                                       $TG_ERR_BAD_INPUT - Invalid input parameters.
                                       Other errors based on the API response.
@@ -384,21 +375,20 @@ Func _Telegram_SendVenue($sChatId, $fLatitude, $fLongitude, $sTitle, $sAddress, 
 EndFunc ;==> _Telegram_SendVenue
 
 #cs ======================================================================================
-    Name .........: _Telegram_SendContact
-    Description...: Sends a contact to the specified chat.
-    Syntax .......: _Telegram_SendContact($sChatId, $sPhoneNumber, $sFirstName, $sLastName = "", $vCard = "", $sReplyMarkup = "", $iReplyToMessage = Null, $bDisableNotification = False)
-    Parameters....:
-                    $sChatId               - The chat ID.
-                    $sPhoneNumber          - Contact's phone number.
-                    $sFirstName            - Contact's first name.
-                    $sLastName             - [optional] Contact's last name. Default is an empty string.
-                    $vCard                 - [optional] Additional data about the contact in the form of a vCard. Default is an empty string.
-                    $sReplyMarkup          - [optional] Additional interface options. Default is an empty string.
-                    $iReplyToMessage       - [optional] ID of the message to reply to. Default is Null.
-                    $bDisableNotification  - [optional] Disables notifications if set to True. Default is False.
-    Return values.:
+    Name .......: _Telegram_SendContact
+    Description.: Sends a contact to the specified chat.
+    Parameters..:
+                    $sChatId - The chat ID.
+                    $sPhoneNumber - Contact's phone number.
+                    $sFirstName - Contact's first name.
+                    $sLastName - [optional] Contact's last name. Default is an empty string.
+                    $vCard - [optional] Additional data about the contact in the form of a vCard. Default is an empty string.
+                    $sReplyMarkup - [optional] Additional interface options. Default is an empty string.
+                    $iReplyToMessage - [optional] ID of the message to reply to. Default is Null.
+                    $bDisableNotification - [optional] Disables notifications if set to True. Default is False.
+    Return......:
                     Success - Returns the API response.
-                    Error   - Returns @error flag along with @extended flag if an error occurs.
+                    Failure - Returns @error flag along with @extended flag if an error occurs.
                                    Possible @error values:
                                       $TG_ERR_BAD_INPUT - Invalid input parameters.
                                       Other errors based on the API response.
@@ -426,20 +416,17 @@ EndFunc ;==> _Telegram_SendContact
 ; TODO: sendDice (https://core.telegram.org/bots/api#senddice)
 
 #cs ======================================================================================
-    Name .........: _Telegram_SendChatAction
-    Description...: Use this method when you need to tell the user that something is happening on the bot's side.
-                    The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
-                    Returns True on success.
-    Syntax .......: _Telegram_SendChatAction($sChatId, $sAction)
-    Parameters....:
-                    $sChatId    - Unique identifier for the target chat or username of the target channel (in the format @channelusername).
-                    $sAction    - Type of action to broadcast.
+    Name .......: _Telegram_SendChatAction
+    Description.: Use this method when you need to tell the user that something is happening on the bot's side
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat or username of the target channel (in the format @channelusername).
+                    $sAction - Type of action to broadcast.
                                   Choose one, depending on what the user is about to receive: 
                                   typing, upload_photo, record_video, upload_video, record_voice, upload_voice, 
                                   upload_document, choose_sticker, find_location, record_video_note, upload_video_note.
-    Return values.:
-                    Success     - Returns True on success.
-                    Error       - Returns Null and sets @error flag if an error occurs.
+    Return......:
+                    Success - Returns True on success.
+                    Failure - Null and sets @error flag if an error occurs.
                                   Possible @error values:
                                     $TG_ERR_BAD_INPUT - Invalid input parameters.
                                     Other errors based on the API response.
@@ -511,8 +498,8 @@ EndFunc ;==> _Telegram_SendChatAction
     Parameters..:
                     $sChatId - Unique identifier for the target chat
     Return......:
-                    Success - Returns a boolean on success, depending on the Telegram response
-                    Error   - Returns Null and sets @error flag to the encountered error code
+                    Success - A boolean on success, depending on the Telegram response
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_LeaveChat($sChatId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -526,14 +513,13 @@ Func _Telegram_LeaveChat($sChatId)
 EndFunc
 
 #cs ======================================================================================
-    Name .........: _Telegram_GetChat
-    Description...: Retrieves up-to-date information about a specific chat.
-    Syntax .......: _Telegram_GetChat($sChatId)
-    Parameters....:
-                    $sChatId               - Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-    Return values.:
-                    Success - Returns a Chat object containing information about the chat upon a successful API call
-                    Error   - Returns Null and sets @error flag to the encountered error code
+    Name .......: _Telegram_GetChat
+    Description.: Retrieves up-to-date information about a specific chat.
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+    Return......:
+                    Success - A Chat object containing information about the chat
+                    Failure - Null, sets @error/@extended to the encountered error code
                                Possible @error values:
                                   $TG_ERR_BAD_INPUT - Invalid input parameters
                                   Other errors based on the API response
@@ -557,7 +543,7 @@ EndFunc ;==> _Telegram_GetChat
                     $sChatId - Unique identifier for the target chat
     Return......:
                     Success - Array of ChatMember objects
-                    Error - Null and sets @error flag to the encountered error code
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_GetChatAdministrators($sChatId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -578,7 +564,7 @@ EndFunc
                     $sChatId - Unique identifier for the target chat
     Return......:
                     Success - Integer number of members in the chat
-                    Error - Null and sets @error flag to the encountered error code
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_GetChatMemberCount($sChatId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -600,7 +586,7 @@ EndFunc
                     $sUserId - Unique identifier of the target user
     Return......:
                     Success - ChatMember object
-                    Error - Null and sets @error flag to the encountered error code
+                    Failure - Null, sets @error/@extended to the encountered error code
 #ce ======================================================================================
 Func _Telegram_GetChatMember($sChatId, $sUserId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -681,6 +667,31 @@ EndFunc
 
 ; TODO: stopMessageLiveLocation (https://core.telegram.org/bots/api#stopmessagelivelocation) 
 
+; TODO: editMessageText (https://core.telegram.org/bots/api#editmessagetext)
+
+; TODO: editMessageCaption (https://core.telegram.org/bots/api#editmessagecaption)
+
+; TODO: editMessageMedia (https://core.telegram.org/bots/api#editmessagemedia)
+
+; TODO: editMessageLiveLocation (https://core.telegram.org/bots/api#editmessagelivelocation)
+
+; TODO: stopMessageLiveLocation (https://core.telegram.org/bots/api#stopmessagelivelocation)
+
+; TODO: editMessageReplyMarkup (https://core.telegram.org/bots/api#editmessagereplymarkup)
+
+; TODO: stopPoll (https://core.telegram.org/bots/api#stoppoll)
+
+#cs ======================================================================================
+    Name .......: _Telegram_DeleteMessage
+    Description.: Deletes a message
+    Reference...: https://core.telegram.org/bots/api#deletemessage
+    Parameters..: 
+                    $sChatId - Unique identifier for the target chat or username of the target channel
+                    $iMessageId - Identifier of the message to edit
+    Return......: 
+                    Success - An object with information about the edited message
+                    Failure - Null, sets @error/@extended to the encountered error code
+#ce ======================================================================================
 Func _Telegram_DeleteMessage($sChatId, $iMessageId)
     If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
     If ($iMessageId = "" Or $iMessageId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
@@ -694,17 +705,19 @@ Func _Telegram_DeleteMessage($sChatId, $iMessageId)
     Return $oResponse
 EndFunc ;==> _Telegram_DeleteMessage
 
+; TODO: deleteMessages (https://core.telegram.org/bots/api#deletemessages)
+
 #EndRegion
 
 #Region "Extra"
 
 #cs ===============================================================================
-    Function Name..: _Telegram_Polling
-    Description....: Wait for incoming messages
-    Syntax.........: _Telegram_Polling([$iSleep = 1000])
-    Parameter(s)...:     
-                        $iSleep - The time to wait in milliseconds between polling requests. Default is 1000 ms.
-    Return Value(s): An array of JSON objects with information about messages
+    Name .......: _Telegram_Polling
+    Description.: Wait for incoming messages
+    Parameters..:     
+                        $iSleep - The time to wait in milliseconds between polling requests
+                            (Default is 1000 ms.)
+    Return......: An array of JSON objects with information about messages
 #ce ===============================================================================
 Func _Telegram_Polling($iSleep = 1000)
     While 1
@@ -715,13 +728,13 @@ Func _Telegram_Polling($iSleep = 1000)
 EndFunc ;==> _Telegram_Polling
 
 #cs ===============================================================================
-   Function Name..:    	_CreateKeyboard
-   Description....:     Create and return a custom keyboard markup
-   Parameter(s)...:     $Keyboard: an array with the keyboard. Use an empty position for line break.
+   Name .......:    	_CreateKeyboard
+   Description.:     Create and return a custom keyboard markup
+   Parameters..:     $Keyboard: an array with the keyboard. Use an empty position for line break.
                             Example: Local $Keyboard[4] = ['Top Left','Top Right','','Second Row']
                         $Resize: Set true if you want to resize the buttons of the keyboard
                         $OneTime: Set true if you want to use the keyboard once
-   Return Value(s):		Return custom markup as string, encoded in JSON
+   Return......:		Return custom markup as string, encoded in JSON
 #ce ===============================================================================
 Func _Telegram_CreateKeyboard(ByRef $Keyboard,$Resize = False,$OneTime = False)
     ;reply_markup={"keyboard":[["Yes","No"],["Maybe"],["1","2","3"]],"one_time_keyboard":true,"resize_keyboard":true}
@@ -747,11 +760,11 @@ EndFunc ;==> _Telegram_CreateKeyboard
 #EndRegion
 
 #cs ===============================================================================
-   Function Name..:    	_Telegram_CreateInlineKeyboard
-   Description....:     Create and return a custom inline keyboard markup
-   Parameter(s)...:     $Keyboard: an array with the keyboard. Use an empty position for line break.
+   Name .......:    	_Telegram_CreateInlineKeyboard
+   Description.:     Create and return a custom inline keyboard markup
+   Parameters..:     $Keyboard: an array with the keyboard. Use an empty position for line break.
                             Example: Local $InlineKeyboard[5] = ['Button1_Text','Button1_Data','','Button2_Text','Button2_Data']
-   Return Value(s):		Return custom inline markup as string, encoded in JSON
+   Return......:		Return custom inline markup as string, encoded in JSON
 #ce ===============================================================================
 Func _Telegram_CreateInlineKeyboard(ByRef $Keyboard)
     ;reply_markup={"inline_keyboard":[[['text':'Yes','callback_data':'pressed_yes'],['text':'No','callback_data':'pressed_no']]]}
@@ -795,10 +808,10 @@ Func _Telegram_BuildCommonParams($sChatId = Null, $sParseMode = Null, $sReplyMar
 EndFunc ;==> _Telegram_BuildCommonParams
 
 #cs ===============================================================================
-   Function Name..:		_Telegram_UrlEncode
-   Description....:     Encode text in url format
-   Parameter(s)...:     $string: Text to encode
-   Return Value(s):  	Return the encoded string
+   Name .......:		_Telegram_UrlEncode
+   Description.:     Encode text in url format
+   Parameters..:     $string: Text to encode
+   Return......:  	Return the encoded string
 #ce ===============================================================================
 Func _Telegram_UrlEncode($string)
     $string = StringSplit($string, "")
@@ -813,20 +826,19 @@ EndFunc
 
 #Region "HTTP Request"
 #cs ======================================================================================
-    Name .........: _Telegram_API_Call
-    Description...: Sends a request to the Telegram API based on provided parameters
-    Syntax .......: _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
-    Parameters....:
-                    $sURL        - URL to the Telegram API
-                    $sPath       - [optional] Path to the specific API endpoint (Default is "")
-                    $sMethod     - [optional] HTTP method for the request (Default is "GET")
-                    $sParams     - [optional] Parameters for the request (Default is "")
-                    $vBody       - [optional] Body content for the request (Default is Null)
-                    $bValidate   - [optional] Boolean flag to validate Telegram response (Default is True)
-    Return values.:
-                    Success      - Returns a JSON object with the 'result' field upon
+    Name .......: _Telegram_API_Call
+    Description.: Sends a request to the Telegram API based on provided parameters
+    Parameters..:
+                    $sURL - URL to the Telegram API
+                    $sPath - [optional] Path to the specific API endpoint (Default is "")
+                    $sMethod - [optional] HTTP method for the request (Default is "GET")
+                    $sParams - [optional] Parameters for the request (Default is "")
+                    $vBody - [optional] Body content for the request (Default is Null)
+                    $bValidate - [optional] Boolean flag to validate Telegram response (Default is True)
+    Return......:
+                    Success - A JSON object with the 'result' field upon
                                    successful API call and validation
-                    Error        - Returns Null and sets @error flag according to encountered errors
+                    Failure - Null and sets @error flag according to encountered errors
 #ce ======================================================================================
 Func _Telegram_API_Call($sURL, $sPath = "", $sMethod = "GET", $sParams = "", $vBody = Null, $bValidate = True)
     ; Create HTTP request object
