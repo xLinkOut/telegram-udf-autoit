@@ -551,7 +551,26 @@ Func _Telegram_GetChatAdministrators($sChatId)
     Return $aResponse
 EndFunc
 
-; TODO: getChatMembersCount (https://core.telegram.org/bots/api#getchatmemberscount)
+#cs ======================================================================================
+    Name .......: _Telegram_GetChatMemberCount
+    Description.: Returns the number of members in a chat.
+    References..: https://core.telegram.org/bots/api#getchatmembercount
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat
+    Return......:
+                    Success - Integer number of members in the chat
+                    Error - Null and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_GetChatMemberCount($sChatId)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
+
+    Local $iResponse = _Telegram_API_Call($URL, "/getChatMemberCount", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $iResponse
+EndFunc
 
 ; TODO: getChatMember (https://core.telegram.org/bots/api#getchatmember)
 
