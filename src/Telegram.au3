@@ -572,7 +572,29 @@ Func _Telegram_GetChatMemberCount($sChatId)
     Return $iResponse
 EndFunc
 
-; TODO: getChatMember (https://core.telegram.org/bots/api#getchatmember)
+#cs ======================================================================================
+    Name .......: _Telegram_GetChatMember
+    Description.: Returns information about a member of a chat.
+    References..: https://core.telegram.org/bots/api#getchatmember
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat
+                    $sUserId - Unique identifier of the target user
+    Return......:
+                    Success - ChatMember object
+                    Error - Null and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_GetChatMember($sChatId, $sUserId)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+    If ($sUserId = "" Or $sUserId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
+    $sParams &= "&user_id=" & $sUserId
+
+    Local $oResponse = _Telegram_API_Call($URL, "/getChatMember", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $oResponse
+EndFunc
 
 ; TODO: setChatStickerSet (https://core.telegram.org/bots/api#setchatstickerset)
 
