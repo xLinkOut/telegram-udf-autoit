@@ -504,7 +504,26 @@ EndFunc ;==> _Telegram_SendChatAction
 
 ; TODO: unpinAllChatMessages (https://core.telegram.org/bots/api#unpinallchatmessages)
 
-; TODO: leaveChat (https://core.telegram.org/bots/api#leavechat)
+#cs ======================================================================================
+    Name .......: _Telegram_LeaveChat
+    Description.: Use this method for your bot to leave a group, supergroup or channel.
+    Reference ..: https://core.telegram.org/bots/api#leavechat
+    Parameters..:
+                    $sChatId - Unique identifier for the target chat
+    Return......:
+                    Success - Returns a boolean on success, depending on the Telegram response
+                    Error   - Returns Null and sets @error flag to the encountered error code
+#ce ======================================================================================
+Func _Telegram_LeaveChat($sChatId)
+    If ($sChatId = "" Or $sChatId = Null) Then Return SetError($TG_ERR_BAD_INPUT, 0, Null)
+
+    Local $sParams = _Telegram_BuildCommonParams($sChatId)
+
+    Local $bResponse = _Telegram_API_Call($URL, "/leaveChat", "GET", $sParams)
+    If (@error) Then Return SetError(@error, @extended, Null)
+
+    Return $bResponse
+EndFunc
 
 #cs ======================================================================================
     Name .........: _Telegram_GetChat
