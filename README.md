@@ -1,4 +1,4 @@
-# Telegram UDFs for AutoIt
+# Telegram Bot UDFs for AutoIt
 A collection of user defined functions to seamlessly control your Telegram Bot with AutoIt.
 It support [most](https://github.com/xLinkOut/telegram-udf-autoit/wiki/Supported-APIs) of the Telegram Bot API and offer a whole set of useful features to interact with them.
 
